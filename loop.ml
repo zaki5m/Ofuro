@@ -1,13 +1,5 @@
 open Mahjong_base
 (*Manzu,Pinzu,Souzu*)
-let s_a = [|[|0;0;0;1;0;0;1;1;0|];
-            [|0;1;0;1;1;1;1;0;1|];
-            [|0;2;0;1;1;0;0;0;0|]
-          |]
-
-          
-let zi = [|0;0;0;0;0;0;0|]
-
 
 let tyuren_a = [|[|4;1;1;1;1;1;1;1;3|];
                  [|3;2;1;1;1;1;1;1;3|];
@@ -47,7 +39,7 @@ let ten_tumo_oya ten =
 let ten_tumo_ko ten =
   if ten mod 200 = 0 then
     let oya = ten/2 in
-    if oya mod 2 = 0 then
+    if oya mod 200 = 0 then
       (oya,oya/2)
     else
       (oya,(oya+100)/2)
@@ -445,14 +437,48 @@ let agari lst zi_lst =
   else
     false
 
+let count_agari zi_lst m = 
+  let n = List.length zi_lst in
+  let rec loop i tmp = 
+    let x = List.nth zi_lst i in
+    let tmp =
+      if x = Toitu then
+        tmp + 2
+      else 
+        tmp + 3 
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  let tmp =
+    if n = 0 then
+      0
+    else
+      loop (n-1) 0
+  in
+  if (tmp + m) = 14 then
+    true
+  else
+    false
+
+
+
+
+
 let tenpai_to_mati s_ary zi_ary =
-  let rec loop' i j ary lst zi_lst =
+  let rec loop' i j ary lst zi_lst = 
     let n = ary.(i).(j) in
     let ary2 = Array.map (fun x -> Array.copy x) ary in
     ary2.(i).(j) <- n+1;
+    let m = Array.fold_left (fun x y -> x + Array.fold_left (fun a b -> a + b) 0 y) 0 ary2 in
     let lst = 
       if agari (lp ary2 zi_lst) zi_lst = true then
-        (i,j)::lst
+        if count_agari zi_lst m then
+          (i,j)::lst
+        else
+          lst
       else
         if titoitu ary2 zi_lst = true then
           (i,j)::lst
@@ -601,24 +627,22 @@ let rm_syuntu ary =
         ary.(i+2) <- n3;
         1)
     in
-
-    if i = 6 then
+    if n = 0 then
+      loop' ary (i)
+    else if i = 6 then
       let x = ary.(0) + ary.(1) + ary.(2) + ary.(3) + ary.(4) + ary.(5) + ary.(6) + ary.(7) + ary.(8) in
       if x = 2 then
         tatu_to_mati ary
       else
         Ns
     else
-      if n = 0 then
-        loop' ary (i)
-      else
         loop' ary (i+1)
     in
   let rec loop2' ary i =
     let n1 = ary.(i) in
     let n2 = ary.(i-1) in
     let n3 = ary.(i-2) in
-    let _ =
+    let n =
       if n1 > 0 && n2 > 0 && n3 >0 then
         (ary.(i) <- n1-1;
         ary.(i-1) <- n2-1;
@@ -630,10 +654,10 @@ let rm_syuntu ary =
         ary.(i-2) <- n3;
         1)
     in
-  
-    if i = 2 then
-      let x = ary.(0) + ary.(1) + ary.(2) + ary.(3) + ary.(4) + ary.(5) + ary.(6) + ary.(7) + ary.(8) in
-      if x = 2 then
+    if n = 0 then
+      loop2' ary (i)
+    else if i = 2 then
+      let x = ary.(0) + ary.(1) + ary.(2) + ary.(3) + ary.(4) + ary.(5) + ary.(6) + ary.(7) + ary.(8) in      if x = 2 then
         tatu_to_mati ary
       else
         Ns
@@ -679,18 +703,19 @@ let rm_mentu ary =
 let head_mati_same ary x y =
   let n = ary.(x) in
   let m = ary.(y) in
+  let ary2 = Array.copy ary in
   if x = y then
     if n >= 3 then
-      (ary.(x) <- n-3;
-      let lst = rm_mentu ary in
+      (ary2.(x) <- n-3;
+      let lst = rm_mentu ary2 in
       let lst = List.filter (fun x -> x <> Ns) lst in
       Tanki::lst)
     else
       [Tanki]
   else
-    (ary.(y) <- m-2;
-    ary.(x) <- n-1;
-    let lst = rm_mentu ary in
+    (ary2.(y) <- m-2;
+    ary2.(x) <- n-1;
+    let lst = rm_mentu ary2 in
     let lst = List.filter (fun x -> x <> Ns) lst in
     lst)
 
@@ -742,12 +767,13 @@ let find_mati ary (a,b) zi_lst zi_ary =
           head_mati_same ary2.(a) b y
         else
           head_mati_diff ary2.(a) b
-    in
-    if n = 0 then
-      ((x,y),lst)::m_lst
-    else
-      f h_lst (n-1) (((x,y),lst)::m_lst)
-    in
+      in
+      let lst = List.filter (fun c -> c <> Ns) lst in
+      if n = 0 then
+        ((x,y),lst)::m_lst
+      else
+        f h_lst (n-1) (((x,y),lst)::m_lst)
+      in
     if n2 = 0 then
       []
     else
@@ -781,6 +807,7 @@ let possible_head ary =
 
 let possible_head_list lst lst2 =
   let m = List.length lst in
+  let m2 = List.length lst2 in
   let rec loop' lst lst2 n lst3 =
     let lst3 = 
       if List.nth lst n <> [] then
@@ -794,6 +821,8 @@ let possible_head_list lst lst2 =
       loop' lst lst2 (n-1) lst3
   in
   if m = 0 then
+    []
+  else if m <> m2 then
     []
   else
     loop' lst lst2 (m-1) []
@@ -826,42 +855,84 @@ let yaku_kotu lst =
   in
   y_lst
 
+let combination_list r xs =
+  let rec comb r xs a b =
+    match (r, xs) with
+      (0, _) -> (List.rev a) :: b
+    | (_, []) -> b
+    | (_, y::ys) -> comb (r - 1) ys (y::a) (comb r ys a b)
+  in
+    comb r xs [] []
+
+
+let tapl_to_kotu ary x = 
+  let rec loop i j tmp = 
+    let tmp = 
+      if ary.(i).(j) >= 3 then
+        (i,j)::tmp
+      else
+        tmp
+    in
+    if i = 2 then
+      if j = 8 then
+        tmp
+      else
+        loop i (j+1) tmp
+    else
+      if j = 8 then
+        loop (i+1) 0 tmp
+      else
+        loop i (j+1) tmp
+    in
+  if x = 0 then
+    []
+  else
+    let lst = loop 0 0 [] in
+    if x = List.length lst then
+      [lst]
+    else
+      combination_list x lst
+
+
+
+
 let ary_to_tapl ary a b =
-  let ary2 = Array.map (fun x -> Array.copy x) ary in
-  let rec loop' i j ary a lst=
-    let n = ary.(i).(j) in
+  let ary3 = Array.map (fun x -> Array.copy x) ary in
+  let c_lst = tapl_to_kotu ary3 b in
+  let rec loop' i j ary2 a lst=
+    let n = ary2.(i).(j) in
     let lst = 
       if a > 0 then
         if n >= 1 then
           if n = 2 then
-            (ary.(i).(j) <- n - 2;
-            let n1 = ary.(i).(j+1) in
-            let n2 = ary.(i).(j+2) in
-            ary.(i).(j+1) <- n1 - 2;
-            ary.(i).(j+2) <- n2 - 2;
+            (ary2.(i).(j) <- n - 2;
+            let n1 = ary2.(i).(j+1) in
+            let n2 = ary2.(i).(j+2) in
+            ary2.(i).(j+1) <- n1 - 2;
+            ary2.(i).(j+2) <- n2 - 2;
             (i,(j,j+1,j+2))::(i,(j,j+1,j+2))::lst)
           else
             if n = 1 then
-              (ary.(i).(j) <- n - 1;
-              let n1 = ary.(i).(j+1) in
-              let n2 = ary.(i).(j+2) in
-              ary.(i).(j+1) <- n1 - 1;
-              ary.(i).(j+2) <- n2 - 1;
+              (ary2.(i).(j) <- n - 1;
+              let n1 = ary2.(i).(j+1) in
+              let n2 = ary2.(i).(j+2) in
+              ary2.(i).(j+1) <- n1 - 1;
+              ary2.(i).(j+2) <- n2 - 1;
               (i,(j,j+1,j+2))::lst)
             else
               if n = 3 then
-                (ary.(i).(j) <- n - 3;
-                let n1 = ary.(i).(j+1) in
-                let n2 = ary.(i).(j+2) in
-                ary.(i).(j+1) <- n1 - 3;
-                ary.(i).(j+2) <- n2 - 3;
+                (ary2.(i).(j) <- n - 3;
+                let n1 = ary2.(i).(j+1) in
+                let n2 = ary2.(i).(j+2) in
+                ary2.(i).(j+1) <- n1 - 3;
+                ary2.(i).(j+2) <- n2 - 3;
                 (i,(j,j+1,j+2))::(i,(j,j+1,j+2))::(i,(j,j+1,j+2))::lst)
               else
-                  (ary.(i).(j) <- n - 4;
-                  let n1 = ary.(i).(j+1) in
-                  let n2 = ary.(i).(j+2) in
-                  ary.(i).(j+1) <- n1 - 4;
-                  ary.(i).(j+2) <- n2 - 4;
+                  (ary2.(i).(j) <- n - 4;
+                  let n1 = ary2.(i).(j+1) in
+                  let n2 = ary2.(i).(j+2) in
+                  ary2.(i).(j+1) <- n1 - 4;
+                  ary2.(i).(j+2) <- n2 - 4;
                   (i,(j,j+1,j+2))::(i,(j,j+1,j+2))::(i,(j,j+1,j+2))::(i,(j,j+1,j+2))::lst)
         else
           lst
@@ -879,71 +950,40 @@ let ary_to_tapl ary a b =
       if j = 6 then
         lst
       else
-        loop' i (j+1) ary a lst
+        loop' i (j+1) ary2 a lst
     else
       if j = 6 then
-        loop' (i+1) 0 ary a lst
+        loop' (i+1) 0 ary2 a lst
       else
-        loop' i (j+1) ary a lst
+        loop' i (j+1) ary2 a lst
   in
 
-
-
-  let rec loop2' i j ary a b lst =
-    let n = ary.(i).(j) in
-    let lst = 
-      if b > 0 then
-        if n >= 3 then
-          if j >= 7 then
-            (ary.(i).(j) <- n - 3;
-            (i,(j,j,j))::lst)
-          else
-            if ary.(i).(j) = ary.(i).(j+1) && ary.(i).(j) = ary.(i).(j+2) then
-              if b >= 3 then
-                (ary.(i).(j) <- n - 3;
-                (i,(j,j,j))::lst)
-              else
-                lst
-            else
-              (ary.(i).(j) <- n - 3;
-              (i,(j,j,j))::lst)
-        else
-          lst
+  let rec loop2' i a b =
+    let ary2 = Array.map (fun x -> Array.copy x) ary in
+    let tmp = List.nth c_lst i in
+    let rec mini_loop j lst l_tmp = 
+      let tmp2 = List.nth lst j in
+      let (x,y) = tmp2 in
+      let l_tmp = (x,(y,y,y))::l_tmp in
+      let n = ary2.(x).(y) in
+      ary2.(x).(y) <- n-3;
+      if j = 0 then
+        l_tmp
       else
-        lst
+        mini_loop (j-1) lst l_tmp
     in
-    let b = 
-      if b <> 0 then
-        if n >= 3 then
-          if j >= 7 then
-            b - 1
-          else
-            if ary.(i).(j) = ary.(i).(j+1) && ary.(i).(j) = ary.(i).(j+2) then
-              if b >= 3 then
-                b - 1
-              else
-                b
-            else
-              b - 1
-        else
-          b
-      else
-        b
-    in
-
-    if i = 2 then
-      if j = 8 then
-        let lst2 = loop' 0 0 ary a lst in
-        lst2
-      else
-        loop2' i (j+1) ary a b lst
-    else
-      if j = 8 then
-        loop2' (i+1) 0 ary a b lst
-      else
-        loop2' i (j+1) ary a b lst
+    let l_tmp = mini_loop ((List.length tmp)-1) tmp [] in
+    let lst2 = loop' 0 0 ary2 a l_tmp in
+    if List.length lst2 = (a+b) then
+       lst2
+    else 
+      loop2' (i-1) a b
   in
-  loop2' 0 0 ary2 a b []
+  let m = List.length c_lst in
+  if m = 0 then
+    loop' 0 0 ary3 a []
+  else
+    loop2' (m-1) a b
 
 let zi_to_tapl ary =
   let rec loop' i ary lst =
@@ -993,39 +1033,42 @@ let hantei_mentu ary zi_ary lst =
 
 
 let sansyoku lst =
-  let (a1,b1) = List.nth lst 0 in
-  let (a2,b2) = List.nth lst 1 in
-  let (a3,b3) = List.nth lst 2 in
-  let (a4,b4) = List.nth lst 3 in
-  if b1 = b2 then
-    if b1 = b3 then
-      if a1 = 2 && a2 = 1 && a3 = 0 then
-        let (x,y,z) = b1 in
-        if x = y then
-          [Sansyokudoukou]
+  if List.length lst = 4 then 
+    let (a1,b1) = List.nth lst 0 in
+    let (a2,b2) = List.nth lst 1 in
+    let (a3,b3) = List.nth lst 2 in
+    let (a4,b4) = List.nth lst 3 in
+    if b1 = b2 then
+      if b1 = b3 then
+        if a1 = 2 && a2 = 1 && a3 = 0 then
+          let (x,y,z) = b1 in
+          if x = y then
+            [Sansyokudoukou]
+          else
+            [Sansyokudouzyun]
         else
-          [Sansyokudouzyun]
+          []
+      else if b1 = b4 then
+        if a1 = 2 && a2 = 1 && a4 = 0 then
+          let (x,y,z) = b1 in
+          if x = y then
+            [Sansyokudoukou]
+          else
+            [Sansyokudouzyun]
+        else
+          []
       else
         []
-    else if b1 = b4 then
-      if a1 = 2 && a2 = 1 && a4 = 0 then
-        let (x,y,z) = b1 in
-        if x = y then
-          [Sansyokudoukou]
+    else if b2 = b3 then
+      if b2 = b4 then
+        if a2 = 2 && a3 = 1 && a4 = 0 then
+          let (x,y,z) = b1 in
+          if x = y then
+            [Sansyokudoukou]
+          else
+            [Sansyokudouzyun]
         else
-          [Sansyokudouzyun]
-      else
-        []
-    else
-      []
-  else if b2 = b3 then
-    if b2 = b4 then
-      if a2 = 2 && a3 = 1 && a4 = 0 then
-        let (x,y,z) = b1 in
-        if x = y then
-          [Sansyokudoukou]
-        else
-          [Sansyokudouzyun]
+          []
       else
         []
     else
@@ -1035,68 +1078,77 @@ let sansyoku lst =
 
 
 let peiko lst = 
-  let (a1,b1) = List.nth lst 0 in
-  let (a2,b2) = List.nth lst 1 in
-  let (a3,b3) = List.nth lst 2 in
-  let (a4,b4) = List.nth lst 3 in
-  let n =
-    if b1 = b2 && a1 = a2 then
-      if b3 = b4 && a3 = a4 then
-        [Ryanpeikou]
-      else
+  if List.length lst = 4 then
+    let (a1,b1) = List.nth lst 0 in
+    let (a2,b2) = List.nth lst 1 in
+    let (a3,b3) = List.nth lst 2 in
+    let (a4,b4) = List.nth lst 3 in
+    let n =
+      if b1 = b2 && a1 = a2 then
+        if b3 = b4 && a3 = a4 then
+          [Ryanpeikou]
+        else
+          [Ipeiko]
+      else if b1 = b3 && a1 = a3 then
+        if b2 = b4 && a2 = a4 then
+          [Ryanpeikou]
+        else
+          [Ipeiko]
+      else if b1 = b4 && a1 = a4 then
+        if b2 = b3 && a2 = a3 then
+          [Ryanpeikou]
+        else
+          [Ipeiko]
+      else if b2 = b3 && a2 = a3 then
         [Ipeiko]
-    else if b1 = b3 && a1 = a3 then
-      if b2 = b4 && a2 = a4 then
-        [Ryanpeikou]
-      else
+      else if b2 = b4 && a2 = a4 then
         [Ipeiko]
-    else if b1 = b4 && a1 = a4 then
-      if b2 = b3 && a2 = a3 then
-        [Ryanpeikou]
-      else
+      else if b3 = b4 && a3 = a4 then
         [Ipeiko]
-    else if b2 = b3 && a2 = a3 then
-      [Ipeiko]
-    else if b2 = b4 && a2 = a4 then
-      [Ipeiko]
-    else if b3 = b4 && a3 = a4 then
-      [Ipeiko]
-    else
-      []
-  in
-  n
+      else
+        []
+    in
+    n
+  else
+    []
     
-let tyanta lst head=
-  let (a1,(b1,_,c1)) = List.nth lst 0 in
-  let (a2,(b2,_,c2)) = List.nth lst 1 in
-  let (a3,(b3,_,c3)) = List.nth lst 2 in
-  let (a4,(b4,_,c4)) = List.nth lst 3 in
-  let (h1,_) = head in
-  if  a1 <> 3 && a2 <> 3 && a3 <> 3 && a4 <> 3 && h1 <> 3 then 
-    if ((b1 = 0 && c1 = 0)||(b1 = 8 && c1 = 8)) && ((b2 = 0 && c2 = 0) ||(b2 = 8 && c2 = 8)) && ((b3 = 0 && c3 = 0) || (b3 = 8 && c3 = 8)) && ((b4 = 0 && c4 = 0) || (b4 = 8 && c4 = 8)) then
-      [Tinroutou]
-    else if (b1 = 0 || c1 = 8) && (b2 = 0 || c2 = 8) && (b3 = 0 || c3 = 8) && (b4 = 0 || c4 = 8) then
-      [Zyuntyan]
-    else
-      []
-  else if (a1 = 3 || (b1 = 0 && c1 = 0)||(b1 = 8 && c1 = 8)) && (a2 = 3 || (b2 = 0 && c2 = 0) ||(b2 = 8 && c2 = 8)) && (a3 = 3 || (b3 = 0 && c3 = 0) || (b3 = 8 && c3 = 8)) && (a4 = 3 || (b4 = 0 && c4 = 0) || (b4 = 8 && c4 = 8)) then
-    [Honroutou]
-  else 
-    if (b1 = 0 || c1 = 8 || a1 = 3) && (b2 = 0 || c2 = 8 || a2 = 3) && (b3 = 0 || c3 = 8 || a3 = 3) && (b4 = 0 || c4 = 8 || a4 = 3) then
-      [Tyanta]
-    else
-      []
+let tyanta lst head =
+  if List.length lst = 4 then
+    let (a1,(b1,_,c1)) = List.nth lst 0 in
+    let (a2,(b2,_,c2)) = List.nth lst 1 in
+    let (a3,(b3,_,c3)) = List.nth lst 2 in
+    let (a4,(b4,_,c4)) = List.nth lst 3 in
+    let (h1,_) = head in
+    if  a1 <> 3 && a2 <> 3 && a3 <> 3 && a4 <> 3 && h1 <> 3 then 
+      if ((b1 = 0 && c1 = 0)||(b1 = 8 && c1 = 8)) && ((b2 = 0 && c2 = 0) ||(b2 = 8 && c2 = 8)) && ((b3 = 0 && c3 = 0) || (b3 = 8 && c3 = 8)) && ((b4 = 0 && c4 = 0) || (b4 = 8 && c4 = 8)) then
+        [Tinroutou]
+      else if (b1 = 0 || c1 = 8) && (b2 = 0 || c2 = 8) && (b3 = 0 || c3 = 8) && (b4 = 0 || c4 = 8) then
+        [Zyuntyan]
+      else
+        []
+    else if (a1 = 3 || (b1 = 0 && c1 = 0)||(b1 = 8 && c1 = 8)) && (a2 = 3 || (b2 = 0 && c2 = 0) ||(b2 = 8 && c2 = 8)) && (a3 = 3 || (b3 = 0 && c3 = 0) || (b3 = 8 && c3 = 8)) && (a4 = 3 || (b4 = 0 && c4 = 0) || (b4 = 8 && c4 = 8)) then
+      [Honroutou]
+    else 
+      if (b1 = 0 || c1 = 8 || a1 = 3) && (b2 = 0 || c2 = 8 || a2 = 3) && (b3 = 0 || c3 = 8 || a3 = 3) && (b4 = 0 || c4 = 8 || a4 = 3) then
+        [Tyanta]
+      else
+        []
+  else
+    []
 
 let tanyao lst head =
-  let (a1,(b1,_,c1)) = List.nth lst 0 in
-  let (a2,(b2,_,c2)) = List.nth lst 1 in
-  let (a3,(b3,_,c3)) = List.nth lst 2 in
-  let (a4,(b4,_,c4)) = List.nth lst 3 in
-  let (h1,h2) = head in
-  if a1 <> 3 && a2 <> 3 && a3 <> 3 && a4 <> 3 && h1 <> 3 then
-    if b1 <> 0 && b2 <> 0 && b3 <> 0 && b4 <> 0 && h2 <> 0 then
-      if c1 <> 8 && c2 <> 8 && c3 <> 8 && c4 <> 8 && h2 <> 8 then
-        [Tanyao]
+  if List.length lst = 4 then
+    let (a1,(b1,_,c1)) = List.nth lst 0 in
+    let (a2,(b2,_,c2)) = List.nth lst 1 in
+    let (a3,(b3,_,c3)) = List.nth lst 2 in
+    let (a4,(b4,_,c4)) = List.nth lst 3 in
+    let (h1,h2) = head in
+    if a1 <> 3 && a2 <> 3 && a3 <> 3 && a4 <> 3 && h1 <> 3 then
+      if b1 <> 0 && b2 <> 0 && b3 <> 0 && b4 <> 0 && h2 <> 0 then
+        if c1 <> 8 && c2 <> 8 && c3 <> 8 && c4 <> 8 && h2 <> 8 then
+          [Tanyao]
+        else
+          []
       else
         []
     else
@@ -1589,7 +1641,12 @@ let yaku_to_han lst naki =
     else
       loop' (n-1) (h_lst'::h_lst)
   in
-  let x = loop' (m-1) [] in
+  let x = 
+    if m = 0 then
+      []
+    else
+      loop' (m-1) [] 
+  in
   let rec add_han n lst2 =
     let tmp = List.nth x n in
     let lst2 = (List.fold_left (fun a b -> a + b) 0 tmp)::lst2 in
@@ -1598,7 +1655,10 @@ let yaku_to_han lst naki =
     else
       add_han (n-1) lst2
   in
-  add_han (m-1) []
+  if x = [] then
+    []
+  else
+    add_han (m-1) []
 
 let opt_man han =
   if han = 5 then
@@ -1948,7 +2008,7 @@ let tehai_to_yaku ary zi_ary lst mati zi_kaze ba_kaze naki oya min_lst f_lst yak
   let zi_lst = hantei_zi zi_ary in
   let rec loop' n new_lst =
     let (a,b) = List.nth lst n in
-    let m_lst = hantei_mentu ary zi_ary (a,b) in
+    let m_lst =  hantei_mentu ary zi_ary (a,b) in
     let tmp = opt_yaku ary zi_ary b m_lst a mati zi_kaze ba_kaze naki zi_lst oya min_lst f_lst yaku_lst dora_lst in
     let new_lst = tmp::new_lst in
     if n = 0 then
@@ -2116,7 +2176,7 @@ let kokushi_ten ary zi_ary (a,b) oya =
   else
     ((a,b),(0,0))
 
-
+(*ary,zi_aryはf_lstの物は加えない*)
 let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int*(int*int*int)))list) (yaku_lst:Mahjong_base.yaku list) dora_lst =
   let oya = if zi_kaze = 0 then true else false in 
   let ary2 = Array.map (fun x -> Array.copy x) ary in
@@ -2144,6 +2204,3 @@ let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int
     []
   else
     loop' (m-1) []
-
-    
-  

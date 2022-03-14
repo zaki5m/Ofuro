@@ -240,6 +240,160 @@ let serch_kanzen_anpai ary zi_ary sutehai_lst player =
   let lst3 = sutehai_common_hai ary zi_ary sutehai_lst player in
   lst1@lst2@lst3
 
+let same_hai count = match count with
+  | 0 -> 0
+  | 1 -> 1
+  | 2 -> 3
+  | _ -> 0
+
+let anzen_s_ary ary (x,y) = 
+  if y >= 2 && y <= 6 then
+    let n1 = ary.(x).(y-2) in
+    let n2 = ary.(x).(y-1) in
+    let n3 = ary.(x).(y+1) in
+    let n4 = ary.(x).(y+2) in
+    let o_n1 = n1*n2 in
+    let o_n2 = n2*n3 in
+    let o_n3 = n3*n4 in
+    let o_n4 = same_hai ary.(x).(y) in
+    o_n1 + o_n2 + o_n3 + o_n4
+  else if y = 1 then
+    let n2 = ary.(x).(y-1) in
+    let n3 = ary.(x).(y+1) in
+    let n4 = ary.(x).(y+2) in
+    let o_n2 = n2*n3 in
+    let o_n3 = n3*n4 in
+    let o_n4 = same_hai ary.(x).(y) in
+    o_n2 + o_n3 + o_n4
+  else if y = 0 then
+    let n3 = ary.(x).(y+1) in
+    let n4 = ary.(x).(y+2) in
+    let o_n3 = n3*n4 in
+    let o_n4 = same_hai ary.(x).(y) in
+    o_n3 + o_n4
+  else if y = 7 then
+    let n1 = ary.(x).(y-2) in
+    let n2 = ary.(x).(y-1) in
+    let n3 = ary.(x).(y+1) in
+    let o_n1 = n1*n2 in
+    let o_n2 = n2*n3 in
+    let o_n4 = same_hai ary.(x).(y) in
+    o_n1 + o_n2 + o_n4
+  else
+    let n1 = ary.(x).(y-2) in
+    let n2 = ary.(x).(y-1) in
+    let o_n1 = n1*n2 in
+    let o_n4 = same_hai ary.(x).(y) in
+    o_n1 + o_n4
 
 
-  
+
+
+let anzen ary zi_ary k_lst = 
+  let m = List.length k_lst in
+  let rec loop i tmp = 
+    let hai = List.nth k_lst i in
+    let (x,y) = hai_to_ary hai in
+    let tmp =
+      if x = 3 then
+        (same_hai zi_ary.(y)) + tmp
+      else
+        (anzen_s_ary ary (x,y)) + tmp
+    in
+    if i = 1 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if m <= 1 then
+    0
+  else
+    loop (m-1) 0
+
+let kyoutu_anpai sutehai_lst tehai player =
+  let tehai_len = List.length tehai in
+  let rec loop i tmp = 
+     let x = List.nth tehai i in
+     let p = 
+      if player = 0 then
+        0
+      else
+      if List.exists (fun (a,b,c) -> if (a,b) = x then true else false) (List.nth sutehai_lst 0) then
+        1
+      else
+        0
+    in
+    let p = 
+      if player = 1 then
+        p
+      else
+      if List.exists (fun (a,b,c) -> if (a,b) = x then true else false) (List.nth sutehai_lst 1) then
+        p + 1
+      else
+        p
+    in
+    let p = 
+      if player = 0 then
+        p
+      else
+      if List.exists (fun (a,b,c) -> if (a,b) = x then true else false) (List.nth sutehai_lst 0) then
+        p+1
+      else
+        p
+    in
+    let p = 
+      if player = 0 then
+        p
+      else
+      if List.exists (fun (a,b,c) -> if (a,b) = x then true else false) (List.nth sutehai_lst 0) then
+        p+1
+      else
+        p
+    in
+    let tmp = (x,p)::tmp in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+    in
+    loop (tehai_len -1) []
+
+let player_anpai sutehai tehai =
+  let m = List.length tehai in
+  let rec loop i tmp = 
+    let x = List.nth tehai i in
+    let tmp =
+      if List.exists (fun (a,b,c) -> if (a,b) = x then true else false) sutehai then
+        x::tmp
+      else
+        tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if  m = 0 then
+    []
+  else
+    loop (m-1) []
+
+
+let other_reach yaku_lst sutehai_lst tehai player =  
+  let rec loop i tmp = 
+    let reach = List.nth yaku_lst i in 
+    let tmp = 
+      if reach <> [] then
+        player_anpai (List.nth sutehai_lst i)
+      else
+        tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  loop 3 tehai
+
+
+

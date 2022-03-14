@@ -408,7 +408,12 @@ let serch_koritsu lst m =
     else
       loop (i-1) tmp
   in
-  let ary = loop (n-1) [] in
+  let ary = 
+    if n = 0 then
+      []
+    else
+      loop (n-1) [] 
+  in
   let ary = Array.concat ary in
   let lst = Array.to_list ary in
   lst
@@ -477,10 +482,14 @@ let koritsu_zi lst =
     else
       loop (i-1) tmp
   in
-  loop (n-1) []
+  if n = 0 then
+    []
+  else
+    loop (n-1) []
 
 
 let koritsu_suhai lst x = 
+  let n = List.length lst in
   let rec loop i tmp = 
     let tmp = 
       if List.nth lst i <> 0 then
@@ -493,7 +502,10 @@ let koritsu_suhai lst x =
     else
       loop (i-1) tmp
   in
-  loop 8 []
+  if n = 0 then
+    []
+  else
+    loop (n-1) []
 
 
 
@@ -569,10 +581,10 @@ let opt_yukouhai lst ary zi_ary=
   if  m = 0 then
     (-1,(1,Not_hai))
   else
-    loop (m-1) (30,(1,Manzu))
+    loop (m-1) (30,(1,Not_hai))
 
 (*mentsu,mentsukouho*)
-let mentsu_kouho m_lst p_lst s_lst zi_lst = 
+let mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len = 
   let m_ary = lst_to_ary_type m_lst in
   let p_ary = lst_to_ary_type p_lst in
   let s_ary = lst_to_ary_type s_lst in
@@ -584,7 +596,7 @@ let mentsu_kouho m_lst p_lst s_lst zi_lst =
   let n = (xm+xp+xs+xzi,ym+yp+ys+yzi) in
   let (x,y) = opt_kouho [n] in
   let lst = koritsu m p s zi in
-  (lst,8-(x*2+y))
+  (lst,8-((x+f_lst_len)*2+y))
 
 
 
@@ -603,10 +615,14 @@ let opt_syanten lst =
     else
       loop' (i-1) tmp
   in
-  loop' (m-1) 8
+  if m = 0 then
+    8
+  else
+    loop' (m-1) 8
 
 
 let common_syanten lst = 
+  let f_lst_len = (14 - (List.length lst))/3 in
   let (ary,zi_ary) = list_to_ary lst in
   let h_lst = (possible_head ary)@(find_head_zi zi_ary) in
   let m = List.length h_lst in
@@ -617,19 +633,19 @@ let common_syanten lst =
     let tmp = 
       if y = Manzu then
         let lst = d_tehai (d_tehai m_lst (x,y)) (x,y) in
-        let (a,b) = mentsu_kouho lst p_lst s_lst zi_lst in
+        let (a,b) = mentsu_kouho lst p_lst s_lst zi_lst f_lst_len in
         (a,b-1)::tmp
       else if y = Pinzu then
         let lst = d_tehai (d_tehai p_lst (x,y)) (x,y) in
-        let (a,b) = mentsu_kouho m_lst lst s_lst zi_lst in
+        let (a,b) = mentsu_kouho m_lst lst s_lst zi_lst f_lst_len in
         (a,b-1)::tmp
       else if y = Souzu then
         let lst = d_tehai (d_tehai s_lst (x,y)) (x,y) in
-        let (a,b) = mentsu_kouho m_lst p_lst lst zi_lst in
+        let (a,b) = mentsu_kouho m_lst p_lst lst zi_lst f_lst_len in
         (a,b-1)::tmp
       else 
         let lst = d_tehai (d_tehai zi_lst (x,y)) (x,y) in
-        let (a,b) = mentsu_kouho m_lst p_lst s_lst lst in
+        let (a,b) = mentsu_kouho m_lst p_lst s_lst lst f_lst_len in
         (a,b-1)::tmp
       in
     if i = 0 then
@@ -638,10 +654,10 @@ let common_syanten lst =
       loop' (i-1) tmp
     in
   if m = 0 then
-    mentsu_kouho m_lst p_lst s_lst zi_lst
+    mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len
   else
     let sy_lst = loop' (m-1) [] in
-    let n = mentsu_kouho m_lst p_lst s_lst zi_lst in
+    let n = mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len in
     let sy_lst = n::sy_lst in
     let sy_lst' = List.map (fun (_,b) -> b) sy_lst in
     let n = opt_syanten sy_lst' in
@@ -717,18 +733,18 @@ let create_table sutehai_lst tehai =
 
 
 
-let hai_eff_select sutehai_lst tehai yaku_lst player = 
+let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player = 
   let (lst,n) = syanten tehai in
   let (_,n') = common_syanten tehai in
   let (ary,zi_ary) = create_table sutehai_lst tehai in
-  let anpai_lst = serch_kanzen_anpai ary zi_ary sutehai_lst player in
-  print_list anpai_lst;
+  let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst ary zi_ary in
   let (d,trush) = opt_yukouhai lst ary zi_ary in
   let rec loop i k_hai = 
     let a = List.nth tehai i in
     let tmp = d_tehai tehai a in
     if k_hai = (1,Not_hai) then
-      if (syanten tmp) = (lst,n) then
+      let (_,m) = syanten tmp in
+      if m = n then
         i
       else
         if i = 0 then
@@ -738,16 +754,21 @@ let hai_eff_select sutehai_lst tehai yaku_lst player =
     else
       if k_hai = a then
         i
+      else if i = 0 then
+        0
       else
         loop (i-1) k_hai
 
   in
   if List.exists (fun a -> a = Reach || a = Doublereach) yaku_lst = true then
     tumogiri tehai
-  else if n = n' && d <> -1 then
+  else if n = n' && d <> -1 && trush <> (1,Not_hai) then
     loop ((List.length tehai) - 1) trush
   else
     loop ((List.length tehai) - 1) (1,Not_hai)
 
 
 
+(*let _ = 
+  let (_,n)  = syanten [(1,Manzu);(2,Manzu);(4,Manzu);(5,Manzu);(8,Manzu);(4,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(2,Souzu);(4,Souzu);(5,Souzu);(8,Souzu);(3,Pinzu)] in
+  Printf.printf "%d\n" n;*)
