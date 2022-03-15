@@ -331,6 +331,27 @@ let anzen_f ary zi_ary k_lst =
   else
     loop (m-1) 0
 
+let tehai_to_anzen ary zi_ary tehai = 
+  let m = List.length tehai in
+  let rec loop i tmp = 
+    let (x,y) = List.nth tehai i in
+    let (x',y') = hai_to_ary (x,y) in
+    let tmp = 
+      if x = 3 then
+        ((x,y),same_hai zi_ary.(y'))::tmp
+      else
+        ((x,y),(anzen_s_ary ary (x',y')))::tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then
+    []
+  else
+    loop (m-1) []
+
 
 let kyoutu_anpai sutehai_lst tehai player =
   let tehai_len = List.length tehai in

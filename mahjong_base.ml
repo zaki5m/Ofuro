@@ -395,5 +395,20 @@ let possible_furo_patern tehai (x,y) =
       p_f_lst
 
 
+let exist_reach yaku_lst player =
+  let p_r = List.nth yaku_lst player in
+  let x = 
+    if List.exists (fun a -> a = Reach || a = Doublereach) p_r then
+      1
+    else
+      0
+  in
+  let lst = List.filter (fun ls -> (List.exists (fun a -> a = Reach || a = Doublereach) ls) = true) yaku_lst in
+  let m = List.length lst in
+  if m = x then
+    false
+  else
+    true
+
 
 
