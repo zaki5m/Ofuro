@@ -133,7 +133,7 @@ let hantei_zi array =
     let n = array.(i) in 
     let lst =
       if n >= 2 then
-        if n = 3 then
+        if n >= 3 then
           Anko::list
         else
         Toitu::list
@@ -254,6 +254,54 @@ let hantei_koutu array =
   in
     loop 0 0 array list 12
 
+let koutu_count ary anko_lst = 
+  let rec loop i j tmp = 
+    let tmp = 
+      if ary.(i).(j) = 3 then
+        tmp+1    
+      else
+        tmp
+    in
+    if i = 2 then
+      if j = 8 then
+        tmp
+      else
+        loop i (j+1) tmp
+    else
+      if j = 8 then
+        loop (i+1) 0 tmp
+      else
+        loop i (j+1) tmp
+  in
+  let x = loop 0 0 0 in
+  let m = List.length anko_lst in
+  let rec loop2 i tmp = 
+    let lst = List.nth anko_lst i in
+    let y = List.length (List.filter (fun a -> a = Anko) lst) in
+    let tmp = 
+      if x = y-1 then
+        if List.hd lst  = Anko then
+          (List.tl lst)::tmp
+        else
+          lst::tmp
+      else
+        lst::tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop2 (i-1) tmp
+  in
+  if m = 0 then
+    []
+  else
+    loop2 (m-1) []
+
+
+
+
+
+
 let lp array zi_lst= 
   let list = [] in
   let rec loop' i j array list zi_lst = 
@@ -299,6 +347,7 @@ let lp array zi_lst=
     if (List.exists (fun x -> x = Toitu) zi_lst) = true then
       let lst = hantei_koutu array in
       let lst = check_Anko lst in
+      let lst = koutu_count array lst in
       let lst2 = remove_to zi_lst in
       let lst3 = add_state lst lst2 in
       let lst3 = add_state_head lst3 Toitu in

@@ -310,6 +310,28 @@ let anzen ary zi_ary k_lst =
   else
     loop (m-1) 0
 
+let anzen_f ary zi_ary k_lst = 
+  let m = List.length k_lst in
+  let rec loop i tmp = 
+    let hai = List.nth k_lst i in
+    let (x,y) = hai_to_ary hai in
+    let tmp =
+      if x = 3 then
+        (same_hai zi_ary.(y)) + tmp
+      else
+        (anzen_s_ary ary (x,y)) + tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then
+    0
+  else
+    loop (m-1) 0
+
+
 let kyoutu_anpai sutehai_lst tehai player =
   let tehai_len = List.length tehai in
   let rec loop i tmp = 

@@ -121,6 +121,50 @@ let hai_to_ary (x,y) =
     else
       (2,x-1)
 
+let ary_to_hai_ex (x,y) n = 
+  let rec loop i tmp = 
+    let tmp = (ary_to_hai (x,y))::tmp in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if n = 0 then
+    []
+  else
+    loop (n-1) []
+
+let ary_to_list ary zi_ary = 
+  let rec loop i j tmp = 
+    let n =  ary.(i).(j) in
+    let tmp =
+      (ary_to_hai_ex (i,j) n)@tmp
+    in
+    if i = 0 then
+      if j = 0 then
+        tmp
+      else
+        loop i (j-1) tmp
+    else
+      if j = 0 then
+        loop (i-1) 8 tmp
+      else
+        loop i (j-1) tmp
+  in
+  let rec loop2 i tmp = 
+    let n =  zi_ary.(i) in
+    let tmp =
+      (ary_to_hai_ex (3,i) n)@tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop2 (i-1) tmp
+  in
+  (loop 2 8 [])@(loop2 6 [])
+    
+
+
 let rec d_tehai list (x,y) = match list with
   | [] -> []
   | [(x1,y1)] -> if (x1,y1) = (x,y) then [] else [(x1,y1)]
