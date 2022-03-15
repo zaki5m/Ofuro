@@ -379,6 +379,29 @@ let minus_kitaiti t_lst p_lst =
   in
   loop (m-1) []
 
+
+let minus_kitaiti_f t_lst p_lst = 
+  let m = List.length p_lst in
+  let rec loop i tmp = 
+    let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = List.nth p_lst i in
+    print_list current_tehai;
+    Printf.printf "%d\n" anzendo;
+    let k_n = List.length k_lst in
+    let k_hai = List.nth k_lst (k_n-1) in
+    let minus_lst = List.filter (fun (a,b,c,d,e,f,g) -> 
+                                      let a_n = List.length a in
+                                      let a_hai = List.nth a (a_n-1) in
+                                      a_hai = k_hai) t_lst in
+    let minus_kitaiti = List.fold_left (fun g (a',b',c',d',e',f',g') -> g +. g') 0.0 minus_lst in
+    Printf.printf "%f\n" minus_kitaiti;
+    let tmp = (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti)::tmp in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  loop (m-1) []
+
 let opt_kitaiti p_lst = 
   let m = List.length p_lst in
   let rec loop i tmp = 
@@ -395,6 +418,18 @@ let opt_kitaiti p_lst =
     []
   else
     loop (m-1) []
+
+let max_kitaiti tenpai_lst = 
+  let rec loop lst tmp = match lst with
+    | [] -> tmp
+    | h::t -> let (_,_,_,_,_,_,_,_,_,j) = h in
+              let (_,_,_,_,_,_,_,_,_,j') = tmp in
+              if j > j' then
+                loop t h
+              else
+                loop t tmp
+  in
+  loop tenpai_lst ([],[],[],[],0.0,0.0,0.0,0.0,0.0,-100.0)
 
 
 (*(k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti)*)    
@@ -413,16 +448,18 @@ let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst =
     else
       loop (i-1) tmp
   in
+  Printf.printf "dstep0\n"; flush stdout;
   let tenpai_lst = loop (m-1) [] in
+  Printf.printf "dstep1\n"; flush stdout;
   let tenpai_lst = tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
+  Printf.printf "dstep1\n"; flush stdout;
   let (o_current_tehai,o_agariritu,o_kitaiti) = opt_tenpai_form tenpai_lst in
   let p_lst = List.filter (fun (a,b,c,d,e,f,g) -> d = o_current_tehai) tenpai_lst in
   let t_lst = List.filter (fun (a,b,c,d,e,f,g) -> d <> o_current_tehai) tenpai_lst in
   let p_lst = List.map (fun (a,b,c,d,e,f,g) -> (a,b,c,d,e,f,g,(anzen ary zi_ary a))) p_lst in
   let p_lst = minus_kitaiti t_lst p_lst in
   let p_lst = opt_kitaiti p_lst in
-  let p_lst = List.sort (fun (a,b,c,d,e,f,g,h,i,j) (a',b',c',d',e',f',g',h',i',j') -> if j < j' then -1 else 1) p_lst in
-  List.hd p_lst
+  max_kitaiti p_lst
 
 
 
@@ -459,7 +496,7 @@ let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora
     let (xa,ya) = hai_to_ary (x,y) in
     let n_tehai =
       if s = Minko then
-        let n_tehai = List.filter (fun z -> z = (x,y)) tehai in
+        let n_tehai = List.filter (fun z -> z <> (x,y)) tehai in
         let n_tehai = 
           if (n-2) = List.length n_tehai then
             n_tehai
@@ -481,7 +518,9 @@ let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora
           let n_tehai = d_tehai n_tehai (c+1,y) in
           n_tehai
     in
+    Printf.printf "sstep1\n"; flush stdout;
     let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti) = col_tenpai ary zi_ary n_tehai yama_len n_f_lst zi_kaze ba_kaze true dora_lst in
+    Printf.printf "sstep2\n"; flush stdout;
     let tmp = ((agariritu,kitaiti),(s,(a,(b,c,d))))::tmp in
     if i = 0 then
       tmp
@@ -544,11 +583,8 @@ let col_tenpai_f ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst t
   let tenpai_lst = tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
   let (o_current_tehai,o_agariritu,o_kitaiti) = opt_tenpai_form tenpai_lst in
   let p_lst = List.filter (fun (a,b,c,d,e,f,g) -> d = o_current_tehai) tenpai_lst in
-  let t_lst = List.filter (fun (a,b,c,d,e,f,g) -> d <> o_current_tehai) tenpai_lst in
   let p_lst = List.map (fun (a,b,c,d,e,f,g) -> (a,b,c,d,e,f,g,(anzen_f ary zi_ary a))) p_lst in
-  let p_lst = minus_kitaiti t_lst p_lst in
-  let p_lst = opt_kitaiti p_lst in
-  let p_lst = List.sort (fun (a,b,c,d,e,f,g,h,i,j) (a',b',c',d',e',f',g',h',i',j') -> if j < j' then -1 else 1) p_lst in
+  let p_lst = List.sort (fun (a,b,c,d,e,f,g,h) (a',b',c',d',e',f',g',h') -> if f < f' then -1 else 1) p_lst in
   List.hd p_lst
         
 
@@ -559,15 +595,25 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
   let (ary,zi_ary) = create_table sutehai_lst tehai in
   let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst ary zi_ary in
   let p_f_lst = possible_furo_patern tehai (x,y) in
+  Printf.printf "step1\n"; flush stdout;
   let f_kitaiti_lst = f_kitaiti p_f_lst tehai (List.nth furo_lst player) (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst in
+  Printf.printf "step2\n"; flush stdout;
   let tenpai_lst = operate_tenapai_ritu_f ary zi_ary tehai in
+  Printf.printf "step3\n"; flush stdout;
   let not_naki = col_tenpai_f ary zi_ary tehai yama_len (List.nth furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
+  Printf.printf "step4\n"; flush stdout;
   List.iter (fun((a,b),(c,(d,(e,f,g)))) -> Printf.printf "%f,%f (%d %d %d)" a b e f g;) f_kitaiti_lst;
-  let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti) = not_naki in
-  Printf.printf "%f,%f, %f" agariritu kitaiti total_kitaiti;
+  Printf.printf "step5\n"; flush stdout;
+  let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
+  Printf.printf "%f,%f\n" agariritu kitaiti;
   nofuro()
 
-  
+(*let reach_defence ary zi_ary yaku_lst sutehai_lst tehai player = 
+  let n_tehai = other_reach yaku_lst sutehai_lst tehai player in
+  let a_lst = tehai_to_anzen ary zi_ary n_tehai in
+  a_lst
+*)
+
 
 
 
