@@ -343,13 +343,13 @@ let possible_furo_patern tehai (x,y) =
     else if x = 2 then
       let p_f_lst =
         if List.exists (fun a -> a = (1,y)) tmp && List.exists (fun a -> a = (3,y)) tmp then
-          (Syuntu,(xa,(1,2,3)))::p_f_lst
+          (Syuntu,(xa,(0,1,2)))::p_f_lst
         else
           p_f_lst
       in
       let p_f_lst =
         if List.exists (fun a -> a = (3,y)) tmp && List.exists (fun a -> a = (4,y)) tmp then
-          (Syuntu,(xa,(2,3,4)))::p_f_lst
+          (Syuntu,(xa,(1,2,3)))::p_f_lst
         else
           p_f_lst
       in
