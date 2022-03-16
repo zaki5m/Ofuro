@@ -893,7 +893,7 @@ let furo_inq2 lst ary_lst sutehai_lst furo_lst yaku_lst yama_len ba kyoku naki_l
     let (m,n) = List.nth lst i in
     let (ary,zi_ary) = List.nth ary_lst m in
     let tmp =
-      if n <> [] then
+      if n <> [] && (List.nth yaku_lst m) = [] then
         let tehai = ary_to_list ary zi_ary in
         let zi_kaze = kyoku_to_kaze kyoku m in
         let len = what_furo n sutehai_lst tehai furo_lst yaku_lst m yama_len zi_kaze ba (List.nth naki_lst m) dora_lst (x,y)in
