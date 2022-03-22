@@ -495,6 +495,8 @@ let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst =
 
   
 let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst = 
+  let yaku = List.nth yaku_lst player in
+  let reach_q = List.exists (fun a -> List.exists (fun b -> b = Reach || b = Doublereach) a) yaku_lst in
   let (_,n) = syanten tehai in
   let n' = titoi_syanten tehai in
   let (ary,zi_ary) = create_table sutehai_lst tehai in
@@ -503,19 +505,25 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
   let rm_wan = (yama_len-14) in
   let tumo_l = (rm_wan)/4 in
   let rm_wan = Int.to_float rm_wan in
-  if List.exists (fun a -> a = Reach || a = Doublereach) yaku_lst = true then
+  if List.exists (fun a -> a = Reach || a = Doublereach) yaku = true then
     tumogiri tehai 
   else if n = 0 then
-    let (x,_) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary in
+    let (x,_) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku dora_lst ary zi_ary in
     x
   else if n > 3 || (n = n' && n' = 3) then
+    if reach_q = true then
+      reach_defence ary zi_ary yaku_lst sutehai_lst tehai player
+    else
     hai_eff_select sutehai_lst tehai furo_lst yaku_lst player
   else
-    let (a,b,c,d,e,f,g,h,i,j) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
-    Printf.printf "coltenpaie\n"; flush stdout;
-    let a_len = List.length a in
-    let x = List.nth a (a_len-1) in
-    hai_to_int tehai x
+    if reach_q = true then
+      reach_defence ary zi_ary yaku_lst sutehai_lst tehai player
+    else
+      let (a,b,c,d,e,f,g,h,i,j) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
+      Printf.printf "coltenpaie\n"; flush stdout;
+      let a_len = List.length a in
+      let x = List.nth a (a_len-1) in
+      hai_to_int tehai x
 
 (*(agariritu,kitaiti),furohai*)
 let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst =
@@ -633,7 +641,8 @@ let col_tenpai_f ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst t
     
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) = 
   let (_,n) = syanten tehai in
-  if n = 0 then
+  let tumo_len = yama_len/4 in
+  if n = 0 || tumo_len = 0 then
     nofuro()
   else if n < 3 then
     let (x,y) = ary_to_hai (x,y) in
@@ -656,11 +665,8 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
   else
     nofuro()
 
-(*let reach_defence ary zi_ary yaku_lst sutehai_lst tehai player = 
-  let n_tehai = other_reach yaku_lst sutehai_lst tehai player in
-  let a_lst = tehai_to_anzen ary zi_ary n_tehai in
-  a_lst
-*)
+
+
 
 
 

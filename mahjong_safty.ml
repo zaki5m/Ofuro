@@ -286,7 +286,50 @@ let anzen_s_ary ary (x,y) =
     let o_n4 = same_hai ary.(x).(y) in
     o_n1 + o_n4
 
+let max_anzen lst = 
+  let m = List.length lst in
+  let rec loop i tmp = 
+    let ((a,b),c) = List.nth lst i in
+    let ((a',b'),c') = tmp in
+    let tmp = 
+      if c' < c then
+        ((a,b),c)
+      else
+        tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then
+    ((0,Not_hai),-1)
+  else
+    loop (m-1) ((0,Not_hai),-1)
 
+
+let minimum_anzen lst = 
+  let m = List.length lst in
+  let rec loop i tmp = 
+    let ((a,b),c) = List.nth lst i in
+    let ((a',b'),c') = tmp in
+    let tmp = 
+      if c' > c then
+        ((a,b),c)
+      else
+        tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then
+    ((0,Not_hai),-1)
+  else
+    loop (m-1) ((0,Not_hai),-1)
+
+   
 
 
 let anzen ary zi_ary k_lst = 
@@ -336,8 +379,9 @@ let tehai_to_anzen ary zi_ary tehai =
   let rec loop i tmp = 
     let (x,y) = List.nth tehai i in
     let (x',y') = hai_to_ary (x,y) in
+    Printf.printf "%d, %d\n"x' y'; flush stdout;
     let tmp = 
-      if x = 3 then
+      if x' = 3 then
         ((x,y),same_hai zi_ary.(y'))::tmp
       else
         ((x,y),(anzen_s_ary ary (x',y')))::tmp
@@ -422,12 +466,12 @@ let player_anpai sutehai tehai =
     loop (m-1) []
 
 
-let other_reach yaku_lst sutehai_lst tehai player =  
+let other_reach yaku_lst sutehai_lst tehai =  
   let rec loop i tmp = 
     let reach = List.nth yaku_lst i in 
     let tmp = 
       if reach <> [] then
-        player_anpai (List.nth sutehai_lst i)
+        player_anpai (List.nth sutehai_lst i) tmp
       else
         tmp
     in
@@ -438,5 +482,14 @@ let other_reach yaku_lst sutehai_lst tehai player =
   in
   loop 3 tehai
 
-
+let reach_defence ary zi_ary yaku_lst sutehai_lst tehai player = 
+  let n_tehai = other_reach yaku_lst sutehai_lst tehai in
+  if n_tehai = [] then
+    let a_tehai = tehai_to_anzen ary zi_ary tehai in
+    let ((a,b),c) = minimum_anzen a_tehai in
+    hai_to_int tehai (a,b)
+  else
+    let a_lst = tehai_to_anzen ary zi_ary n_tehai in
+    let ((a,b),c) = max_anzen a_lst in
+    hai_to_int tehai (a,b)
 

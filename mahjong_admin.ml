@@ -589,9 +589,9 @@ let kiriban tehai_lst sutehai_lst ary_lst (x,y) player f_lst naki (yaku_lst:Mahj
     t_format tehai_lst f_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst;
     let n = 
       if player = 0 then
-        prob_select sutehai_lst tehai f_lst (List.nth yaku_lst player) player yama_len zi_kaze ba naki dora_lst 
+        prob_select sutehai_lst tehai f_lst yaku_lst player yama_len zi_kaze ba naki dora_lst 
       else
-        hai_eff_select sutehai_lst tehai f_lst (List.nth yaku_lst player) player
+        hai_eff_select sutehai_lst tehai f_lst yaku_lst player
     in
     Printf.printf "%d\n" n;
     if n < 0 && (List.length tehai) <= n then
