@@ -734,6 +734,8 @@ let create_table sutehai_lst tehai =
 
 
 let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player = 
+  let yaku = List.nth yaku_lst player in
+  let reach_q = List.exists (fun a -> List.exists (fun b -> b = Reach || b = Doublereach) a) yaku_lst in
   let (lst,n) = syanten tehai in
   let (_,n') = common_syanten tehai in
   let (ary,zi_ary) = create_table sutehai_lst tehai in
@@ -760,8 +762,10 @@ let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player =
         loop (i-1) k_hai
 
   in
-  if List.exists (fun a -> a = Reach || a = Doublereach) yaku_lst = true then
+  if List.exists (fun a -> a = Reach || a = Doublereach) yaku = true then
     tumogiri tehai
+  else if reach_q = true then
+    reach_defence ary zi_ary yaku_lst sutehai_lst tehai player
   else if n = n' && d <> -1 && trush <> (1,Not_hai) then
     loop ((List.length tehai) - 1) trush
   else
