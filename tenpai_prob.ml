@@ -491,6 +491,184 @@ let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst =
   Printf.printf "dstep7\n"; flush stdout;
   max_kitaiti p_lst
 
+let mode_kokushi ary zi_ary k_lst = 
+  let k_lst = tehai_to_anzen ary zi_ary k_lst in
+  let m = List.length k_lst in
+  let rec loop i tmp = 
+    let ((x,y),z) = List.nth k_lst i in
+    let ((x',y'),z') = tmp in
+    let tmp = 
+      if z' < z then
+        ((x,y),z)
+      else
+        tmp
+    in
+    if i = 0 then
+      let (x,_) = tmp in
+      x
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then
+    (1,Not_hai)
+  else
+    loop (m-1) (List.hd k_lst)
+
+let mode_somete ary zi_ary tehai s_hai =
+  let n_tehai = List.filter (fun (a,b) -> b <> s_hai) tehai in
+  let n_tehai = List.filter (fun (a,b) -> a <> 0 ) n_tehai in
+  let n_tehai = tehai_to_anzen ary zi_ary n_tehai in
+  let m = List.length n_tehai in
+  let rec loop i tmp = 
+    let ((x,y),z) = List.nth n_tehai i in
+    let ((x',y'),z') = tmp in
+    let tmp = 
+      if z' < z then
+        ((x,y),z)
+      else
+        tmp
+    in
+    if i = 0 then
+      let (x,_) = tmp in
+      x
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then
+    (1,Not_hai)
+  else
+    loop (m-1) (List.hd n_tehai)
+
+(*anzen_baseの処理未実装*)
+let mode_titoi ary zi_ary t_lst tehai = 
+  let t_lst = tehai_to_anzen ary zi_ary t_lst in
+  let m = List.length t_lst in
+  let rec loop i tmp = 
+    let ((x,y),z) = List.nth t_lst i in
+    let ((x',y'),z') = tmp in
+    let tmp = 
+      if z' < z then
+        ((x,y),z)
+      else
+        tmp
+    in
+    if i = 0 then
+      let (x,_) = tmp in
+      x
+    else
+      loop (i-1) tmp
+  in
+  let k_hai = 
+    if m = 0 then
+      (1,Not_hai)
+    else
+      loop (m-1) (List.hd t_lst)
+  in
+  k_hai
+
+
+let mode_common_b ary zi_ary sutehai_lst tehai player = 
+  let (_,n) = syanten tehai in
+  let m = List.length tehai in
+  let rec loop i tmp = 
+    let x = List.nth tehai i in
+    let n_tehai = d_tehai tehai x in 
+    let (_,n') = syanten n_tehai in 
+    let tmp = 
+      if n = n' then
+        if anzen_base ary zi_ary n_tehai sutehai_lst player then
+          x::tmp
+        else
+          tmp
+      else
+        tmp
+    in 
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  let k_lst = 
+    if m = 0 then
+      [] 
+    else
+      loop (m-1) []
+  in
+  if k_lst = [] then 
+    let n_tehai = tehai_to_anzen ary zi_ary tehai in
+    let ((x,y),z) = max_anzen n_tehai in
+    (x,y)
+  else
+    let n_tehai = tehai_to_anzen ary zi_ary k_lst in
+    let ((x,y),z) = max_anzen n_tehai in
+    (x,y)
+
+
+let common_b ary zi_ary tehai sutehai_lst tumo_len f_lst dora_lst player = 
+  let (_,n) = syanten tehai in
+  if tumo_len >= n then
+    let (k_lst,kind_k) = kind_kokushi tehai in
+    let (s_hai,s_count) = somete tehai f_lst in
+    let (t_lst,t_count) = titoi_allow tehai f_lst in
+    let mode = 
+      if kind_k >= 9 then
+        Kokushi
+      else if s_count >= 9 then
+        Some
+      else if t_count >= 3 then
+        Titoi
+      else
+        CommonB
+    in
+    let k_hai = 
+      if mode = Kokushi then
+        mode_kokushi ary zi_ary k_lst
+      else if mode = Some then 
+        mode_somete ary zi_ary tehai s_hai
+      else if mode = Titoi then
+        mode_titoi ary zi_ary t_lst tehai
+      else
+        mode_common_b ary zi_ary sutehai_lst tehai player
+    in
+    hai_to_int tehai k_hai
+  else
+    let yaku_lst = 
+      if player = 0 then 
+        [[];[Reach];[Reach];[Reach]]
+      else if player = 1 then
+        [[Reach];[];[Reach];[Reach]]
+      else if player = 2 then
+        [[Reach];[Reach];[];[Reach]]
+      else
+        [[Reach];[Reach];[Reach];[]]
+    in
+    reach_defence ary zi_ary yaku_lst sutehai_lst tehai 
+
+
+
+let mode_choice count tumo_len = 
+  if tumo_len > 15 then
+    if count <= 3 then
+      true
+    else
+      false 
+  else if tumo_len > 12 then
+    if count <= 2 then
+      true
+    else
+      false 
+  else if tumo_len > 9 then
+    if count <= 1 then
+      true
+    else
+      false  
+  else 
+    if count = 0 then 
+      true
+    else
+      false
+
+
 
 
   
@@ -505,25 +683,28 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
   let rm_wan = (yama_len-14) in
   let tumo_l = (rm_wan)/4 in
   let rm_wan = Int.to_float rm_wan in
-  if List.exists (fun a -> a = Reach || a = Doublereach) yaku = true then
-    tumogiri tehai 
-  else if n = 0 then
-    let (x,_) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku dora_lst ary zi_ary in
-    x
-  else if n > 3 || (n = n' && n' = 3) then
-    if reach_q = true then
-      reach_defence ary zi_ary yaku_lst sutehai_lst tehai player
+  if mode_choice n tumo_l then 
+    if List.exists (fun a -> a = Reach || a = Doublereach) yaku = true then
+      tumogiri tehai 
+    else if n = 0 then
+      let (x,_) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku dora_lst ary zi_ary in
+      x
+    else if n > 3 || (n = n' && n' = 3) then
+      if reach_q = true then
+        reach_defence ary zi_ary yaku_lst sutehai_lst tehai 
+      else
+      hai_eff_select sutehai_lst tehai furo_lst yaku_lst player
     else
-    hai_eff_select sutehai_lst tehai furo_lst yaku_lst player
+      if reach_q = true then
+        reach_defence ary zi_ary yaku_lst sutehai_lst tehai 
+      else
+        let (a,b,c,d,e,f,g,h,i,j) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
+        Printf.printf "coltenpaie\n"; flush stdout;
+        let a_len = List.length a in
+        let x = List.nth a (a_len-1) in
+        hai_to_int tehai x
   else
-    if reach_q = true then
-      reach_defence ary zi_ary yaku_lst sutehai_lst tehai player
-    else
-      let (a,b,c,d,e,f,g,h,i,j) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
-      Printf.printf "coltenpaie\n"; flush stdout;
-      let a_len = List.length a in
-      let x = List.nth a (a_len-1) in
-      hai_to_int tehai x
+    common_b ary zi_ary tehai sutehai_lst tumo_l f_lst dora_lst player
 
 (*(agariritu,kitaiti),furohai*)
 let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst =
@@ -664,7 +845,6 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
     nofuro()
   else
     nofuro()
-
 
 
 

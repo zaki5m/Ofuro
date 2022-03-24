@@ -379,7 +379,6 @@ let tehai_to_anzen ary zi_ary tehai =
   let rec loop i tmp = 
     let (x,y) = List.nth tehai i in
     let (x',y') = hai_to_ary (x,y) in
-    Printf.printf "%d, %d\n"x' y'; flush stdout;
     let tmp = 
       if x' = 3 then
         ((x,y),same_hai zi_ary.(y'))::tmp
@@ -397,53 +396,159 @@ let tehai_to_anzen ary zi_ary tehai =
     loop (m-1) []
 
 
+(*((int*hai)*int) List -> ((int*hai)*int*bool List) List*)    
 let kyoutu_anpai sutehai_lst tehai player =
   let tehai_len = List.length tehai in
-  let rec loop i tmp = 
-     let x = List.nth tehai i in
-     let p = 
+  let rec loop i tmp_s = 
+    let ((x,y),z) = List.nth tehai i in
+    let kyoutu_lst = 
       if player = 0 then
-        0
-      else
-      if List.exists (fun (a,b,c) -> if (a,b) = x then true else false) (List.nth sutehai_lst 0) then
-        1
-      else
-        0
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 3) then
+            [true]
+          else
+            [false]
+        in
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 2) then
+            true::tmp
+          else
+            false::tmp
+        in
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 1) then
+            true::tmp
+          else
+            false::tmp
+        in
+        tmp
+      else if player = 1 then
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 3) then
+            [true]
+          else
+            [false]
+        in
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 2) then
+            true::tmp
+          else
+            false::tmp
+        in
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 0) then
+            true::tmp
+          else
+            false::tmp
+        in
+        tmp
+      else if player = 2 then
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 3) then
+            [true]
+          else
+            [false]
+        in
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 1) then
+            true::tmp
+          else
+            false::tmp
+        in
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 0) then
+            true::tmp
+          else
+            false::tmp
+        in
+        tmp
+      else 
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 2) then
+            [true]
+          else
+            [false]
+        in
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 1) then
+            true::tmp
+          else
+            false::tmp
+        in
+        let tmp = 
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 0) then
+            true::tmp
+          else
+            false::tmp
+        in
+        tmp
     in
-    let p = 
-      if player = 1 then
-        p
-      else
-      if List.exists (fun (a,b,c) -> if (a,b) = x then true else false) (List.nth sutehai_lst 1) then
-        p + 1
-      else
-        p
-    in
-    let p = 
-      if player = 0 then
-        p
-      else
-      if List.exists (fun (a,b,c) -> if (a,b) = x then true else false) (List.nth sutehai_lst 0) then
-        p+1
-      else
-        p
-    in
-    let p = 
-      if player = 0 then
-        p
-      else
-      if List.exists (fun (a,b,c) -> if (a,b) = x then true else false) (List.nth sutehai_lst 0) then
-        p+1
-      else
-        p
-    in
-    let tmp = (x,p)::tmp in
+    let tmp_s = ((x,y),z,kyoutu_lst)::tmp_s in
     if i = 0 then
+      tmp_s
+    else
+      loop (i-1) tmp_s
+    in
+    loop (tehai_len -1) []
+
+let bool_kyoutu_anpai n_tehai = 
+  let m = List.length n_tehai in
+  let rec loop i tmp = 
+    let ((_,_),_,a) = List.nth n_tehai i in
+    let n1 = List.nth a 2 in
+    let n2 = List.nth a 1 in
+    let n3 = List.nth a 0 in
+    let (s3,s2,s1) = tmp in
+    let s1 = if n1 = true then true else s1 in
+    let s2 = if n2 = true then true else s2 in
+    let s3 = if n3 = true then true else s3 in
+    let tmp = (s3,s2,s1) in
+    if i = 0 then 
       tmp
     else
       loop (i-1) tmp
+  in
+  if m = 0 then
+    false
+  else
+    let kyoutu_a = loop (m-1) (false,false,false) in
+    if kyoutu_a = (true,true,true) then
+      true
+    else
+      false
+
+let second_anzen n_tehai = 
+  let m = List.length n_tehai in
+  let rec loop i m4 m10 = 
+    let ((_,_),a,_) = List.nth  n_tehai i in
+    let m4 = 
+      if a <= 4 then
+        m4 + 1 
+      else
+        m4
     in
-    loop (tehai_len -1) []
+    let m10 = 
+      if a <= 10 then
+        m10 + 1
+      else
+        m10
+    in
+    if i = 0 then
+      (m4,m10)
+    else
+      loop (i-1) m4 m10
+  in
+  if m = 0 then
+    false
+  else
+    let (m4,m10) = loop (m-1) 0 0 in
+    if m4 >=1 && m10 >= 2 then
+      true
+    else
+      false
+
+
+
 
 let player_anpai sutehai tehai =
   let m = List.length tehai in
@@ -482,7 +587,7 @@ let other_reach yaku_lst sutehai_lst tehai =
   in
   loop 3 tehai
 
-let reach_defence ary zi_ary yaku_lst sutehai_lst tehai player = 
+let reach_defence ary zi_ary yaku_lst sutehai_lst tehai = 
   let n_tehai = other_reach yaku_lst sutehai_lst tehai in
   if n_tehai = [] then
     let a_tehai = tehai_to_anzen ary zi_ary tehai in
@@ -493,3 +598,16 @@ let reach_defence ary zi_ary yaku_lst sutehai_lst tehai player =
     let ((a,b),c) = max_anzen a_lst in
     hai_to_int tehai (a,b)
 
+let anzen_base ary zi_ary tehai sutehai_lst player = 
+  let n_tehai1 = tehai_to_anzen ary zi_ary tehai in
+  let n_tehai2 = kyoutu_anpai sutehai_lst n_tehai1 player in
+  let x = 
+    if List.exists (fun ((a,b),c,d) -> c <= 1) n_tehai2 then
+      true
+    else
+      bool_kyoutu_anpai n_tehai2
+  in
+  if x = true then
+    second_anzen n_tehai2
+  else
+    false

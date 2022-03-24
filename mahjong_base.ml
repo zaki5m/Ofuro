@@ -6,6 +6,8 @@ type yaku = Reach | Ippatu | Menzentumo | Yakuhai | Tanyao | Pinhu | Ipeiko | Ha
             | Doublereach | Sansyokudouzyun | Sansyokudoukou | Sanankou | Ikkitukan | Titoitu | Toitoi | Tyanta | Sankantu | Syousangen
             | Honroutou | Ryanpeikou | Zyuntyan | Honitu | Tinitu | Suankou | Daisangen | Kokusimusou | Ryuiso | Tuiso | Tinroutou
             | Sukantu | Syoususi | Daisusi | Tyurenpoutou | Tihou | Tenhou
+type mode_b = Kokushi | Some | Titoi | CommonB
+
 
 let rename (m, n) = match n with
   | Manzu -> (Int.to_string m) ^ "m" 
@@ -297,6 +299,8 @@ let autoreach () =
 
 let suzi_lst = [(1,4);(2,5);(3,6);(4,7);(5,8);(6,9)]
 
+let kokushi_lst = [(1,Manzu);(9,Manzu);(1,Pinzu);(9,Pinzu);(1,Souzu);(9,Souzu);(0,Ton);(0,Nan);(0,Sya);(0,Pei);(0,Haku);(0,Hatsu);(0,Tyun)]
+
 let suzi s = match s with
   | 1 -> [(1,4)]
   | 2 -> [(2,5)]
@@ -409,6 +413,125 @@ let exist_reach yaku_lst player =
     false
   else
     true
+
+let kind_kokushi tehai = 
+  let m = List.length tehai in
+  let rec loop i k_tmp h_tmp = 
+    let x = List.nth tehai i in
+    let (k_tmp,h_tmp) = 
+      if List.exists (fun a -> a = x) h_tmp then
+        let h_tmp = List.filter (fun a -> a <> x) h_tmp in
+        (k_tmp,h_tmp)
+      else
+        let k_tmp = x::k_tmp in
+        (k_tmp,h_tmp)
+    in
+    if i = 0 then
+      (k_tmp,h_tmp)
+    else
+      loop (i-1) k_tmp h_tmp
+  in
+  if m = 0 then
+    ([],13)
+  else
+    let (k_tmp,h_tmp) = loop (m-1) [] kokushi_lst in
+    let n = List.length h_tmp in
+    let n = 13 - n in
+    (k_tmp,n)
+
+let furo_kind f_lst =
+  let m = List.length f_lst in
+  let rec loop i tmp = 
+    let (a,(b,(c,d,e))) = List.nth f_lst i in
+    let tmp = 
+      if b = 3 then
+        tmp
+      else
+        b::tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then
+    []
+  else
+    loop (m-1) []
+
+let which_some n_count m_count p_count s_count = 
+  let (hai,count) = 
+    if m_count > p_count then
+      if m_count > s_count then
+        (Manzu,m_count)
+      else
+        (Souzu,s_count)
+    else
+      if p_count > s_count then
+        (Pinzu,p_count)
+      else
+        (Souzu,s_count)
+  in
+  (hai,(n_count-count))
+
+
+
+let somete tehai f_lst = 
+  let k_furo = furo_kind f_lst in
+  let k = if k_furo = [] then 3 else (List.hd k_furo) in
+  let k_furo = List.for_all (fun a -> a = k) k_furo in
+  if k_furo = true then
+    let no_zi_lst = List.filter (fun (a,b) -> a = 0) tehai in
+    let n = List.length no_zi_lst in
+    let m_lst = List.filter (fun (a,b) -> b = Manzu) no_zi_lst in
+    let p_lst = List.filter (fun (a,b) -> b = Pinzu) no_zi_lst in
+    let s_lst = List.filter (fun (a,b) -> b = Souzu) no_zi_lst in
+    let m_count = List.length m_lst in
+    let p_count = List.length p_lst in
+    let s_count = List.length s_lst in
+    let some_c = 
+      if k = 0 then
+        (Manzu,(14 - (n-m_count))) 
+      else if k = 1 then
+        (Pinzu,(14 - (n-p_count)))
+      else if k = 2 then
+        (Souzu,(14 - (n-s_count)))
+      else
+        let (hai,count) = which_some n m_count p_count s_count in
+        (hai,(14-count))
+    in
+    some_c
+  else
+    (Ton,0)
+
+
+let titoi_allow tehai f_lst = 
+  let m = List.length tehai in
+  let rec loop i tmp count = 
+    let x = List.nth tehai i in
+    let count = 
+      if List.exists (fun a -> a = x) tmp then
+        count + 1
+      else
+        count
+    in
+    let tmp = 
+      if List.exists (fun a -> a = x) tmp then
+        d_tehai tmp x
+      else
+        x::tmp
+    in
+    if i = 0 then
+      (tmp,count)
+    else
+      loop (i-1) tmp count
+  in
+  if m = 0 || f_lst <> [] then
+    ([],0)
+  else
+    loop (m-1) [] 0
+
+    
 
 
 
