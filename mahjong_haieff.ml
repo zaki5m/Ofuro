@@ -765,7 +765,7 @@ let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player =
   if List.exists (fun a -> a = Reach || a = Doublereach) yaku = true then
     tumogiri tehai
   else if reach_q = true then
-    reach_defence ary zi_ary yaku_lst sutehai_lst tehai player
+    reach_defence ary zi_ary yaku_lst sutehai_lst tehai 
   else if n = n' && d <> -1 && trush <> (1,Not_hai) then
     loop ((List.length tehai) - 1) trush
   else
