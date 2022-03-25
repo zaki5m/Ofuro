@@ -254,8 +254,33 @@ let furo_to_ary f_lst =
   else
     loop (m-1) []
 
+let rm_furo_double ary zi_ary furo_double_lst =
+  let m = List.length furo_double_lst in 
+  let rec loop i = 
+    let (x,y) = List.nth furo_double_lst i in
+    let  _ = 
+      if x = 3 then
+        let n = zi_ary.(y) in  
+        zi_ary.(y) <-  n + 1;
+      else
+        let n = ary.(x).(y) in 
+        ary.(x).(y) <- n + 1;
+    in
+    if i = 0 then 
+      (ary,zi_ary)
+    else
+      loop (i-1)
+  in
+  if m = 0 then 
+    (ary,zi_ary)
+  else
+    loop (m-1)
+
+
+
+
 (*furo_lstから副露されている牌を配列から引いた配列を返す。(ary,zi_ary)*)     
-let furo_lst_to_rm_ary furo_lst ary zi_ary =
+let furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary =
   let a_lst = furo_to_ary (List.nth furo_lst 0) in
   let b_lst = furo_to_ary (List.nth furo_lst 1) in
   let c_lst = furo_to_ary (List.nth furo_lst 2) in
@@ -280,7 +305,8 @@ let furo_lst_to_rm_ary furo_lst ary zi_ary =
   if m = 0 then
     (ary,zi_ary)
   else
-    loop (m-1)
+    let (ary2,zi_ary2) = loop (m-1) in 
+    rm_furo_double ary2 zi_ary2 furo_double_lst
 
 
 

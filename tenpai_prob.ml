@@ -672,13 +672,13 @@ let mode_choice count tumo_len =
 
 
   
-let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst = 
+let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst furo_double_lst = 
   let yaku = List.nth yaku_lst player in
   let reach_q = List.exists (fun a -> List.exists (fun b -> b = Reach || b = Doublereach) a) yaku_lst in
   let (_,n) = syanten tehai in
   let n' = titoi_syanten tehai in
   let (ary,zi_ary) = create_table sutehai_lst tehai in
-  let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst ary zi_ary in   
+  let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary in   
   let f_lst = List.nth furo_lst player in
   let rm_wan = (yama_len-14) in
   let tumo_l = (rm_wan)/4 in
@@ -693,7 +693,7 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
       if reach_q = true then
         reach_defence ary zi_ary yaku_lst sutehai_lst tehai 
       else
-      hai_eff_select sutehai_lst tehai furo_lst yaku_lst player
+      hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst
     else
       if reach_q = true then
         reach_defence ary zi_ary yaku_lst sutehai_lst tehai 
@@ -820,29 +820,32 @@ let col_tenpai_f ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst t
         
 
     
-let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) = 
+let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst = 
   let (_,n) = syanten tehai in
+  let n' = kokushi_syanten tehai in
   let tumo_len = yama_len/4 in
-  if n = 0 || tumo_len = 0 then
+  if n = 0 || tumo_len = 0 || n = n' then
     nofuro()
   else if n < 3 then
     let (x,y) = ary_to_hai (x,y) in
     let (ary,zi_ary) = create_table sutehai_lst tehai in
-    let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst ary zi_ary in
+    let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary in
     let p_f_lst = possible_furo_patern tehai (x,y) in
     print_list tehai;
     Printf.printf "step1\n"; flush stdout;
     let f_kitaiti_lst = f_kitaiti p_f_lst tehai (List.nth furo_lst player) (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst in
     Printf.printf "step2\n"; flush stdout;
     let tenpai_lst = operate_tenapai_ritu_f ary zi_ary tehai in
-    Printf.printf "step3\n"; flush stdout;
-    let not_naki = col_tenpai_f ary zi_ary tehai yama_len (List.nth furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
-    Printf.printf "step4\n"; flush stdout;
-    List.iter (fun((a,b),(c,(d,(e,f,g)))) -> Printf.printf "%f,%f (%d %d %d)" a b e f g;) f_kitaiti_lst;
-    Printf.printf "step5\n"; flush stdout;
-    let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
-    Printf.printf "%f,%f\n" agariritu kitaiti;
-    nofuro()
+    if tenpai_lst = [] then 
+      nofuro()
+    else
+      let not_naki = col_tenpai_f ary zi_ary tehai yama_len (List.nth furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
+      Printf.printf "step4\n"; flush stdout;
+      List.iter (fun((a,b),(c,(d,(e,f,g)))) -> Printf.printf "%f,%f (%d %d %d)" a b e f g;) f_kitaiti_lst;
+      Printf.printf "step5\n"; flush stdout;
+      let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
+      Printf.printf "%f,%f\n" agariritu kitaiti;
+      nofuro()
   else
     nofuro()
 
