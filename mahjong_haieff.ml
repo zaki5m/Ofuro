@@ -733,13 +733,13 @@ let create_table sutehai_lst tehai =
 
 
 
-let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player = 
+let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst = 
   let yaku = List.nth yaku_lst player in
   let reach_q = List.exists (fun a -> List.exists (fun b -> b = Reach || b = Doublereach) a) yaku_lst in
   let (lst,n) = syanten tehai in
   let (_,n') = common_syanten tehai in
   let (ary,zi_ary) = create_table sutehai_lst tehai in
-  let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst ary zi_ary in
+  let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary in
   let (d,trush) = opt_yukouhai lst ary zi_ary in
   let rec loop i k_hai = 
     let a = List.nth tehai i in
