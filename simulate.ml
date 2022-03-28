@@ -187,7 +187,6 @@ let zyuniten a b c d (uma1,uma2) =
 let simulate count (uma1,uma2) =
   let rec loop i (tmp1,tmp2,tmp3,tmp4) = 
     let (a,b,c,d) = hantyan () in
-    Printf.printf "OK\n"; flush stdout;
     let a' = a - 25000 in
     let b' = b - 25000 in
     let c' = c - 25000 in
@@ -197,9 +196,9 @@ let simulate count (uma1,uma2) =
     let tmp2 = b + tmp2 in
     let tmp3 = c + tmp3 in
     let tmp4 = d + tmp4 in
-    Printf.printf "%d A:%d B:%d c:%d d:%d\n"i a b c d;
+    (*Printf.printf "%d A:%d B:%d c:%d d:%d\n"i a b c d;*)
     if i = 0 then
-      (Printf.printf "result: %dtimes A:%d B:%d c:%d d:%d\n" count tmp1 tmp2 tmp3 tmp4;)
+      ((*Printf.printf "result: %dtimes A:%d B:%d c:%d d:%d\n" count tmp1 tmp2 tmp3 tmp4;*))
     else
       loop (i-1) (tmp1,tmp2,tmp3,tmp4)
   in
