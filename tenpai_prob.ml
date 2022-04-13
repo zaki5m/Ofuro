@@ -286,7 +286,30 @@ let operate_tenapai_ritu ary zi_ary tehai =
   let tmp = syanten_to_tenpai ary zi_ary all_t in
   tmp@tmp'
 
-
+let operate_tenpai_ritu_parallel ary zi_ary tenpai_lst = 
+  let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = tenpai_lst in 
+  let (_,n) = syanten current_tehai in 
+  let tenpai_lst = [tenpai_lst] in 
+  let rec loop i tmp =
+    let m = List.length tmp in
+    let rec loop2 j tmp2 = 
+      let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.nth tmp j in
+      let tmp2 = (k_fase ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai))@tmp2 in
+      if j = 0 then
+        tmp2
+      else
+        loop2 (j-1) tmp2
+    in
+    let tmp' = loop2 (m-1) [] in
+    if i = 0 then
+      (tmp,tmp')
+    else
+      loop (i-1) tmp'
+  in
+  let (tmp,tmp') = loop (n-1) tenpai_lst in
+  let all_t = all_k_fase ary zi_ary tmp in
+  let tmp = syanten_to_tenpai ary zi_ary all_t in
+  tmp@tmp'
 
 let tenpai_ritu rest_tumo_lst tumo_l rm_wan = 
   let m = List.length rest_tumo_lst in
@@ -872,11 +895,12 @@ let max_f_agariritu lst =
     
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst = 
   let (_,n) = syanten tehai in
+  let reach_q = List.exists (fun a -> List.exists (fun b -> b = Reach || b = Doublereach) a) yaku_lst in
   let n' = kokushi_syanten tehai in
   let tumo_len = (yama_len-14)/4 in
   if n = 0 || tumo_len = 0 || n = n' then
     nofuro()
-  else if n < 3 then
+  else 
     let (x,y) = ary_to_hai (x,y) in
     let (ary,zi_ary) = create_table sutehai_lst tehai in
     let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary in
@@ -885,20 +909,19 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
     let tenpai_lst = operate_tenapai_ritu_f ary zi_ary tehai in
     if tenpai_lst = [] then 
       nofuro()
-    else
+    else if reach_q = false then
       let not_naki = col_tenpai_f ary zi_ary tehai yama_len (List.nth furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
       let ((f_agariritu,f_kitaiti),f_hai) = max_f_agariritu f_kitaiti_lst in  
       let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
       let _ = 
         if (f_agariritu -. agariritu) > 0.0 && f_kitaiti > 0.0 && agariritu > 0.0 then
-          (Printf.printf "%d %f %f %f %f\n" tumo_len (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) agariritu f_kitaiti;)
+          (Printf.printf "%d %f %f %f %f\n" tumo_len (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) agariritu f_kitaiti; flush stdout;)
         else
           ()
       in
       nofuro()
-  else
-    nofuro()
-
+    else
+      nofuro ()
 
 
 
