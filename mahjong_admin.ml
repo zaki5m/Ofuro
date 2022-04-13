@@ -1522,3 +1522,4 @@ let hantyan () =
     in
     loop' 1 0 0 0 player_score 0 
 
+
