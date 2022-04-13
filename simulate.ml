@@ -185,8 +185,8 @@ let zyuniten a b c d (uma1,uma2) =
 
 
 let simulate count (uma1,uma2) =
-  let rec loop i (tmp1,tmp2,tmp3,tmp4) = 
-    let (a,b,c,d) = hantyan () in
+  let rec loop i (tmp1,tmp2,tmp3,tmp4) total  = 
+    let (total_kyoku,a,b,c,d) = hantyan () in
     let a' = a - 25000 in
     let b' = b - 25000 in
     let c' = c - 25000 in
@@ -198,13 +198,14 @@ let simulate count (uma1,uma2) =
     let tmp4 = d + tmp4 in
     (*Printf.printf "%d A:%d B:%d c:%d d:%d\n"i a b c d;*)
     if i = 0 then
-      ((*Printf.printf "result: %dtimes A:%d B:%d c:%d d:%d\n" count tmp1 tmp2 tmp3 tmp4;*))
+      ((*Printf.printf "%d\n" (total+total_kyoku);*)
+        (*Printf.printf "result: %dtimes A:%d B:%d c:%d d:%d\n" count tmp1 tmp2 tmp3 tmp4;*))
     else
-      loop (i-1) (tmp1,tmp2,tmp3,tmp4)
+      loop (i-1) (tmp1,tmp2,tmp3,tmp4) (total+ total_kyoku) 
   in
   loop (count-1) (0,0,0,0)
 
 
 
-let _ = simulate 5 (10000,30000)
+let _ = simulate 20 (10000,30000) 0
 

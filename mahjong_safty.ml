@@ -549,7 +549,7 @@ let second_anzen n_tehai =
 
 
 
-
+(*sutehai, tehai, anpai_lst*)
 let player_anpai sutehai tehai =
   let m = List.length tehai in
   let rec loop i tmp = 
@@ -586,6 +586,58 @@ let other_reach yaku_lst sutehai_lst tehai =
       loop (i-1) tmp
   in
   loop 3 tehai
+
+
+let reach_genbutu yaku_lst sutehai_lst tehai = 
+  let rec r_loop i tmp =
+    let tmp = 
+      if List.exists (fun b -> b = Reach || b = Doublereach) (List.nth yaku_lst i) then
+        i::tmp
+      else
+        tmp
+    in
+    if i = 0 then 
+      tmp 
+    else
+      r_loop (i-1) tmp 
+  in
+  let r_lst = r_loop 3 [] in
+  let r_lst_len = List.length r_lst in 
+  let rec loop i tmp = 
+    let sutehai = List.nth sutehai_lst i in
+    let lst = player_anpai sutehai tehai in
+    let tmp =  
+      let rec loop' i tmp2 = 
+        let a = List.nth tmp i in 
+        let tmp2 = 
+          if List.exists (fun x -> x = a) lst then 
+            a::tmp2 
+          else tmp2 
+        in 
+        if i = 0 then 
+          tmp2
+        else
+          loop' (i-1) tmp2
+      in
+      let m = List.length tmp in 
+      if m = 0 then
+        lst 
+      else
+        loop' (m-1) tmp
+    in
+    if i = 0 then 
+      tmp 
+    else
+      loop (i-1) tmp
+  in
+  if r_lst_len = 0 then 
+    tehai
+  else
+    loop (r_lst_len-1) []
+
+
+
+
 
 let reach_defence ary zi_ary yaku_lst sutehai_lst tehai = 
   let n_tehai = other_reach yaku_lst sutehai_lst tehai in
