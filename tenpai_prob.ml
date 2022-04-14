@@ -451,6 +451,7 @@ let judge_parallel ary zi_ary tehai =
     let tenpai_lst = [([],[],[],tehai)] in 
     let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.hd tenpai_lst in
     let tmp = k_fase ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai) in
+    Printf.printf "menzen:%d\n" (List.length tmp); flush stdout;
     let pool = Task.setup_pool ~num_additional_domains:10 () in
     let res = Task.run pool (fun () -> parallel ary zi_ary pool tmp [])  in
     Task.teardown_pool pool;
@@ -1004,6 +1005,7 @@ let judge_parallel_f ary zi_ary tehai =
     let tenpai_lst = [([],[],[],tehai)] in 
     let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.hd tenpai_lst in
     let tmp = all_tumo ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai) in
+    Printf.printf "furo:%d\n" (List.length tmp); flush stdout;
     let pool = Task.setup_pool ~num_additional_domains:10 () in
     let res = Task.run pool (fun () -> parallel ary zi_ary pool tmp [])  in
     Task.teardown_pool pool;
