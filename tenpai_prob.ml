@@ -967,6 +967,8 @@ let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora
 
 
 
+
+
 let operate_tenapai_ritu_f ary zi_ary tehai = 
   let tenpai_lst = [([],[],[],tehai)] in
   let (_,n) = syanten tehai in
@@ -996,7 +998,18 @@ let operate_tenapai_ritu_f ary zi_ary tehai =
   let tmp = syanten_to_tenpai ary zi_ary all_t in
   tmp@tmp'
 
-
+let judge_parallel_f ary zi_ary tehai = 
+  let (_,n) = syanten tehai in 
+  if n  =  3 then 
+    let tenpai_lst = [([],[],[],tehai)] in 
+    let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.hd tenpai_lst in
+    let tmp = all_tumo ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai) in
+    let pool = Task.setup_pool ~num_additional_domains:10 () in
+    let res = Task.run pool (fun () -> parallel ary zi_ary pool tmp [])  in
+    Task.teardown_pool pool;
+    res
+  else
+    operate_tenapai_ritu_f ary zi_ary tehai
 
 let col_tenpai_f ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst tenpai_lst  = 
   let m = List.length tenpai_lst in
@@ -1058,7 +1071,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
     let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary in
     let p_f_lst = possible_furo_patern tehai (x,y) in
     let f_kitaiti_lst = f_kitaiti p_f_lst tehai (List.nth furo_lst player) (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst in
-    let tenpai_lst = operate_tenapai_ritu_f ary zi_ary tehai in
+    let tenpai_lst = judge_parallel_f ary zi_ary tehai in
     if tenpai_lst = [] then 
       nofuro()
     else if reach_q = false then
