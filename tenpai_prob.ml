@@ -190,7 +190,10 @@ let opt_tumohai ary zi_ary tenpai_lst =
     else 
       loop (i-1) tmp
   in
-  loop (tenpai_lst_len-1) []
+  if tenpai_lst_len = 0 then 
+    []
+  else
+    loop (tenpai_lst_len-1) []
 
 
 
@@ -419,18 +422,232 @@ let rec parallel ary zi_ary pool tenpai_lst tmp3 =
                       let (k_lst9,tumo_lst9,rest_tumo_lst9,current_tehai9) = List.hd tenpai_lst in
                       let tenpai_lst = List.tl tenpai_lst in 
                       let j = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst9,tumo_lst9,rest_tumo_lst9,current_tehai9)) in 
-                      
-                      let a' = Task.await pool a in
-                      let b' = Task.await pool b in
-                      let c' = Task.await pool c in
-                      let d' = Task.await pool d in
-                      let e' = Task.await pool e in
-                      let f' = Task.await pool f in
-                      let g' = Task.await pool g in
-                      let h' = Task.await pool h in
-                      let i' = Task.await pool i in
-                      let j' = Task.await pool j in
-                      (a'@b'@c'@d'@e'@f'@g'@h'@i'@j',tenpai_lst)
+                      if m = 10 then
+                        let a' = Task.await pool a in
+                        let b' = Task.await pool b in
+                        let c' = Task.await pool c in
+                        let d' = Task.await pool d in
+                        let e' = Task.await pool e in
+                        let f' = Task.await pool f in
+                        let g' = Task.await pool g in
+                        let h' = Task.await pool h in
+                        let i' = Task.await pool i in
+                        let j' = Task.await pool j in
+                        (a'@b'@c'@d'@e'@f'@g'@h'@i'@j',tenpai_lst)
+                      else
+                        let (k_lst10,tumo_lst10,rest_tumo_lst10,current_tehai10) = List.hd tenpai_lst in
+                        let tenpai_lst = List.tl tenpai_lst in 
+                        let k = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst10,tumo_lst10,rest_tumo_lst10,current_tehai10)) in 
+                        if m = 11 then
+                          let a' = Task.await pool a in
+                          let b' = Task.await pool b in
+                          let c' = Task.await pool c in
+                          let d' = Task.await pool d in
+                          let e' = Task.await pool e in
+                          let f' = Task.await pool f in
+                          let g' = Task.await pool g in
+                          let h' = Task.await pool h in
+                          let i' = Task.await pool i in
+                          let j' = Task.await pool j in
+                          let k' = Task.await pool k in
+                          (a'@b'@c'@d'@e'@f'@g'@h'@i'@j'@k',tenpai_lst)
+                        else
+                          let (k_lst11,tumo_lst11,rest_tumo_lst11,current_tehai11) = List.hd tenpai_lst in
+                          let tenpai_lst = List.tl tenpai_lst in 
+                          let l = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst11,tumo_lst11,rest_tumo_lst11,current_tehai11)) in 
+                          if m = 12 then
+                            let a' = Task.await pool a in
+                            let b' = Task.await pool b in
+                            let c' = Task.await pool c in
+                            let d' = Task.await pool d in
+                            let e' = Task.await pool e in
+                            let f' = Task.await pool f in
+                            let g' = Task.await pool g in
+                            let h' = Task.await pool h in
+                            let i' = Task.await pool i in
+                            let j' = Task.await pool j in
+                            let k' = Task.await pool k in
+                            let l' = Task.await pool l in
+                            (a'@b'@c'@d'@e'@f'@g'@h'@i'@j'@k'@l',tenpai_lst)
+                          else
+                            let (k_lst12,tumo_lst12,rest_tumo_lst12,current_tehai12) = List.hd tenpai_lst in
+                            let tenpai_lst = List.tl tenpai_lst in 
+                            let n = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst12,tumo_lst12,rest_tumo_lst12,current_tehai12)) in 
+                            if m = 13 then
+                              let a' = Task.await pool a in
+                              let b' = Task.await pool b in
+                              let c' = Task.await pool c in
+                              let d' = Task.await pool d in
+                              let e' = Task.await pool e in
+                              let f' = Task.await pool f in
+                              let g' = Task.await pool g in
+                              let h' = Task.await pool h in
+                              let i' = Task.await pool i in
+                              let j' = Task.await pool j in
+                              let k' = Task.await pool k in
+                              let l' = Task.await pool l in
+                              let n' = Task.await pool n in
+                              (a'@b'@c'@d'@e'@f'@g'@h'@i'@j'@k'@l'@n',tenpai_lst)
+                            else
+                              let (k_lst13,tumo_lst13,rest_tumo_lst13,current_tehai13) = List.hd tenpai_lst in
+                              let tenpai_lst = List.tl tenpai_lst in 
+                              let o = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst13,tumo_lst13,rest_tumo_lst13,current_tehai13)) in 
+                              if m = 14 then
+                                let a' = Task.await pool a in
+                                let b' = Task.await pool b in
+                                let c' = Task.await pool c in
+                                let d' = Task.await pool d in
+                                let e' = Task.await pool e in
+                                let f' = Task.await pool f in
+                                let g' = Task.await pool g in
+                                let h' = Task.await pool h in
+                                let i' = Task.await pool i in
+                                let j' = Task.await pool j in
+                                let k' = Task.await pool k in
+                                let l' = Task.await pool l in
+                                let n' = Task.await pool n in
+                                let o' = Task.await pool o in
+                                (a'@b'@c'@d'@e'@f'@g'@h'@i'@j'@k'@l'@n'@o',tenpai_lst)
+                              else
+                                let (k_lst14,tumo_lst14,rest_tumo_lst14,current_tehai14) = List.hd tenpai_lst in
+                                let tenpai_lst = List.tl tenpai_lst in 
+                                let p = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst14,tumo_lst14,rest_tumo_lst14,current_tehai14)) in 
+                                if m = 15 then
+                                  let a' = Task.await pool a in
+                                  let b' = Task.await pool b in
+                                  let c' = Task.await pool c in
+                                  let d' = Task.await pool d in
+                                  let e' = Task.await pool e in
+                                  let f' = Task.await pool f in
+                                  let g' = Task.await pool g in
+                                  let h' = Task.await pool h in
+                                  let i' = Task.await pool i in
+                                  let j' = Task.await pool j in
+                                  let k' = Task.await pool k in
+                                  let l' = Task.await pool l in
+                                  let n' = Task.await pool n in
+                                  let o' = Task.await pool o in
+                                  let p' = Task.await pool p in
+                                  (a'@b'@c'@d'@e'@f'@g'@h'@i'@j'@k'@l'@n'@o'@p',tenpai_lst)
+                                else
+                                  let (k_lst15,tumo_lst15,rest_tumo_lst15,current_tehai15) = List.hd tenpai_lst in
+                                  let tenpai_lst = List.tl tenpai_lst in 
+                                  let q = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst15,tumo_lst15,rest_tumo_lst15,current_tehai15)) in 
+                                  if m = 16 then
+                                    let a' = Task.await pool a in
+                                    let b' = Task.await pool b in
+                                    let c' = Task.await pool c in
+                                    let d' = Task.await pool d in
+                                    let e' = Task.await pool e in
+                                    let f' = Task.await pool f in
+                                    let g' = Task.await pool g in
+                                    let h' = Task.await pool h in
+                                    let i' = Task.await pool i in
+                                    let j' = Task.await pool j in
+                                    let k' = Task.await pool k in
+                                    let l' = Task.await pool l in
+                                    let n' = Task.await pool n in
+                                    let o' = Task.await pool o in
+                                    let p' = Task.await pool p in
+                                    let q' = Task.await pool q in
+                                    (a'@b'@c'@d'@e'@f'@g'@h'@i'@j'@k'@l'@n'@o'@p'@q',tenpai_lst)
+                                  else
+                                    let (k_lst16,tumo_lst16,rest_tumo_lst16,current_tehai16) = List.hd tenpai_lst in
+                                    let tenpai_lst = List.tl tenpai_lst in 
+                                    let r = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst16,tumo_lst16,rest_tumo_lst16,current_tehai16)) in 
+                                    if m = 17 then
+                                      let a' = Task.await pool a in
+                                      let b' = Task.await pool b in
+                                      let c' = Task.await pool c in
+                                      let d' = Task.await pool d in
+                                      let e' = Task.await pool e in
+                                      let f' = Task.await pool f in
+                                      let g' = Task.await pool g in
+                                      let h' = Task.await pool h in
+                                      let i' = Task.await pool i in
+                                      let j' = Task.await pool j in
+                                      let k' = Task.await pool k in
+                                      let l' = Task.await pool l in
+                                      let n' = Task.await pool n in
+                                      let o' = Task.await pool o in
+                                      let p' = Task.await pool p in
+                                      let q' = Task.await pool q in
+                                      let r' = Task.await pool r in
+                                      (a'@b'@c'@d'@e'@f'@g'@h'@i'@j'@k'@l'@n'@o'@p'@q'@r',tenpai_lst)
+                                    else
+                                      let (k_lst17,tumo_lst17,rest_tumo_lst17,current_tehai17) = List.hd tenpai_lst in
+                                      let tenpai_lst = List.tl tenpai_lst in 
+                                      let s = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst17,tumo_lst17,rest_tumo_lst17,current_tehai17)) in 
+                                      if m = 18 then
+                                        let a' = Task.await pool a in
+                                        let b' = Task.await pool b in
+                                        let c' = Task.await pool c in
+                                        let d' = Task.await pool d in
+                                        let e' = Task.await pool e in
+                                        let f' = Task.await pool f in
+                                        let g' = Task.await pool g in
+                                        let h' = Task.await pool h in
+                                        let i' = Task.await pool i in
+                                        let j' = Task.await pool j in
+                                        let k' = Task.await pool k in
+                                        let l' = Task.await pool l in
+                                        let n' = Task.await pool n in
+                                        let o' = Task.await pool o in
+                                        let p' = Task.await pool p in
+                                        let q' = Task.await pool q in
+                                        let r' = Task.await pool r in
+                                        let s' = Task.await pool s in
+                                        (a'@b'@c'@d'@e'@f'@g'@h'@i'@j'@k'@l'@n'@o'@p'@q'@r'@s',tenpai_lst)
+                                      else
+                                        let (k_lst18,tumo_lst18,rest_tumo_lst18,current_tehai18) = List.hd tenpai_lst in
+                                        let tenpai_lst = List.tl tenpai_lst in 
+                                        let t = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst18,tumo_lst18,rest_tumo_lst18,current_tehai18)) in 
+                                        if m = 19 then
+                                          let a' = Task.await pool a in
+                                          let b' = Task.await pool b in
+                                          let c' = Task.await pool c in
+                                          let d' = Task.await pool d in
+                                          let e' = Task.await pool e in
+                                          let f' = Task.await pool f in
+                                          let g' = Task.await pool g in
+                                          let h' = Task.await pool h in
+                                          let i' = Task.await pool i in
+                                          let j' = Task.await pool j in
+                                          let k' = Task.await pool k in
+                                          let l' = Task.await pool l in
+                                          let n' = Task.await pool n in
+                                          let o' = Task.await pool o in
+                                          let p' = Task.await pool p in
+                                          let q' = Task.await pool q in
+                                          let r' = Task.await pool r in
+                                          let s' = Task.await pool s in
+                                          let t' = Task.await pool t in
+                                          (a'@b'@c'@d'@e'@f'@g'@h'@i'@j'@k'@l'@n'@o'@p'@q'@r'@s'@t',tenpai_lst)
+                                        else
+                                          let (k_lst19,tumo_lst19,rest_tumo_lst19,current_tehai19) = List.hd tenpai_lst in
+                                          let tenpai_lst = List.tl tenpai_lst in 
+                                          let u = Task.async pool (fun _ ->  operate_tenpai_ritu_parallel ary zi_ary  (k_lst19,tumo_lst19,rest_tumo_lst19,current_tehai19)) in 
+                                          let a' = Task.await pool a in
+                                          let b' = Task.await pool b in
+                                          let c' = Task.await pool c in
+                                          let d' = Task.await pool d in
+                                          let e' = Task.await pool e in
+                                          let f' = Task.await pool f in
+                                          let g' = Task.await pool g in
+                                          let h' = Task.await pool h in
+                                          let i' = Task.await pool i in
+                                          let j' = Task.await pool j in
+                                          let k' = Task.await pool k in
+                                          let l' = Task.await pool l in
+                                          let n' = Task.await pool n in
+                                          let o' = Task.await pool o in
+                                          let p' = Task.await pool p in
+                                          let q' = Task.await pool q in
+                                          let r' = Task.await pool r in
+                                          let s' = Task.await pool s in
+                                          let t' = Task.await pool t in
+                                          let u' = Task.await pool u in
+                                          (a'@b'@c'@d'@e'@f'@g'@h'@i'@j'@k'@l'@n'@o'@p'@q'@r'@s'@t'@u',tenpai_lst)
   in
   if new_tenpai_lst = [] then 
     tmp2@tmp3
@@ -451,8 +668,7 @@ let judge_parallel ary zi_ary tehai =
     let tenpai_lst = [([],[],[],tehai)] in 
     let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.hd tenpai_lst in
     let tmp = k_fase ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai) in
-    Printf.printf "menzen:%d\n" (List.length tmp); flush stdout;
-    let pool = Task.setup_pool ~num_additional_domains:10 () in
+    let pool = Task.setup_pool ~num_additional_domains:20 () in
     let res = Task.run pool (fun () -> parallel ary zi_ary pool tmp [])  in
     Task.teardown_pool pool;
     res
@@ -856,15 +1072,18 @@ let judge_reach ary zi_ary tehai sutehai_lst yaku_lst yama_len f_lst zi_kaze ba_
   else
     let (a,b,c,d,e,f,g,h,i,j) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
     let a_len = List.length a in 
-    let k_hai = List.nth a (a_len - 1) in
-    let g_lst = reach_genbutu yaku_lst sutehai_lst tehai in
-    if List.exists (fun x -> x = k_hai) g_lst then
-      hai_to_int tehai k_hai
+    if a_len = 0 then      
+      reach_defence ary zi_ary yaku_lst sutehai_lst tehai
     else
-      if judge_suzi k_hai ary zi_ary g_lst then 
+      let k_hai = List.nth a (a_len - 1) in
+      let g_lst = reach_genbutu yaku_lst sutehai_lst tehai in
+      if List.exists (fun x -> x = k_hai) g_lst then
         hai_to_int tehai k_hai
       else
-        reach_defence ary zi_ary yaku_lst sutehai_lst tehai
+        if judge_suzi k_hai ary zi_ary g_lst then 
+          hai_to_int tehai k_hai
+        else
+          reach_defence ary zi_ary yaku_lst sutehai_lst tehai
 
     
 
@@ -1005,8 +1224,7 @@ let judge_parallel_f ary zi_ary tehai =
     let tenpai_lst = [([],[],[],tehai)] in 
     let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.hd tenpai_lst in
     let tmp = all_tumo ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai) in
-    Printf.printf "furo:%d\n" (List.length tmp); flush stdout;
-    let pool = Task.setup_pool ~num_additional_domains:10 () in
+    let pool = Task.setup_pool ~num_additional_domains:20 () in
     let res = Task.run pool (fun () -> parallel ary zi_ary pool tmp [])  in
     Task.teardown_pool pool;
     res
