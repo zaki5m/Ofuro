@@ -201,7 +201,8 @@ let simulate count (uma1,uma2) =
       (Printf.printf "%d\n" (total+total_kyoku);
         (*Printf.printf "result: %dtimes A:%d B:%d c:%d d:%d\n" count tmp1 tmp2 tmp3 tmp4;*))
     else
-      loop (i-1) (tmp1,tmp2,tmp3,tmp4) (total+ total_kyoku) 
+      (Printf.printf "%d\n" (total+total_kyoku);
+      loop (i-1) (tmp1,tmp2,tmp3,tmp4) (total+ total_kyoku)) 
   in
   loop (count-1) (0,0,0,0)
 

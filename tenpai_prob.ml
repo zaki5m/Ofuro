@@ -1192,7 +1192,8 @@ let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora
     let (agariritu,total_kitaiti) = 
       if n <= 0 then
         let (_,x) = tenpai_to_opt n_tehai tumo_l rm_wan n_f_lst zi_kaze ba_kaze true [] dora_lst ary zi_ary in
-        x
+        let (kitaiti,agariritu) = x in
+        (agariritu,kitaiti)
       else 
         let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti) = col_tenpai ary zi_ary n_tehai yama_len n_f_lst zi_kaze ba_kaze true dora_lst in
         (agariritu,total_kitaiti)
@@ -1331,7 +1332,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           if (f_agariritu -. agariritu) > 0.0 && f_kitaiti > 0.0 && agariritu > 0.0 then
             (let _ = 
               if f_agariritu > 100.0 then 
-                print_list current_tehai 
+                print_list tehai 
               else
                 ()
             in
