@@ -279,16 +279,22 @@ let operate_tenapai_ritu ary zi_ary tehai =
       else
         loop2 (j-1) tmp2
     in
-    let tmp' = loop2 (m-1) [] in
-    if i = 0 then
-      (tmp,tmp')
+    if m = 0 then 
+      ([],[])
     else
-      loop (i-1) tmp'
+      let tmp' = loop2 (m-1) [] in
+      if i = 0 then
+        (tmp,tmp')
+      else
+        loop (i-1) tmp'
   in
   let (tmp,tmp') = loop (n-1) tenpai_lst in
-  let all_t = all_k_fase ary zi_ary tmp in
-  let tmp = syanten_to_tenpai ary zi_ary all_t in
-  tmp@tmp'
+  if tmp = [] then
+    tmp'
+  else
+    let all_t = all_k_fase ary zi_ary tmp in
+    let tmp = syanten_to_tenpai ary zi_ary all_t in
+    tmp@tmp'
 
 let operate_tenpai_ritu_parallel ary zi_ary tenpai_lst = 
   let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = tenpai_lst in 
@@ -304,16 +310,22 @@ let operate_tenpai_ritu_parallel ary zi_ary tenpai_lst =
       else
         loop2 (j-1) tmp2
     in
-    let tmp' = loop2 (m-1) [] in
-    if i = 0 then
-      (tmp,tmp')
+    if m = 0 then 
+      ([],[])
     else
-      loop (i-1) tmp'
+      let tmp' = loop2 (m-1) [] in
+      if i = 0 then
+        (tmp,tmp')
+      else
+        loop (i-1) tmp'
   in
   let (tmp,tmp') = loop (n-1) tenpai_lst in
-  let all_t = all_k_fase ary zi_ary tmp in
-  let tmp = syanten_to_tenpai ary zi_ary all_t in
-  tmp@tmp'
+  if tmp = [] then 
+    tmp'
+  else
+    let all_t = all_k_fase ary zi_ary tmp in
+    let tmp = syanten_to_tenpai ary zi_ary all_t in
+    tmp@tmp'
 
 
 let rec parallel ary zi_ary pool tenpai_lst tmp3 = 
@@ -710,7 +722,10 @@ let tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst 
     else
       loop (i-1) tmp
   in
-  loop (m-1) []
+  if m = 0 then 
+    []
+  else
+    loop (m-1) []
 
 let compile_kitaiti p_lst current_tehai = 
   let m = List.length p_lst in
@@ -839,15 +854,18 @@ let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst =
     else
       loop (i-1) tmp
   in
-  let tenpai_lst = loop (m-1) [] in
-  let tenpai_lst = tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
-  let (o_current_tehai,o_agariritu,o_kitaiti) = opt_tenpai_form tenpai_lst in
-  let p_lst = List.filter (fun (a,b,c,d,e,f,g) -> d = o_current_tehai) tenpai_lst in
-  let t_lst = List.filter (fun (a,b,c,d,e,f,g) -> d <> o_current_tehai) tenpai_lst in
-  let p_lst = List.map (fun (a,b,c,d,e,f,g) -> (a,b,c,d,e,f,g,(anzen ary zi_ary a))) p_lst in
-  let p_lst = minus_kitaiti t_lst p_lst in
-  let p_lst = opt_kitaiti p_lst in
-  max_kitaiti p_lst
+  if m = 0 then
+    ([],[],[],[],0.0,0.0,0.0,0.0,0.0,0.0)
+  else
+    let tenpai_lst = loop (m-1) [] in
+    let tenpai_lst = tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
+    let (o_current_tehai,o_agariritu,o_kitaiti) = opt_tenpai_form tenpai_lst in
+    let p_lst = List.filter (fun (a,b,c,d,e,f,g) -> d = o_current_tehai) tenpai_lst in
+    let t_lst = List.filter (fun (a,b,c,d,e,f,g) -> d <> o_current_tehai) tenpai_lst in
+    let p_lst = List.map (fun (a,b,c,d,e,f,g) -> (a,b,c,d,e,f,g,(anzen ary zi_ary a))) p_lst in
+    let p_lst = minus_kitaiti t_lst p_lst in
+    let p_lst = opt_kitaiti p_lst in
+    max_kitaiti p_lst
 
 let mode_kokushi ary zi_ary k_lst = 
   let k_lst = tehai_to_anzen ary zi_ary k_lst in
@@ -1122,6 +1140,11 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
     else 
       let (a,b,c,d,e,f,g,h,i,j) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
       let a_len = List.length a in
+      if a_len = 0 then 
+        let a_tehai = tehai_to_anzen ary zi_ary tehai in
+        let ((a,b),c) = minimum_anzen a_tehai in
+        hai_to_int tehai (a,b)
+      else
       let x = List.nth a (a_len-1) in
       hai_to_int tehai x
   else
@@ -1245,12 +1268,15 @@ let col_tenpai_f ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst t
     else
       loop (i-1) tmp
   in
-  let tenpai_lst = loop (m-1) [] in
-  let tenpai_lst = tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
-  let (o_current_tehai,o_agariritu,o_kitaiti) = opt_tenpai_form tenpai_lst in
-  let p_lst = List.filter (fun (a,b,c,d,e,f,g) -> d = o_current_tehai) tenpai_lst in
-  let p_lst = List.map (fun (a,b,c,d,e,f,g) -> (a,b,c,d,e,f,g,(anzen_f ary zi_ary a))) p_lst in
-  max_agariritu p_lst
+  if m = 0 then
+    ([],[],[],[],0.0,0.0,0.0,0)
+  else
+    let tenpai_lst = loop (m-1) [] in
+    let tenpai_lst = tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
+    let (o_current_tehai,o_agariritu,o_kitaiti) = opt_tenpai_form tenpai_lst in
+    let p_lst = List.filter (fun (a,b,c,d,e,f,g) -> d = o_current_tehai) tenpai_lst in
+    let p_lst = List.map (fun (a,b,c,d,e,f,g) -> (a,b,c,d,e,f,g,(anzen_f ary zi_ary a))) p_lst in
+    max_agariritu p_lst
         
 let max_f_agariritu lst = 
   let m = List.length lst in 
@@ -1296,15 +1322,24 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
       nofuro()
     else if reach_q = false then
       let not_naki = col_tenpai_f ary zi_ary tehai yama_len (List.nth furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
-      let ((f_agariritu,f_kitaiti),f_hai) = max_f_agariritu f_kitaiti_lst in  
-      let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
-      let _ = 
-        if (f_agariritu -. agariritu) > 0.0 && f_kitaiti > 0.0 && agariritu > 0.0 then
-          (Printf.printf "%d %f %f %f %f\n" tumo_len (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) agariritu f_kitaiti; flush stdout;)
-        else
-          ()
-      in
-      nofuro()
+      if f_kitaiti_lst = [] then 
+        nofuro()
+      else
+        let ((f_agariritu,f_kitaiti),f_hai) = max_f_agariritu f_kitaiti_lst in  
+        let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
+        let _ = 
+          if (f_agariritu -. agariritu) > 0.0 && f_kitaiti > 0.0 && agariritu > 0.0 then
+            (let _ = 
+              if f_agariritu > 100.0 then 
+                print_list current_tehai 
+              else
+                ()
+            in
+              Printf.printf "%d %f %f %f %f\n" tumo_len (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) agariritu f_kitaiti; flush stdout;)
+          else
+            ()
+        in
+        nofuro()
     else
       nofuro ()
 
