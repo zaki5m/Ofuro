@@ -249,7 +249,10 @@ let all_k_fase ary zi_ary tenpai_lst =
     else
       loop (i-1) tmp
   in
-  loop (m-1) [] 
+  if m = 0 then
+    []
+  else
+    loop (m-1) [] 
 
 let syanten_to_tenpai ary zi_ary tenpai_lst = 
   let m = List.length tenpai_lst in
@@ -738,8 +741,11 @@ let compile_kitaiti p_lst current_tehai =
     else
       loop (i-1) tmp
   in
-  let (agariritu,kitaiti) = loop (m-1) (0.0,0.0) in
-  (current_tehai,agariritu,kitaiti)
+  if m = 0 then
+    ([],0.0,0.0)
+  else
+    let (agariritu,kitaiti) = loop (m-1) (0.0,0.0) in
+    (current_tehai,agariritu,kitaiti)
   
 
 let opt_tenpai_form tenpai_lst = 
@@ -774,7 +780,10 @@ let minus_kitaiti t_lst p_lst =
     else
       loop (i-1) tmp
   in
-  loop (m-1) []
+  if m = 0 then
+    []
+  else
+    loop (m-1) []
 
 
 let minus_kitaiti_f t_lst p_lst = 
@@ -794,7 +803,10 @@ let minus_kitaiti_f t_lst p_lst =
     else
       loop (i-1) tmp
   in
-  loop (m-1) []
+  if m = 0 then
+    []
+  else
+    loop (m-1) []
 
 let opt_kitaiti p_lst = 
   let m = List.length p_lst in
