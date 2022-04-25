@@ -1312,6 +1312,92 @@ let max_f_agariritu lst =
   else
     loop (m-1) ((0.0,0.0),(Minko,(0,(0,0,0))))
 
+let tenpai_hai_lst n_tehai = 
+  let m = List.length n_tehai in 
+  let rec loop i tmp = 
+    let (x,y) = List.nth n_tehai i in 
+    let tehai = d_tehai n_tehai (x,y) in 
+    let (_,n) = syanten tehai in
+    let tmp = 
+      if n = 0 then
+        (x,y)::tmp 
+      else
+        tmp
+    in
+    if i = 0 then 
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then 
+    []
+  else
+    loop (m-1) []
+
+
+
+
+let keiten tehai sutehai_lst f_lst p_f_lst yama_len (x,y) yaku_lst ary zi_ary = 
+  let m = List.length p_f_lst in 
+  let n = List.length tehai in
+  let rm_wan = (yama_len-14) in
+  let tumo_l = rm_wan/4 in
+  let rec loop i tmp = 
+    let (s,(a,(b,c,d))) =List.nth p_f_lst i in
+    let n_f_lst = (s,(a,(b,c,d)))::f_lst in
+    let (xa,ya) = hai_to_ary (x,y) in
+    let n_tehai =
+      if s = Minko then
+        let n_tehai = List.filter (fun z -> z <> (x,y)) tehai in
+        let n_tehai = 
+          if (n-2) = List.length n_tehai then
+            n_tehai
+          else
+            add_tehai n_tehai (x,y)
+        in
+        n_tehai
+      else
+        if ya = b then
+          let n_tehai = d_tehai tehai (c+1,y) in
+          let n_tehai = d_tehai n_tehai (d+1,y) in
+          n_tehai
+        else if ya = c then
+          let n_tehai = d_tehai tehai (b+1,y) in
+          let n_tehai = d_tehai n_tehai (d+1,y) in
+          n_tehai
+        else
+          let n_tehai = d_tehai tehai (b+1,y) in
+          let n_tehai = d_tehai n_tehai (c+1,y) in
+          n_tehai
+    in
+    let (_,n) = syanten n_tehai in
+    let tenpai_lst = 
+      if n = 0 then
+        tenpai_hai_lst n_tehai
+      else 
+        []
+    in
+    let genbutu_lst = reach_genbutu yaku_lst sutehai_lst tenpai_lst in 
+    let tenpai_lst = tehai_to_anzen ary zi_ary tenpai_lst in (*((int*hai)*kikendo)*)
+    let kikendo = reach_genbutu_anzen_zero tenpai_lst genbutu_lst in 
+    let min_den = List.hd (List.sort (fun (_,a) (_,b) -> if a < b then -1 else 1) kikendo) in
+    let tmp = 
+      let (a1,b1) = tmp in 
+      let (a2,b2) = min_den in 
+      if b1 > b2 then 
+        min_den
+      else
+        tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 || tumo_l > 6 then
+    ((1,Not_hai),100)
+  else
+    loop (m-1) ((1,Not_hai),100)
 
     
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst =
@@ -1350,7 +1436,11 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
             in
               Printf.printf "%d %f %f %f %f\n" tumo_len (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) agariritu f_kitaiti; flush stdout;)
           else
-            ()
+            let (k_hai,den) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in 
+            if k_hai = (1,Not_hai) then 
+              ()
+            else
+              Printf.printf "%d %d\n" tumo_len den; flush stdout;
         in
         nofuro()
     else

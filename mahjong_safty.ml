@@ -587,6 +587,28 @@ let other_reach yaku_lst sutehai_lst tehai =
   in
   loop 3 tehai
 
+(*立直者の現物を危険度0として((int*hai)*int)listを返す*)
+let reach_genbutu_anzen_zero tehai genbutu_lst = 
+  let m = List.length tehai in 
+  let rec loop i tmp = 
+    let (x,y) = List.nth tehai i in 
+    let tmp = 
+      if List.exists (fun a -> a = x) genbutu_lst then 
+        (x,0)::tmp
+      else
+        (x,y)::tmp 
+    in
+    if i = 0 then 
+      tmp
+    else
+      loop (i-1) []
+  in
+  if m = 0 then 
+    []
+  else
+    loop (m-1) [] 
+
+
 
 let reach_genbutu yaku_lst sutehai_lst tehai = 
   let rec r_loop i tmp =
