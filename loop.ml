@@ -192,7 +192,6 @@ let hantei_syuntu array list=
     loop 0 0 array list
 
 let hantei_koutu array = 
-  let list = [] in
   let rec loop i j array list count = 
     let n = array.(i).(j) in
     let lst =
@@ -235,13 +234,14 @@ let hantei_koutu array =
       if j = 8  then
         let array2 = Array.map (fun x -> Array.copy x) array in
         let remove_kotu = hantei_syuntu array2 [] in
-        let remove_kotu = if (List.for_all (fun x -> x <> Ws) remove_kotu) = true then
-          if count = 12 then
-            remove_kotu::lst
+        let remove_kotu = 
+          if (List.for_all (fun x -> x <> Ws) remove_kotu) = true then
+            if count = 12 then
+              remove_kotu::lst
+            else
+              add_state lst remove_kotu
           else
-            add_state lst remove_kotu
-        else
-          lst
+            lst
         in
         remove_kotu
       else
@@ -252,7 +252,7 @@ let hantei_koutu array =
       else
         loop i (j+1) array lst count
   in
-    loop 0 0 array list 12
+    loop 0 0 array [] 12
 
 let koutu_count ary anko_lst = 
   let rec loop i j tmp = 
@@ -2231,8 +2231,13 @@ let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int
   let ary2 = Array.map (fun x -> Array.copy x) ary in
   let zi_ary2 = Array.copy zi_ary in
   furo_to_tehai ary2 zi_ary2 f_lst;
+  let zi_count = Array.fold_left (fun a b -> a + if b = 1 then 1 else 0) 0 zi_ary2 in 
   let zi_lst = hantei_zi zi_ary2 in
-  let lst = tenpai_to_mati ary2 zi_ary2 in
+  let lst = 
+    if zi_count > 1 && zi_count < 6 then 
+      []
+    else
+      tenpai_to_mati ary2 zi_ary2 in
   let m = List.length lst in
   let rec loop' i tmp = 
     let kokushi_lst = kokushi_ten ary2 zi_ary2 (List.nth lst i) oya in 
@@ -2256,8 +2261,9 @@ let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int
 
 
 (*let _ = 
-  let a = [|[|1;1;1;0;0;0;2;0;0|];
-            [|1;0;1;0;0;0;1;1;1|];
-            [|0;0;0;0;0;0;0;0;0|]|] in 
-  let zi = [|0;0;0;0;0;0;0|] in 
-  tehai_to_ten a zi 3 0 true [(Syuntu,(2,(6,7,8)))] [] [(3,4)] *)
+  let a = [|[|0;0;0;1;0;0;0;0;0|];
+            [|0;0;0;1;0;0;0;0;0|];
+            [|2;2;0;0;0;0;0;0;1|]|] in 
+  let zi = [|2;1;0;1;2;0;0|] in
+  let zi_lst = hantei_zi zi in  
+  tehai_to_ten a zi 3 0 false [] [] [(3,5)] *)
