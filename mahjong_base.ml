@@ -559,5 +559,19 @@ let titoi_allow tehai f_lst =
 
     
 
+let uradora dora_lst yama_lst = 
+  let m = List.length dora_lst in
+  let yama_len = List.length yama_lst in 
+  let rec loop i tmp =
+    let dora = List.nth yama_lst (yama_len - (5+i*2)) in 
+    let dora = hyouzi_to_dora (hai_to_ary dora) in 
+    let tmp = dora::tmp in 
+    if i = 0 then 
+      tmp 
+    else
+      loop (i-1) tmp 
+  in
+  (loop (m-1) [])@dora_lst
+
 
 

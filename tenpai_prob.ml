@@ -1218,16 +1218,16 @@ let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora
           n_tehai
     in
     let (_,n) = syanten n_tehai in
-    let (agariritu,total_kitaiti) = 
+    let (t_ritu,agariritu,total_kitaiti) = 
       if n <= 0 then
         let (_,x) = tenpai_to_opt n_tehai tumo_l rm_wan n_f_lst zi_kaze ba_kaze true [] dora_lst ary zi_ary in
         let (kitaiti,agariritu) = x in
-        (agariritu,kitaiti)
+        (100.0,agariritu,kitaiti)
       else 
         let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti) = col_tenpai ary zi_ary n_tehai yama_len n_f_lst zi_kaze ba_kaze true dora_lst in
-        (agariritu,total_kitaiti)
+        (t_ritu,agariritu,total_kitaiti)
     in
-    let tmp = ((agariritu,total_kitaiti),(s,(a,(b,c,d))))::tmp in
+    let tmp = ((t_ritu,agariritu,total_kitaiti),(s,(a,(b,c,d))))::tmp in
     if i = 0 then
       tmp
     else
@@ -1311,13 +1311,13 @@ let col_tenpai_f ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst t
 let max_f_agariritu lst = 
   let m = List.length lst in 
   let rec loop i tmp = 
-    let ((x,y),z) = List.nth lst i in
-    let ((x',y'),_) = tmp in 
+    let ((a,x,y),z) = List.nth lst i in
+    let ((a',x',y'),_) = tmp in 
     let tmp = 
       if x < x' then 
         tmp
       else
-        ((x,y),z) 
+        ((a,x,y),z) 
     in
     if i = 0 then 
       tmp 
@@ -1325,9 +1325,9 @@ let max_f_agariritu lst =
       loop (i-1) tmp 
   in
   if m = 0 then 
-    ((0.0,0.0),(Minko,(0,(0,0,0))))
+    ((0.0,0.0,0.0),(Minko,(0,(0,0,0))))
   else
-    loop (m-1) ((0.0,0.0),(Minko,(0,(0,0,0))))
+    loop (m-1) ((0.0,0.0,0.0),(Minko,(0,(0,0,0))))
 
 let tenpai_hai_lst n_tehai = 
   let m = List.length n_tehai in 
@@ -1444,7 +1444,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
       if f_kitaiti_lst = [] then 
         nofuro()
       else
-        let ((f_agariritu,f_kitaiti),f_hai) = max_f_agariritu f_kitaiti_lst in  
+        let ((f_t_ritu,f_agariritu,f_kitaiti),f_hai) = max_f_agariritu f_kitaiti_lst in  
         let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
         let _ = 
           if (f_agariritu -. agariritu) > 0.0 && f_kitaiti > 0.0 && agariritu > 0.0 then
@@ -1453,7 +1453,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           else
             let (k_hai,den) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in 
             if k_hai = (1,Not_hai) then 
-              ()
+              (Printf.printf "%f\n" f_t_ritu; flush stdout;)
             else
               Printf.printf "%d %d\n" tumo_len den; flush stdout;
         in
