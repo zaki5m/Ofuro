@@ -1238,6 +1238,72 @@ let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora
   else
     loop (m-1) []
 
+let min_f_safty lst = 
+  let m = List.length lst in 
+  let rec loop i tmp = 
+    let ((an_pai,anzen),f_hai) = List.nth lst i in
+    let ((_,anzen'),_) = tmp in 
+    let tmp = 
+      if anzen' > anzen then
+        ((an_pai,anzen),f_hai)
+      else
+        tmp 
+    in
+    if i = 0 then 
+      tmp 
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then
+    (((1,Not_hai),100),(Minko,(0,(0,0,0))))
+  else
+    loop (m-1) (List.hd lst) 
+
+
+
+let f_safty p_f_lst tehai f_lst (x,y) ary zi_ary  =
+  let m = List.length p_f_lst in
+  let n = List.length tehai in
+  let rec loop i tmp = 
+    let (s,(a,(b,c,d))) =List.nth p_f_lst i in
+    let n_f_lst = (s,(a,(b,c,d)))::f_lst in
+    let (xa,ya) = hai_to_ary (x,y) in
+    let n_tehai =
+      if s = Minko then
+        let n_tehai = List.filter (fun z -> z <> (x,y)) tehai in
+        let n_tehai = 
+          if (n-2) = List.length n_tehai then
+            n_tehai
+          else
+            add_tehai n_tehai (x,y)
+        in
+        n_tehai
+      else
+        if ya = b then
+          let n_tehai = d_tehai tehai (c+1,y) in
+          let n_tehai = d_tehai n_tehai (d+1,y) in
+          n_tehai
+        else if ya = c then
+          let n_tehai = d_tehai tehai (b+1,y) in
+          let n_tehai = d_tehai n_tehai (d+1,y) in
+          n_tehai
+        else
+          let n_tehai = d_tehai tehai (b+1,y) in
+          let n_tehai = d_tehai n_tehai (c+1,y) in
+          n_tehai
+    in
+    let (an_pai,anzen) = minimum_anzen (tehai_to_anzen ary zi_ary n_tehai) in 
+    let tmp = ((an_pai,anzen),(s,(a,(b,c,d))))::tmp in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then
+    []
+  else
+    loop (m-1) []
+
 
 
 
@@ -1459,12 +1525,20 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         in
         nofuro()
     else
-      let (k_hai,den) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in 
-            if k_hai = (1,Not_hai) then 
-              ()
-            else
-              Printf.printf "%d %d\n" tumo_len den; flush stdout;
-      nofuro ()
+      let haitei_s = haitei_slide (yama_len - 14) yaku_lst player in
+      if haitei_s = true then
+        let ((an_pai,anzen),_) = min_f_safty (f_safty p_f_lst tehai (List.nth furo_lst player) (x,y) ary zi_ary) in 
+        Printf.printf "a:%d\n" anzen; flush stdout;
+        nofuro ()
+      else
+        let (k_hai,den) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in
+        let _ = 
+          if k_hai = (1,Not_hai) then 
+            ()          
+          else
+            Printf.printf "%d %d\n" tumo_len den; flush stdout;
+        in
+        nofuro ()
 
 
 

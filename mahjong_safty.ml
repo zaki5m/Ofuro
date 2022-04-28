@@ -325,9 +325,9 @@ let minimum_anzen lst =
       loop (i-1) tmp
   in
   if m = 0 then
-    ((0,Not_hai),-1)
+    ((0,Not_hai),100)
   else
-    loop (m-1) ((0,Not_hai),-1)
+    loop (m-1) ((0,Not_hai),100)
 
    
 

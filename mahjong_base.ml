@@ -574,4 +574,39 @@ let uradora dora_lst yama_lst =
   (loop (m-1) [])@dora_lst
 
 
+(*ハイテイをずらせるか．ずらせる:true,ずらせない:false*)
+let haitei_slide rm_wan yaku_lst player = 
+  let rec loop i tmp = 
+    let yaku = 
+      if player = i then 
+        List.nth yaku_lst i
+      else
+        []
+    in
+    let tmp = 
+      if List.exists (fun a -> a = Reach || a = Doublereach) yaku then
+        i::tmp 
+      else
+        tmp
+    in
+    if i = 0 then 
+      tmp 
+    else
+      loop (i-1) tmp
+  in
+  let r_lst = 
+    if List.exists (fun a -> a = Reach || a = Doublereach) (List.nth yaku_lst player) then 
+      []
+    else
+      loop 3 []
+  in
+  let haitei = (rm_wan - 1 + player) mod 4 in
+  if List.exists (fun a -> a = haitei) r_lst then 
+    if List.exists (fun a -> a = (haitei+1) mod 4) r_lst then 
+      false
+    else
+      true
+  else
+    false
+
 
