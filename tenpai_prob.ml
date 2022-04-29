@@ -1222,7 +1222,7 @@ let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora
       if n <= 0 then
         let (_,x) = tenpai_to_opt n_tehai tumo_l rm_wan n_f_lst zi_kaze ba_kaze true [] dora_lst ary zi_ary in
         let (kitaiti,agariritu) = x in
-        (100.0,agariritu,kitaiti)
+        (1.0,agariritu,kitaiti)
       else 
         let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti) = col_tenpai ary zi_ary n_tehai yama_len n_f_lst zi_kaze ba_kaze true dora_lst in
         (t_ritu,agariritu,total_kitaiti)
@@ -1519,7 +1519,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           else
             let (k_hai,den) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in 
             if k_hai = (1,Not_hai) then 
-              (Printf.printf "%f\n" f_t_ritu; flush stdout;)
+              (Printf.printf "%d %f\n" tumo_len f_t_ritu; flush stdout;)
             else
               Printf.printf "%d %d\n" tumo_len den; flush stdout;
         in
