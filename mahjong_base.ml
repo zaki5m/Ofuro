@@ -579,9 +579,9 @@ let haitei_slide rm_wan yaku_lst player =
   let rec loop i tmp = 
     let yaku = 
       if player = i then 
-        List.nth yaku_lst i
-      else
         []
+      else
+        List.nth yaku_lst i
     in
     let tmp = 
       if List.exists (fun a -> a = Reach || a = Doublereach) yaku then
