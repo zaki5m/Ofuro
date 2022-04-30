@@ -1519,14 +1519,14 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           else
             let (k_hai,den) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in 
             if k_hai = (1,Not_hai) then 
-              (Printf.printf "%d %f\n" tumo_len f_t_ritu; flush stdout;)
+              (Printf.printf "%d %f %f\n" tumo_len f_t_ritu (f_t_ritu -. t_ritu); flush stdout;)
             else
               Printf.printf "%d %d\n" tumo_len den; flush stdout;
         in
         nofuro()
-    else
+    else 
       let haitei_s = haitei_slide (yama_len - 14) yaku_lst player in
-      if haitei_s = true then
+      if haitei_s = true && (yama_len-14) < 4 then
         let ((an_pai,anzen),_) = min_f_safty (f_safty p_f_lst tehai (List.nth furo_lst player) (x,y) ary zi_ary) in 
         Printf.printf "a:%d\n" anzen; flush stdout;
         nofuro ()
