@@ -1514,21 +1514,26 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
         let _ = 
           if (f_agariritu -. agariritu) > 0.0 && f_kitaiti > 0.0 && agariritu > 0.0 then
-            ()
-              (*Printf.printf "%d %f %f %f %f\n" tumo_len (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) agariritu f_kitaiti; flush stdout;)*)
+            (let (x',y') = hai_to_ary (x,y) in
+                            Printf.printf "%d,%d " x' y'; flush stdout; print_list tehai;
+              Printf.printf "%d %f %f %f %f\n" tumo_len (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) agariritu f_kitaiti; flush stdout;)
           else
             let (k_hai,den) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in 
-            if k_hai = (1,Not_hai) then 
-              (Printf.printf "%d %f %f\n" tumo_len f_t_ritu (f_t_ritu -. t_ritu); flush stdout;)
+            if k_hai = (1,Not_hai) && f_t_ritu = 1.0 then 
+              ()
+                    (*let (x',y') = hai_to_ary (x,y) in
+                            Printf.printf "%d,%d " x' y'; flush stdout; print_list tehai;
+                      Printf.printf "%d %f %f\n" tumo_len f_t_ritu (f_t_ritu -. t_ritu); flush stdout;*)
             else
-              Printf.printf "%d %d\n" tumo_len den; flush stdout;
+                    ()
+              (*Printf.printf "%d %d\n" tumo_len den; flush stdout;*)
         in
         nofuro()
     else 
       let haitei_s = haitei_slide (yama_len - 14) yaku_lst player in
       if haitei_s = true && (yama_len-14) < 4 then
         let ((an_pai,anzen),_) = min_f_safty (f_safty p_f_lst tehai (List.nth furo_lst player) (x,y) ary zi_ary) in 
-        Printf.printf "a:%d\n" anzen; flush stdout;
+        (*Printf.printf "a:%d\n" anzen; flush stdout;*)
         nofuro ()
       else
         let (k_hai,den) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in
@@ -1536,7 +1541,8 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           if k_hai = (1,Not_hai) then 
             ()          
           else
-            Printf.printf "%d %d\n" tumo_len den; flush stdout;
+                  ()
+            (*Printf.printf "%d %d\n" tumo_len den; flush stdout;*)
         in
         nofuro ()
 
