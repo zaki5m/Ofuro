@@ -74,6 +74,56 @@ let tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_l
     let (b,c) = 
       if lst = [] then
         (0.0,0.0)
+      else if List.length a_lst = 2 then 
+        List.nth lst 1
+      else
+        List.hd lst 
+    in
+    let (x,(y,z)) = tmp in
+    let tmp =
+      if y > b then
+        tmp
+      else
+        (a,(b,c))
+    in
+    if i = 0 then
+      tmp
+    else
+      loop2 (i-1) a_lst tmp
+  in
+
+  let t_lst = loop (m-1) [] in
+  if t_lst = [] then
+    (13,(0.0,0.0))
+  else
+    let m = List.length t_lst in
+    loop2 (m-1) t_lst (14,(0.0,0.0))
+
+
+let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary kuikae_lst = 
+  let m = List.length tehai in
+  let rec loop i tmp = 
+    let x = List.nth tehai i in
+    let lst = d_tehai tehai x in
+    let (_,n) = syanten lst in
+    let tmp = 
+      if List.exists (fun a -> a = x) kuikae_lst then 
+        tmp 
+      else if n = 0 then
+        (i,(tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary tumo_l rm_wan))::tmp
+      else
+        tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  let rec loop2 i a_lst tmp = 
+    let (a,lst) = List.nth a_lst i in
+    let (b,c) = 
+      if lst = [] then
+        (0.0,0.0)
       else
         List.hd lst 
     in
@@ -896,6 +946,48 @@ let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst =
       max
 
 
+let col_tenpai_f_kuikae ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst kuikae_lst = 
+  let tenpai_lst = judge_parallel ary zi_ary tehai in
+  let m = List.length tenpai_lst in
+  let rm_wan = yama_len-14 in
+  let tumo_l =  rm_wan / 4 in
+  let rm_wan = Int.to_float rm_wan in
+  let rec loop i tmp = 
+    let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.nth tenpai_lst i in
+    let n = List.length k_lst in
+    let tmp = 
+      if n = 0 then
+        tmp 
+      else
+        if List.exists (fun a -> a = (List.nth k_lst (n-1))) kuikae_lst then
+          tmp
+        else
+          let t_ritu = tenpai_ritu rest_tumo_lst tumo_l rm_wan in 
+          (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu)::tmp 
+    in
+    if i = 0 then
+      tmp
+    else
+      loop (i-1) tmp
+  in
+  if m = 0 then
+    ([],[],[],[],0.0,0.0,0.0,0.0,0.0,0.0)
+  else
+    let tenpai_lst = loop (m-1) [] in
+    let tenpai_lst = tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
+    let (o_current_tehai,o_agariritu,o_kitaiti) = opt_tenpai_form tenpai_lst in
+    let p_lst = List.filter (fun (a,b,c,d,e,f,g) -> d = o_current_tehai) tenpai_lst in
+    let t_lst = List.filter (fun (a,b,c,d,e,f,g) -> d <> o_current_tehai) tenpai_lst in
+    let p_lst = List.map (fun (a,b,c,d,e,f,g) -> (a,b,c,d,e,f,g,(anzen ary zi_ary a))) p_lst in
+    let p_lst = minus_kitaiti t_lst p_lst in
+    let p_lst = opt_kitaiti p_lst in
+    let max = max_kitaiti p_lst in 
+    if max = ([],[],[],[],0.0,0.0,0.0,0.0,0.0,0.0) then 
+      max_tenpairitu p_lst
+    else
+      max
+
+
 let mode_kokushi ary zi_ary k_lst = 
   let k_lst = tehai_to_anzen ary zi_ary k_lst in
   let m = List.length k_lst in
@@ -1218,13 +1310,14 @@ let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora
           n_tehai
     in
     let (_,n) = syanten n_tehai in
+    let kuikae_lst = kuikae (x,y) (s,(a,(b,c,d))) in 
     let (t_ritu,agariritu,total_kitaiti) = 
       if n <= 0 then
-        let (_,x) = tenpai_to_opt n_tehai tumo_l rm_wan n_f_lst zi_kaze ba_kaze true [] dora_lst ary zi_ary in
+        let (_,x) = tenpai_to_opt_f n_tehai tumo_l rm_wan n_f_lst zi_kaze ba_kaze true [] dora_lst ary zi_ary kuikae_lst in
         let (kitaiti,agariritu) = x in
         (1.0,agariritu,kitaiti)
       else 
-        let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti) = col_tenpai ary zi_ary n_tehai yama_len n_f_lst zi_kaze ba_kaze true dora_lst in
+        let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti) = col_tenpai_f_kuikae ary zi_ary n_tehai yama_len n_f_lst zi_kaze ba_kaze true dora_lst kuikae_lst in
         (t_ritu,agariritu,total_kitaiti)
     in
     let tmp = ((t_ritu,agariritu,total_kitaiti),(s,(a,(b,c,d))))::tmp in
