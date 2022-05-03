@@ -609,4 +609,46 @@ let haitei_slide rm_wan yaku_lst player =
   else
     false
 
+(*in:副露牌，out:(くいかえ牌,副露面子) list*)
+let kuikae (x,y) = match y with 
+  | 0 -> [((x,3),(Syuntu,(x,(0,1,2))))]
+  | 1 -> [((x,4),(Syuntu,(x,(1,2,3))))]
+  | 2 -> [((x,5),(Syuntu,(x,(2,3,4))))]
+  | 3 -> [((x,0),(Syuntu,(x,(1,2,3))));((x,6),(Syuntu,(x,(3,4,5))))]
+  | 4 -> [((x,1),(Syuntu,(x,(2,3,4))));((x,7),(Syuntu,(x,(4,5,6))))]
+  | 5 -> [((x,2),(Syuntu,(x,(3,4,5))));((x,8),(Syuntu,(x,(5,6,7))))]
+  | 6 -> [((x,3),(Syuntu,(x,(4,5,6))))]
+  | 7 -> [((x,4),(Syuntu,(x,(5,6,7))))]
+  | 8 -> [((x,5),(Syuntu,(x,(6,7,8))))]
+  | _ -> []
+
+(*(int*hai)*)
+let kuikae (x,y) furo_block = 
+  if x = 0 then 
+    [(x,y)]
+  else
+    let (x',y') = hai_to_ary (x,y) in 
+    let lst = kuikae (x',y') in 
+    let m = List.length lst in 
+    let rec loop i tmp = 
+      let (kuikae_hai,n_block) = List.nth lst i in 
+      let tmp = 
+        if n_block = furo_block then 
+          kuikae_hai::tmp 
+        else
+          tmp 
+      in
+      if i = 0 then 
+        tmp 
+      else
+        loop (i-1) tmp 
+    in
+    if m = 0 then
+      [(x,y)]
+    else
+      let n_lst = loop (m-1) [] in 
+      let n_lst = List.map (fun (a,b) -> ary_to_hai (a,b)) n_lst in
+      (x,y)::n_lst
+
+
 
