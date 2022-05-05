@@ -110,7 +110,7 @@ let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora
       if List.exists (fun a -> a = x) kuikae_lst then 
         tmp 
       else if n = 0 then
-        (i,(tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary tumo_l rm_wan))::tmp
+        (x,(tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary tumo_l rm_wan))::tmp
       else
         tmp
     in
@@ -142,10 +142,10 @@ let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora
 
   let t_lst = loop (m-1) [] in
   if t_lst = [] then
-    (13,(0.0,0.0))
+    ((1,Not_hai),(0.0,0.0))
   else
     let m = List.length t_lst in
-    loop2 (m-1) t_lst (14,(0.0,0.0))
+    loop2 (m-1) t_lst ((1,Not_hai),(0.0,0.0))
     
 
 let ary_opt ary zi_ary lst = 
@@ -1314,16 +1314,20 @@ let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora
     in
     let (_,n) = syanten n_tehai in
     let kuikae_lst = kuikae (x,y) (s,(a,(b,c,d))) in 
-    let (t_ritu,agariritu,total_kitaiti) = 
+    let (t_ritu,agariritu,total_kitaiti,k_hai) = 
       if n <= 0 then
-        let (_,x) = tenpai_to_opt_f n_tehai tumo_l rm_wan n_f_lst zi_kaze ba_kaze true [] dora_lst ary zi_ary kuikae_lst in
+        let (k_hai,x) = tenpai_to_opt_f n_tehai tumo_l rm_wan n_f_lst zi_kaze ba_kaze true [] dora_lst ary zi_ary kuikae_lst in
         let (kitaiti,agariritu) = x in
-        (1.0,agariritu,kitaiti)
+        (1.0,agariritu,kitaiti,k_hai)
       else 
         let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti) = col_tenpai_f_kuikae ary zi_ary n_tehai yama_len n_f_lst zi_kaze ba_kaze true dora_lst kuikae_lst in
-        (t_ritu,agariritu,total_kitaiti)
+        let k_lst_len = List.length k_lst in 
+        if k_lst_len = 0 then 
+          (t_ritu,agariritu,total_kitaiti,(1,Not_hai))
+        else
+          (t_ritu,agariritu,total_kitaiti,(List.nth k_lst (k_lst_len-1)))
     in
-    let tmp = ((t_ritu,agariritu,total_kitaiti),(s,(a,(b,c,d))))::tmp in
+    let tmp = ((t_ritu,agariritu,total_kitaiti,k_hai),(s,(a,(b,c,d))))::tmp in
     if i = 0 then
       tmp
     else
@@ -1362,7 +1366,6 @@ let f_safty p_f_lst tehai f_lst (x,y) ary zi_ary  =
   let n = List.length tehai in
   let rec loop i tmp = 
     let (s,(a,(b,c,d))) =List.nth p_f_lst i in
-    let n_f_lst = (s,(a,(b,c,d)))::f_lst in
     let (xa,ya) = hai_to_ary (x,y) in
     let n_tehai =
       if s = Minko then
@@ -1491,6 +1494,27 @@ let max_f_agariritu lst =
   else
     loop (m-1) ((0.0,0.0,0.0),(Minko,(0,(0,0,0))))
 
+let max_f_agariritu_a lst = 
+  let m = List.length lst in 
+  let rec loop i tmp = 
+    let ((a,x,y,z),b) = List.nth lst i in
+    let ((a',x',y',z'),_) = tmp in 
+    let tmp = 
+      if x < x' then 
+        tmp
+      else
+        ((a,x,y,z),b) 
+    in
+    if i = 0 then 
+      tmp 
+    else
+      loop (i-1) tmp 
+  in
+  if m = 0 then 
+    ((0.0,0.0,0.0,(1,Not_hai)),(Minko,(0,(0,0,0))))
+  else
+    loop (m-1) ((0.0,0.0,0.0,(1,Not_hai)),(Minko,(0,(0,0,0))))
+
 let tenpai_hai_lst n_tehai = 
   let m = List.length n_tehai in 
   let rec loop i tmp = 
@@ -1523,7 +1547,6 @@ let keiten tehai sutehai_lst f_lst p_f_lst yama_len (x,y) yaku_lst ary zi_ary =
   let tumo_l = rm_wan/4 in
   let rec loop i tmp = 
     let (s,(a,(b,c,d))) =List.nth p_f_lst i in
-    let n_f_lst = (s,(a,(b,c,d)))::f_lst in
     let (xa,ya) = hai_to_ary (x,y) in
     let n_tehai =
       if s = Minko then
@@ -1560,14 +1583,14 @@ let keiten tehai sutehai_lst f_lst p_f_lst yama_len (x,y) yaku_lst ary zi_ary =
       if tenpai_lst = [] then 
           tmp
       else
-      let genbutu_lst = reach_genbutu yaku_lst sutehai_lst tenpai_lst in 
-      let tenpai_lst = tehai_to_anzen ary zi_ary tenpai_lst in (*((int*hai)*kikendo)*)
-      let kikendo = reach_genbutu_anzen_zero tenpai_lst genbutu_lst in 
-      let min_den = List.hd (List.sort (fun (_,a) (_,b) -> if a < b then -1 else 1) kikendo) in
-        let (a1,b1) = tmp in 
+        let genbutu_lst = reach_genbutu yaku_lst sutehai_lst tenpai_lst in 
+        let tenpai_lst = tehai_to_anzen ary zi_ary tenpai_lst in (*((int*hai)*kikendo)*)
+        let kikendo = reach_genbutu_anzen_zero tenpai_lst genbutu_lst in 
+        let min_den = List.hd (List.sort (fun (_,a) (_,b) -> if a < b then -1 else 1) kikendo) in
+        let ((a1,b1),c1) = tmp in 
         let (a2,b2) = min_den in 
         if b1 > b2 then 
-                min_den
+                (min_den,(s,(a,(b,c,d))))
         else
                 tmp
     in
@@ -1577,11 +1600,13 @@ let keiten tehai sutehai_lst f_lst p_f_lst yama_len (x,y) yaku_lst ary zi_ary =
       loop (i-1) tmp
   in
   if m = 0 || tumo_l > 6 then
-    ((1,Not_hai),100)
+    (((1,Not_hai),100),(Minko,(0,(0,0,0))))
   else
-    loop (m-1) ((1,Not_hai),100)
+    loop (m-1) (((1,Not_hai),100),(List.hd p_f_lst))
 
-    
+
+(*deebug*)
+(*
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst =
   let (_,n) = syanten tehai in
   let reach_q = List.exists (fun a -> List.exists (fun b -> b = Reach || b = Doublereach) a) yaku_lst in
@@ -1641,6 +1666,77 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
             (*Printf.printf "%d %d\n" tumo_len den; flush stdout;*)
         in
         nofuro ()
+*)
+
+let threthhold_furo agariritu kitaiti tumo_len furo_ritu = 
+  if furo_ritu = 10 then 
+    if tumo_len > 12 then 
+      if (2100.0 *. agariritu *. agariritu -. 7000.0) > kitaiti then 
+        true
+      else
+        false
+    else if tumo_len > 6 then 
+      if (3700.0 *. agariritu *. agariritu -. 3800.0) > kitaiti then 
+        true
+      else
+        false
+    else
+      if (5300.0 *. agariritu *. agariritu -. 2400.0) > kitaiti then 
+        true
+      else
+        false
+    else
+      false
+
+
+
+(*automatic*)
+let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst =
+  let (_,n) = syanten tehai in
+  let reach_q = List.exists (fun a -> List.exists (fun b -> b = Reach || b = Doublereach) a) yaku_lst in
+  let n' = kokushi_syanten tehai in
+  let tn = titoi_syanten tehai in
+  let tumo_len = (yama_len-14)/4 in
+  if n = 0 || tumo_len = 0 || n = n' then
+    []
+  else if n > 3 || n = tn && tn >= 3 then 
+    []
+  else 
+    let (x,y) = ary_to_hai (x,y) in
+    let (ary,zi_ary) = create_table sutehai_lst tehai in
+    let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary in
+    let p_f_lst = possible_furo_patern tehai (x,y) in
+    let f_kitaiti_lst = f_kitaiti p_f_lst tehai (List.nth furo_lst player) (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst in
+    let tenpai_lst = judge_parallel_f ary zi_ary tehai in
+    if tenpai_lst = [] then 
+      []
+    else if reach_q = false then
+      let not_naki = col_tenpai_f ary zi_ary tehai yama_len (List.nth furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
+      if f_kitaiti_lst = [] then 
+        []
+      else
+        let ((f_t_ritu,f_agariritu,f_kitaiti,k_hai),f_hai) = max_f_agariritu_a f_kitaiti_lst in  
+        let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
+        if threthhold_furo (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) tumo_len 10 then
+          [(k_hai,f_hai)]
+        else
+          let ((k_hai,den),f_hai) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in 
+          if k_hai = (1,Not_hai) || den > 5 then 
+            []
+          else
+            [(k_hai,f_hai)]
+    else 
+      let haitei_s = haitei_slide (yama_len - 14) yaku_lst player in
+      if haitei_s = true && (yama_len-14) < 4 then
+        []
+      else
+        let ((k_hai,den),f_hai) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in
+        if k_hai = (1,Not_hai) || den > 5 then 
+          []
+        else
+          [(k_hai,f_hai)]
+
+          
 
 
 

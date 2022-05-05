@@ -703,8 +703,8 @@ let ary_sub_furo ary zi_ary furo =
   else
     let _ = loop' (m-1) in
     (ary,zi_ary)
-
-let what_furo lst sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst = 
+(*not automatic*)
+(*let what_furo lst sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst = 
   let m = List.length lst in
   let rec loop' m =
     if m = 3 then
@@ -772,6 +772,7 @@ let what_furo lst sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba
     []
   else
     loop' m
+*)
 
 let rec ti_furo_number lst = 
   let m = List.length lst in
@@ -925,7 +926,8 @@ let kan yama_lst tehai_lst ary_lst furo_lst naki_lst yaku_lst dora_lst player ba
   in
   (yama_lst,dora_lst,tehai_lst,(x,y),(ten_0,ten_1,ten_2,ten_3))
 
-let furo_inq2 lst ary_lst sutehai_lst furo_lst yaku_lst yama_len ba kyoku naki_lst dora_lst (x,y) furo_double_lst = 
+(*not automatic*)
+(*let furo_inq2 lst ary_lst sutehai_lst furo_lst yaku_lst yama_len ba kyoku naki_lst dora_lst (x,y) furo_double_lst = 
   let rec loop' i tmp = 
     let (m,n) = List.nth lst i in
     let (ary,zi_ary) = List.nth ary_lst m in
@@ -948,6 +950,33 @@ let furo_inq2 lst ary_lst sutehai_lst furo_lst yaku_lst yama_len ba kyoku naki_l
       loop' (i-1) tmp
   in
   loop' 2 []
+*)
+
+(*automatic*)
+let furo_inq2 lst ary_lst sutehai_lst furo_lst yaku_lst yama_len ba kyoku naki_lst dora_lst (x,y) furo_double_lst = 
+  let rec loop' i tmp = 
+    let (m,n) = List.nth lst i in
+    let (ary,zi_ary) = List.nth ary_lst m in
+    let tmp =
+      if n <> [] && (List.nth yaku_lst m) = [] then
+        let tehai = ary_to_list ary zi_ary in
+        let zi_kaze = kyoku_to_kaze kyoku m in
+        let furo_t_f = purob_furo sutehai_lst tehai furo_lst yaku_lst m yama_len zi_kaze ba (List.nth naki_lst m) dora_lst (x,y) furo_double_lst in 
+        if furo_t_f = [] then 
+          tmp 
+        else
+          let (k_hai,f_hai) = List.hd furo_t_f in 
+          (m,f_hai)::tmp
+      else
+        tmp
+    in
+    if i = 0 then
+      tmp
+    else
+      loop' (i-1) tmp
+  in
+  loop' 2 []
+
 
 
 let furo_inq ary_lst furo_lst naki_lst (x,y) player yama_lst tehai_lst yaku_lst dora_lst ba kyoku kyotaku honba sutehai_lst furo_double_lst = 
