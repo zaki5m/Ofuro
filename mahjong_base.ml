@@ -651,4 +651,15 @@ let kuikae (x,y) furo_block =
       (x,y)::n_lst
 
 
+let return_what_furo furo = 
+  let (x,_) = furo in 
+  if x = Syuntu then 
+    "t" 
+  else if x = Minko then
+    "p"
+  else
+    "k"
+
+
+
 
