@@ -188,13 +188,13 @@ let sprit_lst lst =
   else
     loop' (n-1) [] [] [] []
 
-let opt_kouho lst = 
+let opt_kouho lst f_lst_len = 
   let m = List.length lst in
   let rec loop' i tmp = 
     let (x,y) = List.nth lst i in
     let (x,y) = 
-      if x + y > 4 then
-        let y = if x + (y-1) > 4 then y-2 else y-1 in
+      if x + y > (4-f_lst_len) then
+        let y = if x + (y-1) > (4-f_lst_len) then y-2 else y-1 in
         (x,y) 
       else
         (x,y)
@@ -319,7 +319,7 @@ let midium_mentsu ary =
   loop 8 n
 
 
-let mentsu_kouho_syuntsu ary = 
+let mentsu_kouho_syuntsu ary f_lst_len = 
   let aryf = Array.copy ary in
   let aryr = Array.copy ary in
   let arym = Array.copy ary in
@@ -382,7 +382,7 @@ let mentsu_kouho_syuntsu ary =
   let (aryf,fk) = loop2' aryf 0 0 in
   let (aryk,rk) = loop2' aryr 0 0 in
   let (arym,mk) = loop2' arym 0 0 in
-  let n = opt_kouho [(f,fk);(r,rk);(m,mk)] in
+  let n = opt_kouho [(f,fk);(r,rk);(m,mk)] f_lst_len in
   if n = (f,fk) then
     (aryf,n)
   else if n = (r,rk) then
@@ -421,7 +421,7 @@ let serch_koritsu lst m =
 
 
 
-let mentsu_kouho_kotsu ary = 
+let mentsu_kouho_kotsu ary f_lst_len = 
   let rec loop' ary i mentsu = 
     let mentsu = 
       if ary.(i) >= 3 then
@@ -435,13 +435,13 @@ let mentsu_kouho_kotsu ary =
         mentsu
     in
     if i = 8 then
-      (mentsu_kouho_syuntsu ary)::mentsu
+      (mentsu_kouho_syuntsu ary f_lst_len)::mentsu
     else
       loop' ary (i+1) mentsu
     in
   let n = loop' ary 0 [] in 
   let lst = List.map (fun (a,(b,c)) -> (b,c)) n in
-  let m = opt_kouho lst in 
+  let m = opt_kouho lst f_lst_len in 
   let x = serch_koritsu n m in
   (x,m) 
   
@@ -589,12 +589,12 @@ let mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len =
   let p_ary = lst_to_ary_type p_lst in
   let s_ary = lst_to_ary_type s_lst in
   let zi_ary = lst_to_ary_type_zi zi_lst in
-  let (m,(xm,ym)) = mentsu_kouho_kotsu m_ary in
-  let (p,(xp,yp)) = mentsu_kouho_kotsu p_ary in
-  let (s,(xs,ys)) = mentsu_kouho_kotsu s_ary in
+  let (m,(xm,ym)) = mentsu_kouho_kotsu m_ary f_lst_len in
+  let (p,(xp,yp)) = mentsu_kouho_kotsu p_ary f_lst_len in
+  let (s,(xs,ys)) = mentsu_kouho_kotsu s_ary f_lst_len in
   let (zi,(xzi,yzi)) = mentsu_kouho_zi zi_ary in
   let n = (xm+xp+xs+xzi,ym+yp+ys+yzi) in
-  let (x,y) = opt_kouho [n] in
+  let (x,y) = opt_kouho [n] f_lst_len in
   let lst = koritsu m p s zi in
   (lst,8-((x+f_lst_len)*2+y))
 
@@ -774,5 +774,6 @@ let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst =
 
 
 (*let _ = 
-  let (_,n)  = syanten [(1,Manzu);(2,Manzu);(4,Manzu);(5,Manzu);(8,Manzu);(4,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(2,Souzu);(4,Souzu);(5,Souzu);(8,Souzu);(3,Pinzu)] in
+  let (_,n)  = common_syanten [(8,Manzu);(9,Manzu);(9,Souzu);(9,Souzu);(0,Nan);(0,Nan);(0,Sya);(0,Sya);(0,Pei);(0,Pei);(0,Pei)] in
+
   Printf.printf "%d\n" n;*)

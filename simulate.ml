@@ -183,7 +183,8 @@ let zyuniten a b c d (uma1,uma2) =
     loop_score 0 (0,0,0,0)
 
 
-
+(*not automatic*)
+(*
 let simulate count (uma1,uma2) =
   let rec loop i (tmp1,tmp2,tmp3,tmp4) total  = 
     let (total_kyoku,a,b,c,d) = hantyan () in
@@ -197,16 +198,38 @@ let simulate count (uma1,uma2) =
     let tmp3 = c + tmp3 in
     let tmp4 = d + tmp4 in
     (*Printf.printf "%d\n" (total+total_kyoku);*)
-    Printf.printf "%d A:%d B:%d c:%d d:%d\n"i a b c d;
+    Printf.printf "%d A:%d B:%d c:%d d:%d\n"i a b c d; flush stdout;
     if i = 0 then
       ((*Printf.printf "%d\n" (total+total_kyoku);*)
       Printf.printf "result: %dtimes A:%d B:%d c:%d d:%d\n" count tmp1 tmp2 tmp3 tmp4;)
     else
       loop (i-1) (tmp1,tmp2,tmp3,tmp4) (total+ total_kyoku) 
   in
-  loop (count-1) (0,0,0,0)
+  loop (count-1) (0,0,0,0) 0
+*)
 
+(*automatic*)
+let simulate count (uma1,uma2) furoritu_lst =
+  let rec loop i (tmp1,tmp2,tmp3,tmp4) total  = 
+    let (total_kyoku,a,b,c,d) = hantyan furoritu_lst in
+    let a' = a - 25000 in
+    let b' = b - 25000 in
+    let c' = c - 25000 in
+    let d' = d - 25000 in
+    let (a,b,c,d) = zyuniten a' b' c' d' (uma1,uma2) in
+    let tmp1 = a + tmp1 in
+    let tmp2 = b + tmp2 in
+    let tmp3 = c + tmp3 in
+    let tmp4 = d + tmp4 in
+    (*Printf.printf "%d\n" (total+total_kyoku);*)
+    Printf.printf "%d A:%d B:%d c:%d d:%d\n"i a b c d; flush stdout;
+    if i = 0 then
+      ((*Printf.printf "%d\n" (total+total_kyoku);*)
+      Printf.printf "result: %dtimes A%f:%d B%f:%d c%f:%d d%f:%d\n" count (List.nth furoritu_lst 0) tmp1 (List.nth furoritu_lst 1) tmp2 (List.nth furoritu_lst 2) tmp3 (List.nth furoritu_lst 3) tmp4;)
+    else
+      loop (i-1) (tmp1,tmp2,tmp3,tmp4) (total+ total_kyoku) 
+  in
+  loop (count-1) (0,0,0,0) 0
 
-
-let _ = simulate 20 (10000,30000) 0
+let _ = simulate 20 (10000,30000) [10.0;15.0;20.0;25.0]
 
