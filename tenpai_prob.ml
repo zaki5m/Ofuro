@@ -1631,20 +1631,19 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
       if f_kitaiti_lst = [] then 
         nofuro()
       else
-        let ((f_t_ritu,f_agariritu,f_kitaiti),f_hai) = max_f_agariritu f_kitaiti_lst in  
+        let ((f_t_ritu,f_agariritu,f_kitaiti,k_hai),f_hai) = max_f_agariritu_a f_kitaiti_lst in  
         let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
         let _ = 
           if (f_agariritu -. agariritu) > 0.0 && f_kitaiti > 0.0 && agariritu > 0.0 then
             ((*let (x',y') = hai_to_ary (x,y) in
                             Printf.printf "%d,%d " x' y'; flush stdout; print_list tehai;*)
-              Printf.printf "%d %f %f %f %f\n" tumo_len (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) agariritu f_kitaiti; flush stdout;)
+              (*Printf.printf "%d %f %f %f %f\n" tumo_len (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) agariritu f_kitaiti; flush stdout;*))
           else
-            let (k_hai,den) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in 
-            if k_hai = (1,Not_hai) && f_t_ritu = 1.0 then 
-              ()
-                    (*let (x',y') = hai_to_ary (x,y) in
-                            Printf.printf "%d,%d " x' y'; flush stdout; print_list tehai;
-                      Printf.printf "%d %f %f\n" tumo_len f_t_ritu (f_t_ritu -. t_ritu); flush stdout;*)
+            let ((k_hai,den),f_hai) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in 
+            if k_hai = (1,Not_hai) then 
+                   (*let (x',y') = hai_to_ary (x,y) in
+                            Printf.printf "%d,%d " x' y'; flush stdout; print_list tehai;*)
+                     (Printf.printf "%d %f %f\n" tumo_len f_t_ritu (f_t_ritu -. t_ritu); flush stdout;)
             else
                     ()
               (*Printf.printf "%d %d\n" tumo_len den; flush stdout;*)
@@ -1657,7 +1656,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         (*Printf.printf "a:%d\n" anzen; flush stdout;*)
         nofuro ()
       else
-        let (k_hai,den) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in
+        let ((k_hai,den),f_hai) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in
         let _ = 
           if k_hai = (1,Not_hai) then 
             ()          
@@ -1668,30 +1667,188 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         nofuro ()
 *)
 
-let threthhold_furo agariritu kitaiti tumo_len furo_ritu = 
-  if furo_ritu = 10 then 
-    if tumo_len > 12 then 
-      if (2100.0 *. agariritu *. agariritu -. 7000.0) > kitaiti then 
-        true
-      else
-        false
-    else if tumo_len > 6 then 
-      if (3700.0 *. agariritu *. agariritu -. 3800.0) > kitaiti then 
-        true
-      else
-        false
+let threthhold_furo_10 agariritu kitaiti tumo_len = 
+  if tumo_len > 12 then 
+    if (2100.0 *. agariritu *. agariritu -. 7000.0) > kitaiti then 
+      true
     else
-      if (5300.0 *. agariritu *. agariritu -. 2400.0) > kitaiti then 
-        true
-      else
-        false
+      false
+  else if tumo_len > 6 then 
+    if (3700.0 *. agariritu *. agariritu -. 3800.0) > kitaiti then 
+      true
+    else
+      false
+  else
+    if (5300.0 *. agariritu *. agariritu -. 2400.0) > kitaiti then 
+      true
     else
       false
 
+let threthhold_furo_15 agariritu kitaiti tumo_len = 
+  if tumo_len > 12 then 
+    if (4500.0 *. agariritu *. agariritu -. 1600.0) > kitaiti then 
+      true
+    else
+      false
+  else if tumo_len > 6 then 
+    if (8800.0 *. agariritu *. agariritu -. 1400.0) > kitaiti then 
+      true
+    else
+      false
+  else
+    if (3300.0 *. agariritu *. agariritu -. 300.0) > kitaiti then 
+      true
+    else
+      false
+
+let threthhold_furo_20 agariritu kitaiti tumo_len = 
+  if tumo_len > 12 then 
+    if (14000.0 *. agariritu *. agariritu -. 800.0) > kitaiti then 
+      true
+    else
+      false
+  else if tumo_len > 6 then 
+    if (9600.0 *. agariritu *. agariritu -. 200.0) > kitaiti then 
+      true
+    else
+      false
+  else
+    if (10000.0 *. agariritu *. agariritu -. 200.0) > kitaiti then 
+      true
+    else
+      false
+
+let threthhold_furo_25 agariritu kitaiti tumo_len = 
+  if tumo_len > 12 then 
+    if (16000.0 *. agariritu *. agariritu) > kitaiti then 
+      true
+    else
+      false
+  else if tumo_len > 6 then 
+    if (16000.0 *. agariritu *. agariritu) > kitaiti then 
+      true
+    else
+      false
+  else
+    if (44000.0 *. agariritu *. agariritu) > kitaiti then 
+      true
+    else
+      false
+
+let threthhold_furo_30 agariritu kitaiti tumo_len = 
+  if tumo_len > 12 then 
+    if (34000.0 *. agariritu *. agariritu) > kitaiti then 
+      true
+    else
+      false
+  else if tumo_len > 6 then 
+    if (44400.0 *. agariritu *. agariritu) > kitaiti then 
+      true
+    else
+      false
+  else
+    true
+
+
+let threthhold_furo_35 agariritu kitaiti tumo_len = 
+  if tumo_len > 12 then 
+    if (48000.0 *. agariritu *. agariritu) > kitaiti then 
+      true
+    else
+      false
+  else if tumo_len > 6 then 
+    if (67000.0 *. agariritu *. agariritu) > kitaiti then 
+      true
+    else
+      false
+  else
+    true
+
+
+let furoritu_to_furo furoritu agariritu kitaiti tumo_len = 
+  if furoritu >= 32.5 then 
+    threthhold_furo_35 agariritu kitaiti tumo_len
+  else if furoritu >= 27.5 then 
+    threthhold_furo_30 agariritu kitaiti tumo_len
+  else if furoritu >= 22.5 then 
+    threthhold_furo_25 agariritu kitaiti tumo_len
+  else if furoritu >= 17.5 then 
+    threthhold_furo_20 agariritu kitaiti tumo_len
+  else if furoritu >= 12.5 then 
+    threthhold_furo_15 agariritu kitaiti tumo_len
+  else if furoritu >= 7.5 then 
+    threthhold_furo_10 agariritu kitaiti tumo_len
+  else
+    false
+
+let threthhold_keiten_15 f_t_ritu tumo_len = 
+  if tumo_len < 6 then 
+    if f_t_ritu >= 0.75 then 
+      true
+    else
+      false
+  else
+    false
+
+let threthhold_keiten_20 f_t_ritu tumo_len = 
+  if tumo_len < 6 then 
+    if f_t_ritu >= 0.50 then 
+      true
+    else
+      false
+  else
+    false
+
+let threthhold_keiten_25 f_t_ritu tumo_len = 
+  if tumo_len < 7 then 
+    if f_t_ritu >= 0.40 then 
+      true
+    else
+      false
+  else
+    false
+
+let threthhold_keiten_30 f_t_ritu tumo_len = 
+  if tumo_len < 7 then 
+    if f_t_ritu >= 0.20 then 
+      true
+    else
+      false
+  else
+    false
+
+let threthhold_keiten_35 f_t_ritu tumo_len = 
+  if tumo_len < 7 then 
+    if f_t_ritu >= 0.20 then 
+      true
+    else
+      false
+  else if tumo_len < 10 then 
+    if f_t_ritu <= 0.5 then 
+      true 
+    else
+      false
+  else
+    false
+
+
+let furoritu_to_keiten furoritu f_t_ritu tumo_len = 
+  if furoritu >= 32.5 then 
+    threthhold_keiten_35 f_t_ritu tumo_len
+  else if furoritu >= 27.5 then 
+    threthhold_keiten_30 f_t_ritu tumo_len
+  else if furoritu >= 22.5 then 
+    threthhold_keiten_25 f_t_ritu tumo_len
+  else if furoritu >= 17.5 then 
+    threthhold_keiten_20 f_t_ritu tumo_len
+  else if furoritu >= 12.5 then 
+    threthhold_keiten_15 f_t_ritu tumo_len
+  else
+    false
 
 
 (*automatic*)
-let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst =
+let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst furoritu_lst =
   let (_,n) = syanten tehai in
   let reach_q = List.exists (fun a -> List.exists (fun b -> b = Reach || b = Doublereach) a) yaku_lst in
   let n' = kokushi_syanten tehai in
@@ -1717,12 +1874,15 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
       else
         let ((f_t_ritu,f_agariritu,f_kitaiti,k_hai),f_hai) = max_f_agariritu_a f_kitaiti_lst in  
         let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo) = not_naki in
-        if threthhold_furo (f_agariritu -. agariritu) (kitaiti -. f_kitaiti) tumo_len 10 then
+        if (f_agariritu -. agariritu) > 0.0 && furoritu_to_furo (List.nth furoritu_lst player) (f_agariritu -. agariritu) (kitaiti -.f_kitaiti) tumo_len  then
           [(k_hai,f_hai)]
         else
           let ((k_hai,den),f_hai) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in 
           if k_hai = (1,Not_hai) || den > 5 then 
-            []
+            if furoritu_to_keiten (List.nth furoritu_lst player) f_t_ritu tumo_len && (f_t_ritu -. t_ritu) >= 0.0 then
+              [(k_hai,f_hai)]
+            else
+              []
           else
             [(k_hai,f_hai)]
     else 
@@ -1735,8 +1895,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           []
         else
           [(k_hai,f_hai)]
-
-          
+        
 
 
 
