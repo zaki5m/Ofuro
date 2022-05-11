@@ -231,5 +231,5 @@ let simulate count (uma1,uma2) furoritu_lst =
   in
   loop (count-1) (0,0,0,0) 0
 
-let _ = simulate 20 (10000,30000) [10.0;15.0;20.0;25.0]
+let _ = simulate 20 (10000,30000) [35.0;10.0;10.0;10.0]
 
