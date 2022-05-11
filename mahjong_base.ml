@@ -610,7 +610,7 @@ let haitei_slide rm_wan yaku_lst player =
     false
 
 (*in:副露牌，out:(くいかえ牌,副露面子) list*)
-let kuikae (x,y) = match y with 
+let kuikae_match (x,y) = match y with 
   | 0 -> [((x,3),(Syuntu,(x,(0,1,2))))]
   | 1 -> [((x,4),(Syuntu,(x,(1,2,3))))]
   | 2 -> [((x,5),(Syuntu,(x,(2,3,4))))]
@@ -628,7 +628,7 @@ let kuikae (x,y) furo_block =
     [(x,y)]
   else
     let (x',y') = hai_to_ary (x,y) in 
-    let lst = kuikae (x',y') in 
+    let lst = kuikae_match (x',y') in 
     let m = List.length lst in 
     let rec loop i tmp = 
       let (kuikae_hai,n_block) = List.nth lst i in 
