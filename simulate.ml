@@ -15,7 +15,7 @@ let zyuniten a b c d (uma1,uma2) =
         0
       else
         List.nth lst (i+1) in
-    let e = if z = z' then i + 1 else i in
+    let e = if z = z' && i <> 3 then i + 1 else i in
     let (a',b',c',d') = tmp in
     let tmp = 
       if z = z' then
@@ -61,7 +61,7 @@ let zyuniten a b c d (uma1,uma2) =
             if z' = c then
               (a',b-(uma1+uma2)/2,c-(uma1+uma2)/2,d')
             else
-              (a',b-(uma1+uma2)/2,c',d+(uma1+uma2)/2)
+              (a',b-(uma1+uma2)/2,c',d-(uma1+uma2)/2)
           else
             (a',b',c-(uma1+uma2)/2,d-(uma1+uma2)/2)
       else
@@ -182,6 +182,49 @@ let zyuniten a b c d (uma1,uma2) =
   else
     loop_score 0 (0,0,0,0)
 
+let zyuni a b c d = 
+  let lst = List.sort (fun x y -> if x > y then -1 else 1) [a;b;c;d] in
+  let rec loop i a' b' c' d' = 
+    let x = List.nth lst i in 
+    let a' = if x = a && a' = 0 then (i+1) else a' in
+    let b' = if x = b && b' = 0 then (i+1) else b' in 
+    let c' = if x = c && c' = 0 then (i+1) else c' in 
+    let d' = if x = d && d' = 0 then (i+1) else d' in 
+    if i = 3 then 
+      [a';b';c';d']
+    else
+      loop (i+1) a' b' c' d'
+  in
+  let n_lst = loop 0 0 0 0 0 in 
+  let n_lst = List.map (fun a -> float_of_int a) n_lst in 
+  let n = List.fold_left (fun a b -> a +. b) 0.0 n_lst in
+  if n = 10.0 then 
+    ((List.nth n_lst 0),(List.nth n_lst 1),(List.nth n_lst 2),(List.nth n_lst 3))
+  else if n = 9.0 then 
+    if List.exists (fun a -> if a = 4.0 then true else false) n_lst then 
+      let n_lst = List.map (fun a -> if a = 3.0 then 3.5 else a) n_lst in 
+      ((List.nth n_lst 0),(List.nth n_lst 1),(List.nth n_lst 2),(List.nth n_lst 3))
+    else if List.exists (fun a -> if a = 3.0 then true else false) n_lst then 
+      let n_lst = List.map (fun a -> if a = 2.0 then 2.5 else a) n_lst in 
+      ((List.nth n_lst 0),(List.nth n_lst 1),(List.nth n_lst 2),(List.nth n_lst 3)) 
+    else
+      let n_lst = List.map (fun a -> if a = 1.0 then 1.5 else a) n_lst in 
+      ((List.nth n_lst 0),(List.nth n_lst 1),(List.nth n_lst 2),(List.nth n_lst 3))
+  else if n = 8.0 then 
+    let n_lst = List.map (fun a -> if a = 1.0 then 1.5 else 3.5) n_lst in 
+    ((List.nth n_lst 0),(List.nth n_lst 1),(List.nth n_lst 2),(List.nth n_lst 3))
+  else if n = 7.0 then 
+    let n_lst = List.map (fun a -> if a = 1.0 then 2.0 else a) n_lst in 
+    ((List.nth n_lst 0),(List.nth n_lst 1),(List.nth n_lst 2),(List.nth n_lst 3))
+  else if n = 4.0 then 
+    (2.5,2.5,2.5,2.5)
+  else
+    let n_lst = List.map (fun a -> if a = 4.0 then 3.0 else a) n_lst in 
+    ((List.nth n_lst 0),(List.nth n_lst 1),(List.nth n_lst 2),(List.nth n_lst 3))
+
+
+
+
 
 (*not automatic*)
 (*
@@ -222,7 +265,8 @@ let simulate count (uma1,uma2) furoritu_lst =
     let tmp3 = c + tmp3 in
     let tmp4 = d + tmp4 in
     (*Printf.printf "%d\n" (total+total_kyoku);*)
-    Printf.printf "%d A:%d B:%d c:%d d:%d\n"i a b c d; flush stdout;
+    let (a',b',c',d') = zyuni a b c d in 
+    Printf.printf "%d A:%d B:%d c:%d d:%d %f %f %f %f\n"i a b c d a' b' c' d'; flush stdout;
     if i = 0 then
       ((*Printf.printf "%d\n" (total+total_kyoku);*)
       Printf.printf "result: %dtimes A%f:%d B%f:%d c%f:%d d%f:%d\n" count (List.nth furoritu_lst 0) tmp1 (List.nth furoritu_lst 1) tmp2 (List.nth furoritu_lst 2) tmp3 (List.nth furoritu_lst 3) tmp4;)
@@ -231,5 +275,5 @@ let simulate count (uma1,uma2) furoritu_lst =
   in
   loop (count-1) (0,0,0,0) 0
 
-let _ = simulate 20 (10000,30000) [35.0;10.0;10.0;10.0]
+let _ = simulate 20 (10000,30000) [35.0;15.0;15.0;15.0]
 
