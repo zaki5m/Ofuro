@@ -747,7 +747,6 @@ let judge_parallel ary zi_ary tehai =
   else
     operate_tenapai_ritu ary zi_ary tehai
 
-
 let tenpai_ritu rest_tumo_lst tumo_l rm_wan = 
   let m = List.length rest_tumo_lst in
   let rec loop i tmp = 
