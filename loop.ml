@@ -134,7 +134,10 @@ let hantei_zi array =
     let lst =
       if n >= 2 then
         if n >= 3 then
-          Anko::list
+          if n = 3 then
+            Anko::list
+          else
+            list
         else
         Toitu::list
       else
@@ -2261,9 +2264,9 @@ let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int
 
 
 (*let _ = 
-  let a = [|[|0;0;0;1;0;0;0;0;0|];
-            [|0;0;0;1;0;0;0;0;0|];
-            [|2;2;0;0;0;0;0;0;1|]|] in 
-  let zi = [|2;1;0;1;2;0;0|] in
+  let a = [|[|0;0;2;0;0;0;0;0;0|];
+            [|3;0;0;0;0;0;0;0;0|];
+            [|0;1;1;1;0;0;0;0;0|]|] in 
+  let zi = [|1;1;0;0;0;0;0|] in
   let zi_lst = hantei_zi zi in  
-  tehai_to_ten a zi 3 0 false [] [] [(3,5)] *)
+  tehai_to_ten a zi 2 1 true [(Minko,(3,(1,1,1)))] [] [(3,5)]*)

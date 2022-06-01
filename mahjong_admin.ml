@@ -636,7 +636,12 @@ let kiriban tehai_lst sutehai_lst ary_lst (x,y) player f_lst naki (yaku_lst:Mahj
     else 
       let (k_x,k_y,k_z) = int_to_hai tehai n in
       let tehai1 = d_tehai tehai (k_x,k_y) in
-      let (kyotaku,reach) = possible_reach tehai1 (List.nth sutehai_lst player) naki (List.nth f_lst player) yaku_player dora_lst zi_kaze ba kyotaku in
+      let (kyotaku,reach) = 
+        if naki = false then
+          possible_reach tehai1 (List.nth sutehai_lst player) naki (List.nth f_lst player) yaku_player dora_lst zi_kaze ba kyotaku 
+        else
+          (kyotaku,[])
+      in
       let sutehai1 = add_tehai2 sutehai (k_x,k_y,k_z) in
       let tehai1 = ripai tehai1 in
       (tehai1,sutehai1,reach,kyotaku)
@@ -1310,34 +1315,37 @@ let opt_ron player lst honba kyotaku =
     else
       let n = loop' (m-1) (List.hd lst) in
       let (a,(_,b)) = n in
-      if player = 0 then
-        if a = 1 then
-          (-(b+honba*300),b+honba*300+kyotaku*1000,0,0)
-        else if a = 2 then
-          (-(b+honba*300),0,b+honba*300+kyotaku*1000,0)
-        else 
-          (-(b+honba*300),0,0,b+honba*300+kyotaku*1000)
-      else if player = 1 then
-        if a = 0 then
-          (b+honba*300+kyotaku*1000,-(b+honba*300),0,0)
-        else if a = 2 then
-          (0,-(b+honba*300),b+honba*300+kyotaku*1000,0)
-        else 
-          (0,-(b+honba*300),0,b+honba*300+kyotaku*1000)
-      else if player = 2 then
-        if a = 0 then
-          (b+honba*300+kyotaku*1000,0,-(b+honba*300),0)
-        else if a = 1 then
-          (0,b+honba*300+kyotaku*1000,-(b+honba*300),0)
-        else 
-          (0,0,-(b+honba*300),b+honba*300+kyotaku*1000)
+      if b > 0 then 
+        if player = 0 then
+          if a = 1 then
+            (-(b+honba*300),b+honba*300+kyotaku*1000,0,0)
+          else if a = 2 then
+            (-(b+honba*300),0,b+honba*300+kyotaku*1000,0)
+          else 
+            (-(b+honba*300),0,0,b+honba*300+kyotaku*1000)
+        else if player = 1 then
+          if a = 0 then
+            (b+honba*300+kyotaku*1000,-(b+honba*300),0,0)
+          else if a = 2 then
+            (0,-(b+honba*300),b+honba*300+kyotaku*1000,0)
+          else 
+            (0,-(b+honba*300),0,b+honba*300+kyotaku*1000)
+        else if player = 2 then
+          if a = 0 then
+            (b+honba*300+kyotaku*1000,0,-(b+honba*300),0)
+          else if a = 1 then
+            (0,b+honba*300+kyotaku*1000,-(b+honba*300),0)
+          else 
+            (0,0,-(b+honba*300),b+honba*300+kyotaku*1000)
+        else
+          if a = 0 then
+            (b+honba*300+kyotaku*1000,0,0,-(b+honba*300))
+          else if a = 1 then
+            (0,b+honba*300+kyotaku*1000,0,-(b+honba*300))
+          else 
+            (0,0,b+honba*300+kyotaku*1000,-(b+honba*300))
       else
-        if a = 0 then
-          (b+honba*300+kyotaku*1000,0,0,-(b+honba*300))
-        else if a = 1 then
-          (0,b+honba*300+kyotaku*1000,0,-(b+honba*300))
-        else 
-          (0,0,b+honba*300+kyotaku*1000,-(b+honba*300))
+        (0,0,0,0)
 
 let ron_inq i = 
   let rec loop' () = 
@@ -1672,7 +1680,7 @@ let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_sc
     in
     if (ten_0,ten_1,ten_2,ten_3) <> (0,0,0,0) then
       ((*let tehai_lst = add_tehai_lst tehai_lst tehai player in
-      t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst;*)
+      t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
       (0,(ten_0,ten_1,ten_2,ten_3),player_score))
     else
         let tehai_lst = add_tehai_lst tehai_lst tehai player in
@@ -1685,7 +1693,7 @@ let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_sc
               player + 1 
           in
           if List.length yama_lst = 14 then
-            ((*t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst;*)
+            ((*t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
             let tenpai_lst = ryukyoku_ten ary_lst furo_lst [] dora_lst in
             let (ten_0,ten_1,ten_2,ten_3) = tenpai_ryo tenpai_lst in
             let player_score = ten_to_player player_score (ten_0,ten_1,ten_2,ten_3) in
@@ -1693,7 +1701,7 @@ let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_sc
           else
             loop' player tehai_lst sutehai_lst yama_lst furo_lst ary_lst naki_lst dora_lst yaku_lst kyotaku player_score furiten_lst furo_double_lst
         else
-          ((*t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst;*)
+          ((*t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
           (0,(a,b,c,d),player_score))
     in
     loop' (kyoku-1) tehai_lst sutehai_lst yama_lst furo_lst ary_lst naki_lst dora_lst yaku_lst kyotaku player_score furiten_lst []
@@ -1855,6 +1863,6 @@ let hantyan furoritu_lst =
     in
     loop' 1 0 0 0 player_score 0 
 
-
-(*let _ = hantyan [25.0;25.0;25.0;25.0]
+(*
+let _ = hantyan [25.0;25.0;25.0;25.0]
 *)
