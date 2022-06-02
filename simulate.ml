@@ -251,9 +251,59 @@ let simulate count (uma1,uma2) =
   loop (count-1) (0,0,0,0) 0
 *)
 
+let zyuni_count lst (a,b,c,d) =
+  let (a1,a2,a3,a4) = List.nth lst 0 in
+  let (b1,b2,b3,b4) = List.nth lst 1 in
+  let (c1,c2,c3,c4) = List.nth lst 2 in
+  let (d1,d2,d3,d4) = List.nth lst 3 in
+  let (a1,a2,a3,a4) = 
+    if a = 1 then 
+      (a1+1,a2,a3,a4)
+    else if a = 2 then 
+      (a1,a2+1,a3,a4)
+    else if a = 3 then 
+      (a1,a2,a3+1,a4)
+    else
+      (a1,a2,a3,a4+1)
+  in
+  let (b1,b2,b3,b4) = 
+    if b = 1 then 
+      (b1+1,b2,b3,b4)
+    else if b = 2 then 
+      (b1,b2+1,b3,b4)
+    else if b = 3 then 
+      (b1,b2,b3+1,b4)
+    else
+      (b1,b2,b3,b4+1)
+  in
+  let (c1,c2,c3,c4) = 
+    if c = 1 then 
+      (c1+1,c2,c3,c4)
+    else if d = 2 then 
+      (c1,c2+1,c3,c4)
+    else if d = 3 then 
+      (c1,c2,c3+1,c4)
+    else
+      (c1,c2,c3,c4+1)
+  in
+  let (d1,d2,d3,d4) = 
+    if d = 1 then 
+      (d1+1,d2,d3,d4)
+    else if d = 2 then 
+      (d1,d2+1,d3,d4)
+    else if d = 3 then 
+      (d1,d2,d3+1,d4)
+    else
+      (d1,d2,d3,d4+1)
+  in
+  [(a1,a2,a3,a4);(b1,b2,b3,b4);(c1,c2,c3,c4);(d1,d2,d3,d4)]
+
+
+
+
 (*automatic*)
 let simulate count (uma1,uma2) furoritu_lst =
-  let rec loop i (tmp1,tmp2,tmp3,tmp4) total  = 
+  let rec loop i (tmp1,tmp2,tmp3,tmp4) total zyuni_lst = 
     let (total_kyoku,a,b,c,d) = hantyan furoritu_lst in
     let a' = a - 25000 in
     let b' = b - 25000 in
@@ -266,14 +316,19 @@ let simulate count (uma1,uma2) furoritu_lst =
     let tmp4 = d + tmp4 in
     (*Printf.printf "%d\n" (total+total_kyoku);*)
     let (a',b',c',d') = zyuni a b c d in 
+    let zyuni_lst = zyuni_count zyuni_lst (int_of_float a',int_of_float b',int_of_float c',int_of_float d') in 
     Printf.printf "%d A:%d B:%d c:%d d:%d %f %f %f %f\n"i a b c d a' b' c' d'; flush stdout;
     if i = 0 then
       ((*Printf.printf "%d\n" (total+total_kyoku);*)
-      Printf.printf "result: %dtimes A%f:%d B%f:%d c%f:%d d%f:%d\n" count (List.nth furoritu_lst 0) tmp1 (List.nth furoritu_lst 1) tmp2 (List.nth furoritu_lst 2) tmp3 (List.nth furoritu_lst 3) tmp4;)
+      Printf.printf "result: %dtimes A%f:%d B%f:%d c%f:%d d%f:%d\n" count (List.nth furoritu_lst 0) tmp1 (List.nth furoritu_lst 1) tmp2 (List.nth furoritu_lst 2) tmp3 (List.nth furoritu_lst 3) tmp4;
+      Printf.printf "A: %d %d %d %d \n" List.nth zyuni_lst 0;
+      Printf.printf "B: %d %d %d %d \n" List.nth zyuni_lst 1;
+      Printf.printf "C: %d %d %d %d \n" List.nth zyuni_lst 2;
+      Printf.printf "D: %d %d %d %d \n" List.nth zyuni_lst 3;)
     else
-      loop (i-1) (tmp1,tmp2,tmp3,tmp4) (total+ total_kyoku) 
+      loop (i-1) (tmp1,tmp2,tmp3,tmp4) (total+ total_kyoku) zyuni_lst
   in
   loop (count-1) (0,0,0,0) 0
 
-let _ = simulate 20 (10000,30000) [35.0;15.0;15.0;15.0]
+let _ = simulate 20 (10000,30000) [35.0;15.0;15.0;15.0] [(0,0,0,0);(0,0,0,0);(0,0,0,0);(0,0,0,0)]
 
