@@ -321,14 +321,18 @@ let simulate count (uma1,uma2) furoritu_lst =
     if i = 0 then
       ((*Printf.printf "%d\n" (total+total_kyoku);*)
       Printf.printf "result: %dtimes A%f:%d B%f:%d c%f:%d d%f:%d\n" count (List.nth furoritu_lst 0) tmp1 (List.nth furoritu_lst 1) tmp2 (List.nth furoritu_lst 2) tmp3 (List.nth furoritu_lst 3) tmp4;
-      Printf.printf "A: %d %d %d %d \n" List.nth zyuni_lst 0;
-      Printf.printf "B: %d %d %d %d \n" List.nth zyuni_lst 1;
-      Printf.printf "C: %d %d %d %d \n" List.nth zyuni_lst 2;
-      Printf.printf "D: %d %d %d %d \n" List.nth zyuni_lst 3;)
+      let (s1,s2,s3,s4) = List.nth zyuni_lst 0 in  
+      Printf.printf "A: %d %d %d %d \n" s1 s2 s3 s4;
+      let (s1,s2,s3,s4) = List.nth zyuni_lst 1 in  
+      Printf.printf "B: %d %d %d %d \n" s1 s2 s3 s4;
+      let (s1,s2,s3,s4) = List.nth zyuni_lst 2 in  
+      Printf.printf "C: %d %d %d %d \n" s1 s2 s3 s4;
+      let (s1,s2,s3,s4) = List.nth zyuni_lst 3 in  
+      Printf.printf "D: %d %d %d %d \n" s1 s2 s3 s4;)
     else
       loop (i-1) (tmp1,tmp2,tmp3,tmp4) (total+ total_kyoku) zyuni_lst
   in
   loop (count-1) (0,0,0,0) 0
 
-let _ = simulate 20 (10000,30000) [35.0;15.0;15.0;15.0] [(0,0,0,0);(0,0,0,0);(0,0,0,0);(0,0,0,0)]
+let _ = simulate 250 (10000,30000) [10.0;10.0;10.0;35.0] [(0,0,0,0);(0,0,0,0);(0,0,0,0);(0,0,0,0)]
 
