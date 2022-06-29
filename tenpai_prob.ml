@@ -6,7 +6,7 @@ open Mahjong_safty
 
 module C = Domainslib.Chan
 
-let num_domains = 40 
+let num_domains = int_of_string Sys.argv.(1) 
 
 type 'a message = Task of 'a | Quit
 
