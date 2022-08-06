@@ -627,7 +627,7 @@ let kiriban tehai_lst sutehai_lst ary_lst (x,y) player f_lst naki (yaku_lst:Mahj
   let yaku_player = List.filter (fun a -> a <> Ippatu) yaku_player in 
   let zi_kaze = kyoku_to_kaze kyoku player in
   let rec loop' tehai sutehai =
-     (*t_format tehai_lst f_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
+     t_format tehai_lst f_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;
     let n = 
       prob_select sutehai_lst tehai f_lst yaku_lst player yama_len zi_kaze ba naki dora_lst furo_double_lst
     in
@@ -1680,8 +1680,8 @@ let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_sc
         (0,0,0,0)
     in
     if (ten_0,ten_1,ten_2,ten_3) <> (0,0,0,0) then
-      ((*let tehai_lst = add_tehai_lst tehai_lst tehai player in
-      t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
+      (let tehai_lst = add_tehai_lst tehai_lst tehai player in
+      t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;
       (0,(ten_0,ten_1,ten_2,ten_3),player_score))
     else
         let tehai_lst = add_tehai_lst tehai_lst tehai player in
@@ -1694,7 +1694,7 @@ let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_sc
               player + 1 
           in
           if List.length yama_lst = 14 then
-            ((*t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
+            (t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;
             let tenpai_lst = ryukyoku_ten ary_lst furo_lst [] dora_lst in
             let (ten_0,ten_1,ten_2,ten_3) = tenpai_ryo tenpai_lst in
             let player_score = ten_to_player player_score (ten_0,ten_1,ten_2,ten_3) in
@@ -1702,7 +1702,7 @@ let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_sc
           else
             loop' player tehai_lst sutehai_lst yama_lst furo_lst ary_lst naki_lst dora_lst yaku_lst kyotaku player_score furiten_lst furo_double_lst
         else
-          ((*t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
+          (t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;
           (0,(a,b,c,d),player_score))
     in
     loop' (kyoku-1) tehai_lst sutehai_lst yama_lst furo_lst ary_lst naki_lst dora_lst yaku_lst kyotaku player_score furiten_lst []

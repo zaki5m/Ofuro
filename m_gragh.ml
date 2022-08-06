@@ -419,5 +419,17 @@ let t_format tehai_lst furo_lst (sutehai_lst:(int*hai*bool)list list) ba kyoku h
   in
   loop' 0 0 
 
+let tehai_onry tehai_lst = 
+  let rec loop i = 
+    print_hai tehai_lst i;
+    if i = 4 then 
+      (Printf.printf "\n";)
+    else
+      (Printf.printf "\n";
+      loop (i+1)
+      )
+  in
+  loop 0
+    
 
 
