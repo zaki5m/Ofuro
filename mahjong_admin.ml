@@ -631,7 +631,7 @@ let kiriban tehai_lst sutehai_lst ary_lst (x,y) player f_lst naki (yaku_lst:Mahj
     let n = 
       prob_select sutehai_lst tehai f_lst yaku_lst player yama_len zi_kaze ba naki dora_lst furo_double_lst
     in
-    (*Printf.printf "%d\n" n; flush stdout;*)
+    Printf.printf "%d\n" n; flush stdout;
     if n < 0 && (List.length tehai) <= n then
       loop' tehai sutehai
     else 
@@ -969,7 +969,7 @@ let furo_inq2 lst ary_lst sutehai_lst furo_lst yaku_lst yama_len ba kyoku naki_l
       if n <> [] && (List.nth yaku_lst m) = [] then
         let tehai = ary_to_list ary zi_ary in
         let zi_kaze = kyoku_to_kaze kyoku m in
-        let furo_t_f = purob_furo sutehai_lst tehai furo_lst yaku_lst m yama_len zi_kaze ba (List.nth naki_lst m) dora_lst (x,y) furo_double_lst furoritu_lst in 
+        let furo_t_f = purob_furo sutehai_lst tehai furo_lst yaku_lst m yama_len zi_kaze ba (List.nth naki_lst m) dora_lst (x,y) furo_double_lst furoritu_lst in
         if furo_t_f = [] then 
           tmp 
         else
@@ -1551,7 +1551,7 @@ let rec furo_loop yama_lst tehai_lst sutehai_lst ary_lst (x,y) player furo_lst n
             (yama_lst,naki_lst',player',dora_lst,furo_lst',tehai_lst,sutehai_lst,ary_lst,yaku_lst,player_score,kyotaku,(x,y),(a,b,c,d),furo_double_lst)
           else
             (yama_lst,naki_lst',player',dora_lst,furo_lst',tehai_lst,sutehai_lst,ary_lst,yaku_lst,player_score,kyotaku,(x,y),(a,b,c,d),furo_double_lst)
-  in
+          in
   if (player = player' &&  (List.length yama_lst) = (List.length yama_lst'))|| (a,b,c,d) <> (0,0,0,0) then
     (tehai_lst,sutehai_lst,ary_lst,furo_lst,naki_lst,player,yama_lst,yaku_lst,dora_lst,(a,b,c,d),kyotaku,player_score,furiten_lst,furo_double_lst)
   else

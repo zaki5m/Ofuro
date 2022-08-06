@@ -2329,7 +2329,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
     let p_f_lst = possible_furo_patern tehai (x,y) in
     let f_kitaiti_lst = f_kitaiti p_f_lst tehai (List.nth furo_lst player) (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst in
     let tenpai_lst = judge_parallel_f ary zi_ary tehai in
-    if Array.length tenpai_lst = 1 && List.length tenpai_lst.(1) = 0 then 
+    if Array.length tenpai_lst = 0 || Array.length tenpai_lst = 1 && List.length tenpai_lst.(0) = 0 then 
       []
     else if reach_q = false then
       let not_naki = col_tenpai_f ary zi_ary tehai yama_len (List.nth furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
@@ -2361,7 +2361,6 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
               []
           else
             [(k_hai,f_hai)]
-
     else 
       let haitei_s = haitei_slide (yama_len - 14) yaku_lst player in
       if haitei_s = true && (yama_len-14) < 4 then
