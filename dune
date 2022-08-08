@@ -2,7 +2,10 @@
   (name mahjong_admin)
   (libraries domainslib)
 )
+
 (env
- (dev
-   (flags (:standard -warn-error -a)))
+  (dev
+    (flags (:standard -warn-error -a)))
+  (release 
+    (ocamlopt_flags (:standard -O2)))
 )
