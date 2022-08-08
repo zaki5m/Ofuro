@@ -884,7 +884,7 @@ let parallel ary zi_ary tmp =
 
 let judge_parallel ary zi_ary tehai = 
   let (_,n) = syanten tehai in 
-  if n  =  3 then 
+  if n  >=  1 then 
     let tenpai_lst = [([],[],[],tehai)] in 
     let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.hd tenpai_lst in
     let tmp = k_fase ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai) in
@@ -1599,7 +1599,7 @@ let operate_tenapai_ritu_f ary zi_ary tehai =
 
 let judge_parallel_f ary zi_ary tehai = 
   let (_,n) = syanten tehai in 
-  if n  =  3 then 
+  if n  >=  1 then 
     let tenpai_lst = [([],[],[],tehai)] in 
     let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.hd tenpai_lst in
     let tmp = all_tumo ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai) in
