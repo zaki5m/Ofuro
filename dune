@@ -1,11 +1,9 @@
 (executable
-  (name mahjong_admin)
+  (name simulate)
   (libraries domainslib)
 )
 
 (env
   (dev
     (flags (:standard -warn-error -a)))
-  (release 
-    (ocamlopt_flags (:standard -O2)))
 )

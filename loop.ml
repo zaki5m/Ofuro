@@ -14,19 +14,19 @@ let tyuren_a = [|[|4;1;1;1;1;1;1;1;3|];
 
 
 
-let ten_oya = [[0;0;1500;2000;2400;2900;3400;3900;4400;4800;5300];
-              [2100;2400;2900;3900;4800;5800;6800;7700;8700;9600;10600];
-              [3900;4800;5800;7700;9600;11600;12000;12000;12000;12000;12000];
-              [7700;9600;11600;12000;12000;12000;12000;12000;12000;12000;12000]]
+let ten_oya = [|[|0;0;1500;2000;2400;2900;3400;3900;4400;4800;5300|];
+              [|2100;2400;2900;3900;4800;5800;6800;7700;8700;9600;10600|];
+              [|3900;4800;5800;7700;9600;11600;12000;12000;12000;12000;12000|];
+              [|7700;9600;11600;12000;12000;12000;12000;12000;12000;12000;12000|]|]
 
-let ten_ko = [[0;0;1000;1300;1600;2000;2300;2600;2900;3200;3600];
-              [1300;1600;2000;2600;3200;3900;4500;5200;5800;6400;7100];
-              [2600;3200;3900;5200;6400;7700;8000;8000;8000;8000;8000];
-              [5200;6400;7700;8000;8000;8000;8000;8000;8000;8000;8000]]
+let ten_ko = [|[|0;0;1000;1300;1600;2000;2300;2600;2900;3200;3600|];
+              [|1300;1600;2000;2600;3200;3900;4500;5200;5800;6400;7100|];
+              [|2600;3200;3900;5200;6400;7700;8000;8000;8000;8000;8000|];
+              [|5200;6400;7700;8000;8000;8000;8000;8000;8000;8000;8000|]|]
 
-let ten_oya_man = [12000;18000;24000;36000;48000]
+let ten_oya_man = [|12000;18000;24000;36000;48000|]
 
-let ten_ko_man = [8000;12000;16000;24000;36000]
+let ten_ko_man = [|8000;12000;16000;24000;36000|]
 
 let ten_tumo_oya ten =
   if ten mod 3 = 0 then
@@ -128,8 +128,7 @@ let sp_kotu list =
   (List.length lst, List.length lst2, List.length lst3, List.length lst4)
 
 let hantei_zi array =
-  let list = [] in
-  let rec loop i array list =
+  let rec loop i list =
     let n = array.(i) in 
     let lst =
       if n >= 2 then
@@ -146,15 +145,56 @@ let hantei_zi array =
     if i = 6 then
       lst
     else
-      loop (i+1) array lst
+      loop (i+1) lst
   in
-  loop 0 array list 
+  loop 0 []
 
-              
 
+  
+let hantei_syuntu array list =
+  let rec loops i j tmp = 
+    let lst =
+      let n = array.(i).(j) in
+      let n1 = array.(i).(j+1) in 
+      let n2 = array.(i).(j+2) in
+      if n >= 1 then      
+        if n1 >= 1 && n2 >= 1 then
+          let tmp = Syuntu::tmp in
+          array.(i).(j) <- n - 1;
+          array.(i).(j+1) <- n1 - 1;
+          array.(i).(j+2) <- n2 - 1;
+          loops i j tmp
+        else
+          [Ws]
+      else
+        tmp
+      in
+
+    if i = 2 then
+      if j = 6 then
+        if array.(i).(7) >= 1 || array.(i).(8) >= 1 then 
+          [Ws]
+        else
+          lst
+      else
+        loops i (j+1) lst
+    else
+      if j = 6 then
+        if array.(i).(7) >= 1 || array.(i).(8) >= 1 then 
+          loops (i+1) 0 [Ws]
+        else
+          loops (i+1) 0 lst
+      else
+        loops i (j+1) lst
+  in
+    loops 0 0 list
+
+
+
+(*
 let hantei_syuntu array list=
   (*let list = [] in*)
-  let rec loop i j array list = 
+  let rec loops i j array list = 
     let lst =
       let n = array.(i).(j) in
       if n >= 1 then
@@ -168,7 +208,7 @@ let hantei_syuntu array list=
                 array.(i).(j) <- n - 1;
                 array.(i).(j+1) <- n' - 1;
                 array.(i).(j+2) <- n'' - 1;
-                loop i j array list
+                loops i j array list
               else
                 [Ws]
             else
@@ -185,17 +225,18 @@ let hantei_syuntu array list=
       if j = 8 then
           lst
       else
-        loop i (j+1) array lst
+        loops i (j+1) array lst
     else
       if j = 8 then
-        loop (i+1) 0 array lst
+        loops (i+1) 0 array lst
       else
-        loop i (j+1) array lst
+        loops i (j+1) array lst
   in
-    loop 0 0 array list
+    loops 0 0 array list
+*)
 
 let hantei_koutu array = 
-  let rec loop i j array list count = 
+  let rec loopk i j array list count = 
     let n = array.(i).(j) in
     let lst =
       if n >= 3 then
@@ -212,11 +253,11 @@ let hantei_koutu array =
         let lst2 = 
           if j = 8 then
             if i = 2 then
-              loop i j array2 tmp (count-3)
+              loopk i j array2 tmp (count-3)
             else
-              loop (i+1) 0 array2 tmp (count-3) 
+              loopk (i+1) 0 array2 tmp (count-3) 
           else
-            loop i (j+1) array2 tmp (count-3) in
+            loopk i (j+1) array2 tmp (count-3) in
         let remove_kotu = hantei_syuntu array2 (List.hd tmp) in
         let remove_kotu = if (List.for_all (fun x -> x <> Ws) remove_kotu) = true then
                             add_state tmp remove_kotu
@@ -248,14 +289,14 @@ let hantei_koutu array =
         in
         remove_kotu
       else
-        loop i (j+1) array lst count
+        loopk i (j+1) array lst count
     else
       if j = 8 then
-        loop (i+1) 0 array lst count
+        loopk (i+1) 0 array lst count
       else
-        loop i (j+1) array lst count
+        loopk i (j+1) array lst count
   in
-    loop 0 0 array [] 12
+    loopk 0 0 array [] 12
 
 let koutu_count ary anko_lst = 
   let rec loop i j tmp = 
@@ -307,7 +348,7 @@ let koutu_count ary anko_lst =
 
 let lp array zi_lst= 
   let list = [] in
-  let rec loop' i j array list zi_lst = 
+  let rec loop10 i j array list zi_lst = 
     let n = array.(i).(j) in
     let lst =
       if n >= 2 then
@@ -334,16 +375,16 @@ let lp array zi_lst=
       if j = 8 then
         lst
       else
-        loop' i (j+1) array lst zi_lst
+        loop10 i (j+1) array lst zi_lst
     else
       if j = 8 then
-        loop' (i+1) 0 array lst zi_lst
+        loop10 (i+1) 0 array lst zi_lst
       else
-        loop' i (j+1) array lst zi_lst
+        loop10 i (j+1) array lst zi_lst
   in
 
   if zi_lst = [] then
-    let lst = loop' 0 0 array list [] in
+    let lst = loop10 0 0 array list [] in
     let lst = remove_ws lst in
     lst
   else
@@ -357,13 +398,12 @@ let lp array zi_lst=
       let lst3 = remove_ws [lst3] in
       lst3
     else
-      let lst = loop' 0 0 array list zi_lst in
+      let lst = loop10 0 0 array list zi_lst in
       let lst = remove_ws lst in
       lst
 
 let titoitu ary zi_lst =
-  let lst = [] in
-  let rec loop' i j ary lst = 
+  let rec loop' i j lst = 
     let n = ary.(i).(j) in
     let lst = 
       if n = 2 then
@@ -375,14 +415,14 @@ let titoitu ary zi_lst =
       if j = 8 then
         lst
       else
-        loop' i (j+1) ary lst 
+        loop' i (j+1) lst 
     else
       if j = 8 then
-        loop' (i+1) 0 ary lst 
+        loop' (i+1) 0 lst 
       else
-        loop' i (j+1) ary lst 
-in
-  let lst = loop' 0 0 ary lst in
+        loop' i (j+1) lst 
+  in
+  let lst = loop' 0 0 [] in
   let lst = List.filter (fun x -> x = Toitu) lst in
   let zi_lst = List.filter (fun x -> x = Toitu) zi_lst in
   let n = (List.length lst) + (List.length zi_lst) in
@@ -520,7 +560,7 @@ let count_agari zi_lst m =
 
 
 let tenpai_to_mati s_ary zi_ary =
-  let rec loop' i j ary lst zi_lst = 
+  let rec looptm i j ary lst zi_lst = 
     let n = ary.(i).(j) in
     let ary2 = Array.map (fun x -> Array.copy x) ary in
     ary2.(i).(j) <- n+1;
@@ -545,14 +585,14 @@ let tenpai_to_mati s_ary zi_ary =
       if j = 8 then
         lst
       else
-        loop' i (j+1) ary lst zi_lst
+        looptm i (j+1) ary lst zi_lst
     else
       if j = 8 then
-        loop' (i+1) 0 ary lst zi_lst
+        looptm (i+1) 0 ary lst zi_lst
       else
-        loop' i (j+1) ary lst zi_lst
+        looptm i (j+1) ary lst zi_lst
   in
-  let m_lst = loop' 0 0 s_ary [] (hantei_zi zi_ary) in
+  let m_lst = looptm 0 0 s_ary [] (hantei_zi zi_ary) in
 
   let rec loop2' i ary zi_ary lst =
     let n = zi_ary.(i) in
@@ -1739,10 +1779,10 @@ let opt_han lst naki oya =
       if a = 0 then
         if naki = false then
           if oya = true then
-            let y = List.nth (List.nth ten_oya (a)) (b-1) in
+            let y = ten_oya.(a).(b-1) in
             (y,0)
           else
-            let y = List.nth (List.nth ten_ko (a)) (b-1) in
+            let y = ten_ko.(a).(b-1) in
             (y,0)
         else
           (0,0)
@@ -1751,73 +1791,73 @@ let opt_han lst naki oya =
           if b >= 3 then
             if oya = true then
               if a > 4 then
-                let x = List.nth ten_oya_man (opt_man (a)) in
-                let y = List.nth ten_oya_man (opt_man (a+1)) in
+                let x = ten_oya_man.(opt_man (a)) in
+                let y = ten_oya_man.(opt_man (a+1)) in
                 (y,x)
               else if a+1 > 4 then
-                let x = List.nth (List.nth ten_oya (a-1)) (c-1) in
-                let y = List.nth ten_oya_man (opt_man (a+1)) in
+                let x = ten_oya.(a-1).(c-1) in
+                let y = ten_oya_man.(opt_man (a+1)) in
                 (y,x)
               else
-                let x = List.nth (List.nth ten_oya (a-1)) (c-1) in
-                let y = List.nth (List.nth ten_oya (a)) (b-1) in
+                let x = ten_oya.(a-1).(c-1) in
+                let y = ten_oya.(a).(b-1) in
                 (y,x)
             else
               if a > 4 then
-                let x = List.nth ten_ko_man (opt_man (a)) in
-                let y = List.nth ten_ko_man (opt_man (a+1)) in
+                let x = ten_ko_man.(opt_man (a)) in
+                let y = ten_ko_man.(opt_man (a+1)) in
                 (y,x)
               else if a+1 > 4 then
-                let x = List.nth (List.nth ten_ko (a-1)) (c-1) in
-                let y = List.nth ten_ko_man (opt_man (a+1)) in
+                let x = ten_ko.(a-1).(c-1) in
+                let y = ten_ko_man.(opt_man (a+1)) in
                 (y,x)
               else
-                let x = List.nth (List.nth ten_ko (a-1)) (c-1) in
-                let y = List.nth (List.nth ten_ko (a)) (b-1) in
+                let x = ten_ko.(a-1).(c-1) in
+                let y = ten_ko.(a).(b-1) in
                 (y,x)
           else
             if oya = true then
               if a > 4 then
-                let x = List.nth ten_oya_man (opt_man (a)) in
-                let y = List.nth ten_oya_man (opt_man (a+1)) in
+                let x = ten_oya_man.(opt_man (a)) in
+                let y = ten_oya_man.(opt_man (a+1)) in
                 (y,x)
               else if a+1 > 4 then
-                let x = List.nth (List.nth ten_oya (a-1)) (c-1) in
-                let y = List.nth ten_oya_man (opt_man (a+1)) in
+                let x = ten_oya.(a-1).(c-1) in
+                let y = ten_oya_man.(opt_man (a+1)) in
                 (y,x)
               else
-                let x = List.nth (List.nth ten_oya (a-1)) (c-1) in
-                let y = List.nth (List.nth ten_oya (a)) 0 in
+                let x = ten_oya.(a-1).(c-1) in
+                let y = ten_oya.(a).(0) in
                 (y,x)
             else
               if a > 4 then
-                let x = List.nth ten_ko_man (opt_man (a)) in
-                let y = List.nth ten_ko_man (opt_man (a+1)) in
+                let x = ten_ko_man.(opt_man (a)) in
+                let y = ten_ko_man.(opt_man (a+1)) in
                 (y,x)
               else if a+1 > 4 then
-                let x = List.nth (List.nth ten_ko (a-1)) (c-1) in
-                let y = List.nth ten_ko_man (opt_man (a+1)) in
+                let x = ten_ko.(a-1).(c-1) in
+                let y = ten_ko_man.(opt_man (a+1)) in
                 (y,x)
               else
-                let x = List.nth (List.nth ten_ko (a-1)) (c-1) in
-                let y = List.nth (List.nth ten_ko (a)) 0 in
+                let x = ten_ko.(a-1).(c-1) in
+                let y = ten_ko.(a).(0) in
                 (y,x)
         else
           if oya = true then
             if a > 4 then
-              let x = List.nth ten_oya_man (opt_man (a)) in
+              let x = ten_oya_man.(opt_man (a)) in
               (x,x)
             else
-              let x = List.nth (List.nth ten_oya (a-1)) (c-1) in
-              let y = List.nth (List.nth ten_oya (a-1)) (b-1) in
+              let x = ten_oya.(a-1).(c-1) in
+              let y = ten_oya.(a-1).(b-1) in
               (y,x)
           else
             if a > 4 then
-              let x = List.nth ten_ko_man (opt_man (a)) in
+              let x = ten_ko_man.(opt_man (a)) in
               (x,x)
             else
-              let x = List.nth (List.nth ten_ko (a-1)) (c-1) in
-              let y = List.nth (List.nth ten_ko (a-1)) (b-1) in
+              let x = ten_ko.(a-1).(c-1) in
+              let y = ten_ko.(a-1).(b-1) in
               (y,x)
     in
     let (_,d) = tmp in
@@ -2180,30 +2220,30 @@ let titoitu_ten ary zi_ary (a,b) oya yaku_lst dora_lst =
     let tmp2 =
       if x > 4 then
         if oya = true then
-          let x' = List.nth ten_oya_man (opt_man x) in
-          let y' = List.nth ten_oya_man (opt_man (x+1)) in
+          let x' = ten_oya_man.(opt_man x) in
+          let y' = ten_oya_man.(opt_man (x+1)) in
           (y',x')
         else
-          let x' = List.nth ten_ko_man (opt_man x) in
-          let y' = List.nth ten_ko_man (opt_man (x+1)) in
+          let x' = ten_ko_man.(opt_man x) in
+          let y' = ten_ko_man.(opt_man (x+1)) in
           (y',x')
       else if (x+1) > 4 then
         if oya = true then
-          let x' = List.nth (List.nth ten_oya (x-1)) 1 in
-          let y' = List.nth ten_oya_man (opt_man (x+1)) in
+          let x' = ten_oya.(x-1).(1) in
+          let y' = ten_oya_man.(opt_man (x+1)) in
           (y',x')
         else
-          let x' = List.nth (List.nth ten_ko (x-1)) 1 in
-          let y' = List.nth ten_ko_man (opt_man (x+1)) in
+          let x' = ten_ko.(x-1).(1) in
+          let y' = ten_ko_man.(opt_man (x+1)) in
           (y',x')
       else
         if oya = true then
-          let x' = List.nth (List.nth ten_oya (x-1)) 1 in
-          let y' = List.nth (List.nth ten_oya x) 1 in
+          let x' = ten_oya.(x-1).(1) in
+          let y' = ten_oya.(x).(1) in
           (y',x')
         else
-          let x' = List.nth (List.nth ten_ko (x-1)) 1 in
-          let y' = List.nth (List.nth ten_ko x) 1 in
+          let x' = ten_ko.(x-1).(1) in
+          let y' = ten_ko.(x).(1) in
           (y',x')
     in
     ((a,b),tmp2)
