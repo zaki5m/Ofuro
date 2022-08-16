@@ -3,39 +3,27 @@ open Loop
 open Mahjong_safty
 
 let lst_to_ary_type lst = 
-  let m = List.length lst in
-  let rec loop' i ary = 
-    let (x,_) = List.nth lst i in
-    let n = ary.(x-1) in
-    ary.(x-1) <- n + 1;
-    if i = 0 then
-      ary
-    else
-      loop' (i-1) ary
+  let ary = Array.make 9 0 in
+  let rec loop lst = match lst with 
+    | [] -> ()
+    | (x,_)::t -> let n = ary.(x-1) in
+                  ary.(x-1) <- n + 1;
+                  loop t
   in
-  if m = 0 then
-    Array.make 9 0
-  else
-    loop' (m-1) (Array.make 9 0)
+  let _ = loop lst in 
+  ary
 
 let lst_to_ary_type_zi lst = 
-  let m = List.length lst in
-  let rec loop' i ary = 
-    let (x,y) = List.nth lst i in
-    let (x,y) = hai_to_ary (x,y) in
-    let n = ary.(y) in
-    ary.(y) <- n + 1;
-    if i = 0 then
-      ary
-    else
-      loop' (i-1) ary
+  let ary = Array.make 7 0 in
+  let rec loop lst = match lst with 
+    | [] -> ()
+    | (x,y)::t -> let (x,y) = hai_to_ary (x,y) in
+                  let n = ary.(y) in
+                  ary.(y) <- n + 1;
+                  loop t
   in
-  if m = 0 then
-    Array.make 7 0
-  else
-    loop' (m-1) (Array.make 7 0)
-
-
+  let _ = loop lst in 
+  ary
 
 let yukouhai (x,y) = match y with
   | Manzu -> if x = 1 then
@@ -95,6 +83,30 @@ let yukouhai (x,y) = match y with
   | _ -> [(0,y)]
 
 let kokushi_syanten lst = 
+  let ary = Array.make 14 0 in 
+  let rec loop lst = match lst with 
+    | [] -> ()
+    | (1,Manzu)::t -> if ary.(0) = 0 then ary.(0) <- 1 else ary.(13) <- 1
+    | (9,Manzu)::t -> if ary.(1) = 0 then ary.(1) <- 1 else ary.(13) <- 1
+    | (1,Pinzu)::t -> if ary.(2) = 0 then ary.(2) <- 1 else ary.(13) <- 1
+    | (9,Pinzu)::t -> if ary.(3) = 0 then ary.(3) <- 1 else ary.(13) <- 1
+    | (1,Souzu)::t -> if ary.(4) = 0 then ary.(4) <- 1 else ary.(13) <- 1
+    | (9,Souzu)::t -> if ary.(5) = 0 then ary.(5) <- 1 else ary.(13) <- 1
+    | (0,Ton)::t -> if ary.(6) = 0 then ary.(6) <- 1 else ary.(13) <- 1
+    | (0,Nan)::t -> if ary.(7) = 0 then ary.(7) <- 1 else ary.(13) <- 1
+    | (0,Sya)::t -> if ary.(8) = 0 then ary.(8) <- 1 else ary.(13) <- 1
+    | (0,Pei)::t -> if ary.(9) = 0 then ary.(9) <- 1 else ary.(13) <- 1
+    | (0,Haku)::t -> if ary.(10) = 0 then ary.(10) <- 1 else ary.(13) <- 1
+    | (0,Hatsu)::t -> if ary.(11) = 0 then ary.(11) <- 1 else ary.(13) <- 1
+    | (0,Tyun)::t -> if ary.(12) = 0 then ary.(12) <- 1 else ary.(13) <- 1
+    | (_,_)::t -> loop t 
+  in
+  let _ = loop lst in
+  let n = Array.fold_left (fun a b -> a + b) 0 ary in 
+  13 - n 
+      
+
+(*let kokushi_syanten lst = 
   let a1 = if (List.exists (fun x -> x = (1,Manzu)) lst) = true then 1 else 0 in
   let tmp = List.filter (fun x -> x <> (1,Manzu)) lst in
   let a2 = if (List.exists (fun x -> x = (9,Manzu)) lst) = true then 1 else 0 in
@@ -127,6 +139,7 @@ let kokushi_syanten lst =
     13 - b
   else
     12 - b
+*)
 
 let titoi_syanten lst = 
   let rec loop' lst tmp i = 
@@ -151,45 +164,38 @@ let titoi_syanten lst =
 
 (*man,pin,sou,zi*)
 let sprit_lst lst = 
-  let n = List.length lst in
-  let rec loop' i m_lst p_lst s_lst zi_lst = 
-    let (x,y) = List.nth lst i in
-    let m_lst = 
-      if y = Manzu then
-        (x,y)::m_lst
-      else
-        m_lst
-    in
-    let p_lst = 
-      if y = Pinzu then
-        (x,y)::p_lst
-      else
-        p_lst
-    in
-    let s_lst = 
-      if y = Souzu then
-        (x,y)::s_lst
-      else
-        s_lst
-    in
-    let zi_lst = 
-      if x = 0 then
-        (x,y)::zi_lst
-      else
-        zi_lst
-    in
-    if i = 0 then
-      (m_lst,p_lst,s_lst,zi_lst)
-    else
-      loop' (i-1) m_lst p_lst s_lst zi_lst
+  let rec loop m_lst p_lst s_lst zi_lst lst = match lst with
+    | [] -> (m_lst,p_lst,s_lst,zi_lst)
+    | (x,y)::t -> let m_lst = 
+                    if y = Manzu then
+                      (x,y)::m_lst
+                    else
+                      m_lst
+                  in
+                  let p_lst = 
+                    if y = Pinzu then
+                      (x,y)::p_lst
+                    else
+                      p_lst
+                  in
+                  let s_lst = 
+                    if y = Souzu then
+                      (x,y)::s_lst
+                    else
+                      s_lst
+                  in
+                  let zi_lst = 
+                    if x = 0 then
+                      (x,y)::zi_lst
+                    else
+                      zi_lst
+                  in
+                  loop m_lst p_lst s_lst zi_lst t
   in
-  if n = 0 then
-    ([],[],[],[])
-  else
-    loop' (n-1) [] [] [] []
+  loop [] [] [] [] lst
 
 let opt_kouho lst f_lst_len = 
-  let m = List.length lst in
+  let m = List.length lst in 
   let rec loop' i tmp = 
     let (x,y) = List.nth lst i in
     let (x,y) = 
@@ -246,7 +252,7 @@ let reverse_mentsu ary =
   loop 8 0
 
 let forward_mentsu ary = 
-  let rec loop' ary i mentsu = 
+  let rec loop' i mentsu = 
     let mentsu' = 
       if ary.(i) > 0 && ary.(i+1) > 0 && ary.(i+2) > 0 then
         (let n1 = ary.(i) in
@@ -264,14 +270,14 @@ let forward_mentsu ary =
       if i = 6 then
         (ary,mentsu')
       else
-        loop' ary (i+1) mentsu'
+        loop' (i+1) mentsu'
     else
-      loop' ary i mentsu' 
+      loop' i mentsu' 
   in
-  loop' ary 0 0
+  loop' 0 0
 
 let midium_mentsu ary = 
-  let rec loop' ary i mentsu = 
+  let rec loop' i mentsu = 
     let mentsu' = 
       if ary.(i) > 0 && ary.(i+1) > 0 && ary.(i+2) > 0 then
         (let n1 = ary.(i) in
@@ -289,9 +295,9 @@ let midium_mentsu ary =
       if i = 3 then
         (ary,mentsu')
       else
-        loop' ary (i+1) mentsu'
+        loop' (i+1) mentsu'
     else
-      loop' ary i mentsu' 
+      loop' i mentsu' 
   in
   let rec loop i mentsu =
     let mentsu' = 
@@ -315,7 +321,7 @@ let midium_mentsu ary =
     else
       loop i mentsu'
   in
-  let (ary,n) = loop' ary 0 0 in
+  let (ary,n) = loop' 0 0 in
   loop 8 n
 
 
@@ -595,7 +601,7 @@ let mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len =
   let (zi,(xzi,yzi)) = mentsu_kouho_zi zi_ary in
   let n = (xm+xp+xs+xzi,ym+yp+ys+yzi) in
   let (x,y) = opt_kouho [n] f_lst_len in
-  let lst = koritsu m p s zi in
+  let lst = koritsu m p s zi in 
   (lst,8-((x+f_lst_len)*2+y))
 
 
