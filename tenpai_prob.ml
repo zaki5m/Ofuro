@@ -1327,7 +1327,7 @@ let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst =
   let rm_wan = yama_len-14 in
   let tumo_l =  rm_wan / 4 in
   let rm_wan = Int.to_float rm_wan in
-  if a_len = 1 && List.length tenpai_lst.(0) = 0 then
+  if a_len = 1 && List.length tenpai_lst.(0) = 0 || a_len = 0 then
     ([],0.0,0.0,0.0,0,0.0,0.0)
   else
     let tenpai_lst = col_tenpai_parallel tenpai_lst tumo_l rm_wan in
@@ -1376,7 +1376,7 @@ let col_tenpai_f_kuikae ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dor
     else
       loop (i-1) tmp2    
   in
-  if a_len = 1 && List.length tenpai_lst.(0) = 0 then
+  if a_len = 1 && List.length tenpai_lst.(0) = 0 || a_len = 0 then
     ([],[],[],[],0.0,0.0,0.0,0.0,0.0,0.0)
   else
     let tenpai_lst = loop (a_len-1) [] in
@@ -1868,7 +1868,7 @@ let col_tenpai_f ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst t
   let rm_wan = yama_len-14 in
   let tumo_l =  rm_wan / 4 in
   let rm_wan = Int.to_float rm_wan in
-  if a_len = 1 && List.length tenpai_lst.(0) = 0 then
+  if a_len = 1 && List.length tenpai_lst.(0) = 0 || a_len = 0 then
     ([],0.0,0.0,0.0,0,0.0,0.0)
   else
     let tenpai_lst = col_tenpai_parallel tenpai_lst tumo_l rm_wan in
