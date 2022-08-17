@@ -2281,26 +2281,17 @@ let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int
       []
     else
       tenpai_to_mati ary2 zi_ary2 in
-  let m = List.length lst in
-  let rec loop' i tmp = 
-    let kokushi_lst = kokushi_ten ary2 zi_ary2 (List.nth lst i) oya in 
-    let titoi_lst = titoitu_ten ary2 zi_ary2 (List.nth lst i) oya yaku_lst dora_lst in
-    let lst2 = find_mati ary2 (List.nth lst i) zi_lst zi_ary2 in
-    let tmp2 = tehai_to_ten_2 ary2 zi_ary2 (List.nth lst i) lst2 zi_kaze ba_kaze naki oya f_lst yaku_lst dora_lst in
-    let tmp2 = titoi_lst::tmp2 in
-    let tmp2 = kokushi_lst::tmp2 in
-    let tmp = 
-      opt_ten2 tmp2::tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop' (i-1) tmp
+  let rec loop tmp = function
+    | [] -> tmp
+    | h::t -> let kokushi_lst = kokushi_ten ary2 zi_ary2 h oya in 
+              let titoi_lst = titoitu_ten ary2 zi_ary2 h oya yaku_lst dora_lst in
+              let lst2 = find_mati ary2 h zi_lst zi_ary2 in
+              let tmp2 = tehai_to_ten_2 ary2 zi_ary2 h lst2 zi_kaze ba_kaze naki oya f_lst yaku_lst dora_lst in
+              let tmp2 = titoi_lst::tmp2 in
+              let tmp2 = kokushi_lst::tmp2 in
+              loop (opt_ten2 tmp2::tmp) t
   in
-  if m = 0 then
-    []
-  else
-    loop' (m-1) []
+  loop [] lst
 
 
 (*let _ = 
