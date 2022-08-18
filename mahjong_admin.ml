@@ -1725,8 +1725,8 @@ let kyoku_s ba kyoku honba kyotaku player_score  =
 (*automatic*)
 let kyoku_s ba kyoku honba kyotaku player_score furoritu_lst count = 
   let lst2 = hai_lst @ hai_lst @ hai_lst @ hai_lst in
-  let lst3 = r_hai lst2 in
-  (*let lst3 = r_hai2 lst2 count in *)
+  (*let lst3 = r_hai lst2 in*)
+  let lst3 = r_hai2 lst2 count in 
   let lst4 = List.sort (fun (x1 ,y1 ,z1) (x2 ,y2 ,z2) -> if z1 < z2 then -1 else 1) lst3 in
   let (yama_lst,tehai_lst_0,tehai_lst_1,tehai_lst_2,tehai_lst_3,dora_lst) = haipai lst4 in
   let tehai_lst = 
@@ -1861,6 +1861,6 @@ let hantyan furoritu_lst =
     loop' 1 0 0 0 player_score 0 
 
 
-(*let _ = hantyan [25.0;25.0;25.0;25.0]*)
+let _ = hantyan [25.0;25.0;25.0;25.0]
 
 

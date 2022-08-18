@@ -35,172 +35,130 @@ let tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary t
   let ten_lst = tehai_to_ten t_ary t_zi_ary zi_kaze ba_kaze naki f_lst yaku_lst dora_lst in
   let m = List.length ten_lst in
   let tumo_times = Int.to_float tumo_l in
-  let rec loop i t_lst tmp_kitaiti tmp_agari = 
-    let ((a,b),(c,d)) = List.nth t_lst i in
-    let n = 
-      if a = 3 then
-        zi_ary.(b)
-      else
-        ary.(a).(b)
-    in
-    let n = Int.to_float n in
-    let c = Int.to_float c in
-    let tmp_kitaiti = (n /. rm_wan) *. c *. tumo_times +. tmp_kitaiti in
-    let tmp_agari = (n /. rm_wan) *. tumo_times +. tmp_agari in
-    if i = 0 then 
-      (tmp_kitaiti,tmp_agari)
-    else
-      loop (i-1) t_lst tmp_kitaiti tmp_agari
+  let rec loop tmp_kitaiti tmp_agari t_lst = match t_lst with
+    | [] -> (tmp_kitaiti,tmp_agari)
+    | ((a,b),(c,_))::t -> let n = 
+                              if a = 3 then
+                                zi_ary.(b)
+                              else
+                                ary.(a).(b)
+                          in
+                          let n = Int.to_float n in
+                          let c = Int.to_float c in
+                          let tmp_kitaiti = (n /. rm_wan) *. c *. tumo_times +. tmp_kitaiti in
+                          let tmp_agari = (n /. rm_wan) *. tumo_times +. tmp_agari in
+                          loop tmp_kitaiti tmp_agari t
   in
   if naki = false then
     let ten_lst2 = tehai_to_ten t_ary t_zi_ary zi_kaze ba_kaze naki f_lst (Reach::yaku_lst) dora_lst in
     if m = 0 then
       []
     else
-      [(loop (m-1) ten_lst 0.0 0.0);(loop (m-1) ten_lst2 0.0 0.0)]
+      [(loop 0.0 0.0 ten_lst);(loop 0.0 0.0 ten_lst2)]
   else
     if m = 0 then
       []
     else
-      [(loop (m-1) ten_lst 0.0 0.0)]
-    
-
-
-
-
-
-
-      
-
-
-
-
+      [(loop 0.0 0.0 ten_lst)]
 
 let tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary = 
-  let m = List.length tehai in
-  let rec loop i tmp = 
-    let x = List.nth tehai i in
-    let lst = d_tehai tehai x in
-    let (_,n) = syanten lst in
-    let tmp = 
-      if n = 0 then
-        (i,(tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary tumo_l rm_wan))::tmp
-      else
-        tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+  let rec loop tmp double_lst i t_lst = match t_lst with 
+    | [] -> tmp
+    | h::t -> if List.exists (fun a -> a = h) double_lst then 
+                loop tmp double_lst (i+1) t
+              else
+                let lst = d_tehai tehai h in
+                let (_,n) = syanten lst in
+                let tmp = 
+                  if n = 0 then
+                    (i,(tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary tumo_l rm_wan))::tmp
+                  else
+                    tmp
+                in
+                loop tmp (h::double_lst) (i+1) t
   in
   (*reach判断を加える*)
-  let rec loop2 i a_lst tmp = 
-    let (a,lst) = List.nth a_lst i in
-    let (b,c) = 
-      if lst = [] then
-        (0.0,0.0)
-      else if (List.length lst) = 2 then 
-        List.nth lst 1
-      else
-        List.hd lst 
-    in
-    let (x,(y,z)) = tmp in
-    let tmp =
-      if y > b then
-        tmp
-      else
-        (a,(b,c))
-    in
-    if i = 0 then
-      tmp
-    else
-      loop2 (i-1) a_lst tmp
+  let rec loop2 tmp a_lst = match a_lst with 
+    | [] -> tmp 
+    | (a,lst)::t -> let (b,c) = 
+                      if lst = [] then
+                        (0.0,0.0)
+                      else if (List.length lst) = 2 then 
+                        List.nth lst 1
+                      else
+                        List.hd lst 
+                    in
+                    let (_,(y,_)) = tmp in
+                    let tmp =
+                      if y > b then
+                        tmp
+                      else
+                        (a,(b,c))
+                    in
+                    loop2 tmp t
   in
-  if m = 0 then 
-    (13,(0.0,0.0))
-  else
-    let t_lst = loop (m-1) [] in
-    if t_lst = [] then
-      (13,(0.0,0.0))
-    else
-      let m = List.length t_lst in
-      loop2 (m-1) t_lst (13,(0.0,0.0))
+  let t_lst = loop [] [] 0 tehai in
+  loop2 (13,(0.0,0.0)) t_lst 
 
 
 let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary kuikae_lst = 
-  let m = List.length tehai in
-  let rec loop i tmp = 
-    let x = List.nth tehai i in
-    let lst = d_tehai tehai x in
-    let (_,n) = syanten lst in
-    let tmp = 
-      if List.exists (fun a -> a = x) kuikae_lst then 
-        tmp 
-      else if n = 0 then
-        (x,(tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary tumo_l rm_wan))::tmp
-      else
-        tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+  let rec loop tmp double_lst t_lst = match t_lst with 
+    | [] -> tmp
+    | h::t -> if List.exists (fun a -> a = h) double_lst  then 
+                loop tmp double_lst t
+              else
+                let lst = d_tehai tehai h in
+                let (_,n) = syanten lst in
+                let tmp = 
+                  if List.exists (fun a -> a = h) kuikae_lst then 
+                    tmp 
+                  else if n = 0 then
+                    (h,(tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary tumo_l rm_wan))::tmp
+                  else
+                    tmp
+                in
+                loop tmp (h::double_lst) t
   in
-  let rec loop2 i a_lst tmp = 
-    let (a,lst) = List.nth a_lst i in
-    let (b,c) = 
-      if lst = [] then
-        (0.0,0.0)
-      else
-        List.hd lst 
-    in
-    let (x,(y,z)) = tmp in
-    let tmp =
-      if y > b then
-        tmp
-      else
-        (a,(b,c))
-    in
-    if i = 0 then
-      tmp
-    else
-      loop2 (i-1) a_lst tmp
+  let rec loop2 tmp a_lst = match a_lst with
+    | [] -> tmp
+    | (a,lst)::t -> let (b,c) = 
+                      if lst = [] then
+                        (0.0,0.0)
+                      else
+                        List.hd lst 
+                    in
+                    let (_,(y,_)) = tmp in
+                    let tmp =
+                      if y > b then
+                        tmp
+                      else
+                        (a,(b,c))
+                    in
+                    loop2 tmp t
   in
-  if m = 0 then 
-    ((1,Not_hai),(0.0,0.0))
-  else
-    let t_lst = loop (m-1) [] in
-    if t_lst = [] then
-      ((1,Not_hai),(0.0,0.0))
-    else
-      let m = List.length t_lst in
-      loop2 (m-1) t_lst ((1,Not_hai),(0.0,0.0))
+  let t_lst = loop [] [] tehai in
+  loop2 ((1,Not_hai),(0.0,0.0)) t_lst 
       
 
 let ary_opt ary zi_ary lst = 
   let lst = List.map (fun (a,b) -> hai_to_ary (a,b)) lst in
-  let m = List.length lst in
   let ary2 = Array.map (fun a -> Array.copy a) ary in
   let zi_ary2 = Array.copy zi_ary in
-  let rec loop i =
-    let (x,y) = List.nth lst i in
-    let _ =
-      if x = 3 then
-        let n = zi_ary2.(y) in
-        zi_ary2.(y) <- n-1;
-      else
-        let n = ary2.(x).(y) in
-        ary2.(x).(y) <- n-1;
-    in
-    if i = 0 then
-      (ary2,zi_ary2)
-    else
-      loop (i-1)
+  let rec loop t_lst = match t_lst with 
+    | [] -> ()
+    | (x,y)::t -> let _ =
+                    if x = 3 then
+                      let n = zi_ary2.(y) in
+                      zi_ary2.(y) <- n-1;
+                    else
+                      let n = ary2.(x).(y) in
+                      ary2.(x).(y) <- n-1;
+                  in
+                  loop t
   in
-  if m = 0 then
-    (ary2,zi_ary2)
-  else
-    loop (m-1)
+  loop lst;
+  (ary2,zi_ary2)
+
 
 
 (*返り値(k_lst,tumo_lst,rest_tumo_lst,current_tehai)list*)
@@ -255,89 +213,56 @@ let all_tumo ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai) =
   loop2 0 t_lst
 
 
-
-
-  
-
 let opt_tumohai ary zi_ary tenpai_lst = 
-  let tenpai_lst_len = List.length tenpai_lst in
-  let rec loop i tmp = 
-    let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.nth tenpai_lst i in
-    let tmp = (all_tumo ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai))@tmp in
-    if i = 0 then
-      tmp
-    else 
-      loop (i-1) tmp
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (k_lst,tumo_lst,rest_tumo_lst,current_tehai)::t -> let tmp = (all_tumo ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai))@tmp in
+                                                         loop tmp t 
   in
-  if tenpai_lst_len = 0 then 
-    []
-  else
-    loop (tenpai_lst_len-1) []
-
-
-
-
-
-
+  loop [] tenpai_lst
 
 
 
 let k_fase ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = 
-  let (lst,n) = syanten current_tehai in
-  let tehai_len = List.length current_tehai in
-  let rec loop i tmp duble_lst = 
-    let ihai = List.nth current_tehai i in
-    if List.exists (fun a -> a = ihai) duble_lst then 
-      if i = 0 then
-        tmp
-      else
-        loop (i-1) tmp duble_lst
-    else
-      let duble_lst = ihai::duble_lst in 
-      let new_tehai = d_tehai current_tehai ihai in
-      let (lst,new_n) = syanten new_tehai in
-      let tmp = 
-        if new_n = n then
-          all_tumo ary zi_ary (ihai::k_lst,tumo_lst,rest_tumo_lst,new_tehai)@tmp
-        else
-          tmp 
-      in
-      if i = 0 then
-        tmp
-      else
-        loop (i-1) tmp duble_lst
+  let (_,n) = syanten current_tehai in
+  let rec loop tmp double_lst t_lst = match t_lst with 
+    | [] -> tmp
+    | h::t -> if List.exists (fun a -> a = h) double_lst then 
+                loop tmp double_lst t
+              else
+                let new_tehai = d_tehai current_tehai h in
+                let (_,new_n) = syanten new_tehai in
+                let tmp = 
+                  if new_n = n then
+                    all_tumo ary zi_ary (h::k_lst,tumo_lst,rest_tumo_lst,new_tehai)@tmp
+                  else
+                    tmp 
+                in
+                loop tmp (h::double_lst) t
   in
-  loop (tehai_len-1) [] []
+  loop [] [] current_tehai
 
 let all_k_fase ary zi_ary tenpai_lst = 
+  let rec loop2 k_lst tumo_lst rest_tumo_lst current_tehai n tmp2 double_lst t_lst = match t_lst with 
+    | [] -> tmp2
+    | h::t -> if List.exists (fun a -> a = h) double_lst then
+                loop2 k_lst tumo_lst rest_tumo_lst current_tehai n tmp2 double_lst t
+              else
+                let new_tehai = d_tehai current_tehai h in
+                let (_,new_n) = syanten new_tehai in
+                let tmp2 = 
+                  if n = new_n then
+                    tmp2 
+                  else
+                    all_tumo ary zi_ary (h::k_lst,tumo_lst,rest_tumo_lst,new_tehai)@tmp2 
+                in
+                loop2 k_lst tumo_lst rest_tumo_lst current_tehai n tmp2 (h::double_lst) t
+  in
   let rec loop tmp lst = match lst with 
     | [] -> tmp
-    | (k_lst,tumo_lst,rest_tumo_lst,current_tehai)::t -> 
-      let n = List.length current_tehai in
-      let rec loop2 j tmp2 duble_lst = 
-        let ihai = List.nth current_tehai j in
-        if List.exists (fun a -> a = ihai) duble_lst then 
-          if j = 0 then
-            tmp2
-          else
-            loop2 (j-1) tmp2 duble_lst
-        else
-          let duble_lst = ihai::duble_lst in 
-          let new_tehai = d_tehai current_tehai ihai in
-          let (lst,new_n) = syanten new_tehai in
-          let tmp2 = 
-            if new_n = n then
-              all_tumo ary zi_ary (ihai::k_lst,tumo_lst,rest_tumo_lst,new_tehai)@tmp2 
-            else
-              tmp2
-          in
-          if j = 0 then
-            tmp2
-          else
-            loop2 (j-1) tmp2 duble_lst
-      in
-      let tmp = (loop2 (n-1) [] [])@tmp in
-      loop tmp t
+    | (k_lst,tumo_lst,rest_tumo_lst,current_tehai)::t -> let (_,n) = syanten current_tehai in 
+                                                         let tmp = (loop2 k_lst tumo_lst rest_tumo_lst current_tehai n [] [] current_tehai)@tmp in
+                                                         loop tmp t
   in
   loop [] tenpai_lst
 
@@ -375,7 +300,7 @@ let all_k_fase ary zi_ary tenpai_lst =
 let syanten_to_tenpai ary zi_ary tenpai_lst = 
   let m = List.length tenpai_lst in
   let rec loop i tmp = 
-    let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.nth tmp i in
+    let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = List.nth tenpai_lst i in
       let tmp = (k_fase ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai))@tmp in
       if i = 0 then
         tmp
@@ -422,18 +347,16 @@ let operate_tenapai_ritu ary zi_ary tehai =
     tmp@tmp'
 
 let operate_tenpai_ritu_parallel ary zi_ary tenpai_lst = 
-  let (k_lst,tumo_lst,rest_tumo_lst,current_tehai) = tenpai_lst in 
+  let (_,_,_,current_tehai) = tenpai_lst in 
   let (_,n) = syanten current_tehai in 
   let tenpai_lst = [tenpai_lst] in 
   let rec loop i tmp =
-    let m = List.length tmp in
     let rec loop2 tmp2 lst = match lst with
       | [] -> tmp2 
-      | (k_lst,tumo_lst,rest_tumo_lst,current_tehai)::t ->  
-        let tmp2 = (k_fase ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai))@tmp2 in
-        loop2 tmp2 t
+      | (k_lst,tumo_lst,rest_tumo_lst,current_tehai)::t ->  let tmp2 = (k_fase ary zi_ary (k_lst,tumo_lst,rest_tumo_lst,current_tehai))@tmp2 in
+                                                            loop2 tmp2 t
       in
-    if m = 0 then 
+    if tmp = [] then 
       ([],[])
     else
       let tmp' = loop2 [] tmp in
@@ -951,43 +874,28 @@ let judge_parallel ary zi_ary tehai =
     [|operate_tenapai_ritu ary zi_ary tehai|]
 
 let tenpai_ritu rest_tumo_lst tumo_l rm_wan = 
-  let m = List.length rest_tumo_lst in
-  let rec loop i tmp = 
-    let h = List.nth rest_tumo_lst i in
-    let h = Int.to_float h in
-    let tumo_c = Int.to_float (tumo_l - i) in
-    let tmp = h /. rm_wan *. tumo_c *. tmp in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+  let rec loop i tmp r_lst = match r_lst with 
+    | [] -> tmp 
+    | h::t -> let h = Int.to_float h in
+              let tumo_c = Int.to_float (tumo_l - i) in
+              let tmp = h /. rm_wan *. tumo_c *. tmp in
+              loop (i+1) tmp t
   in
-  if m = 0 then
-    1.0
-  else
-    loop (m-1) 1.0
+  loop 0 1.0 rest_tumo_lst
 
 let tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan = 
-  let m = List.length tenpai_lst in
-  let rec loop i tmp = 
-    let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu) = List.nth tenpai_lst i in
-    let (ary2,zi_ary2) = ary_opt ary zi_ary tumo_lst in
-    let current_tehai = ripai current_tehai in
-    let tumo_l' = tumo_l - (List.length tumo_lst) in
-    let a_k_lst = tenpai_to_opt current_tehai tumo_l' rm_wan f_lst zi_kaze ba_kaze naki [] dora_lst ary2 zi_ary2 in
-    let (_,(kitaiti,agariritu)) = a_k_lst in
-    let kitaiti = t_ritu *. kitaiti in
-    let agariritu = agariritu *. t_ritu in
-    let tmp = (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti)::tmp in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu)::t -> let (ary2,zi_ary2) = ary_opt ary zi_ary tumo_lst in
+                                                                let current_tehai = ripai current_tehai in
+                                                                let tumo_l' = tumo_l - (List.length tumo_lst) in
+                                                                let a_k_lst = tenpai_to_opt current_tehai tumo_l' rm_wan f_lst zi_kaze ba_kaze naki [] dora_lst ary2 zi_ary2 in
+                                                                let (_,(kitaiti,agariritu)) = a_k_lst in
+                                                                let kitaiti = t_ritu *. kitaiti in
+                                                                let agariritu = agariritu *. t_ritu in
+                                                                loop ((k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti)::tmp) t 
   in
-  if m = 0 then 
-    []
-  else
-    loop (m-1) []
+  loop [] tenpai_lst
 
 let tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan = 
   let m = Array.length tenpai_lst in
@@ -995,7 +903,7 @@ let tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_ls
   create_work tasks;
   let rec loop tmp lst = match lst with 
     | [] -> tmp
-    | (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu)::t ->
+    | (k_lst,tumo_lst,_,current_tehai,t_ritu)::t ->
           let (ary2,zi_ary2) = ary_opt ary zi_ary tumo_lst in
           let current_tehai = ripai current_tehai in
           let tumo_l' = tumo_l - (List.length tumo_lst) in
@@ -1015,21 +923,17 @@ let tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_ls
   
 
 let compile_kitaiti p_lst current_tehai = 
-  let m = List.length p_lst in
-  let rec loop i tmp = 
-    let (_,_,_,_,_,agariritu,kitaiti) = List.nth p_lst i in
-    let (x,y) = tmp in
-    let tmp = ((x +. agariritu),(y +. kitaiti)) in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (_,_,_,_,_,agariritu,kitaiti)::t -> let (x,y) = tmp in
+                                          loop ((x +. agariritu),(y +. kitaiti)) t
   in
-  if m = 0 then
+  if p_lst = [] then 
     ([],0.0,0.0)
   else
-    let (agariritu,kitaiti) = loop (m-1) (0.0,0.0) in
+    let (agariritu,kitaiti) = loop (0.0,0.0) p_lst in
     (current_tehai,agariritu,kitaiti)
+
 
 (*最初の捨て牌が同じものを一つのindexにまとめる
   recieve(k_lst,t_ritu,agariritu,kitaiti)array
@@ -1118,49 +1022,39 @@ let opt_tenpai_form_p tenpai_lst =
 
 let opt_tenpai_form tenpai_lst = 
   let rec loop tmp t_lst = 
-    let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti) = List.hd t_lst in
-    let p_lst = List.filter (fun (a,b,c,d,e,f,g) -> d = current_tehai) t_lst in
+    let (_,_,_,current_tehai,_,_,_) = List.hd t_lst in
+    let p_lst = List.filter (fun (_,_,_,d,_,_,_) -> d = current_tehai) t_lst in
     let tmp = (compile_kitaiti p_lst current_tehai)::tmp in
-    let t_lst = List.filter (fun (a,b,c,d,e,f,g) -> d <> current_tehai) t_lst in
+    let t_lst = List.filter (fun (_,_,_,d,_,_,_) -> d <> current_tehai) t_lst in
     if t_lst = [] then
       tmp
     else
       loop tmp t_lst
   in
   let kitaiti_lst = loop [] tenpai_lst in
-  let kitaiti_lst = List.sort (fun (x,y,z) (x',y',z') -> if z > z' then -1 else 1) kitaiti_lst in
+  let kitaiti_lst = List.sort (fun (_,_,z) (_,_,z') -> if z > z' then -1 else 1) kitaiti_lst in
   List.hd kitaiti_lst
 
 (*recieve (k_lst,t_ritu,agariritu,kitaiti,anzendo)lst
    return (k_lst,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti)lst*)
 let minus_kitaiti_p lst = 
-  let n = List.length lst in 
   (*期待値の合計を計算*)
-  let rec loop i tmp = 
-    let (_,_,_,kitaiti,_) = List.nth lst i in 
-    if i = 0 then 
-      tmp +. kitaiti
-    else
-      loop (i-1) (tmp +. kitaiti)
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (_,_,_,kitaiti,_)::t -> loop (tmp +. kitaiti) t
   in
-  let sum = loop (n-1) 0.0 in 
-  let rec loop2 j tmp = 
-    let (k_lst,t_ritu,agariritu,kitaiti,anzendo) = List.nth lst j in 
-    let minus_kitaiti = sum -. kitaiti in 
-    let anzendo_f = float_of_int anzendo in 
-    let total_kitaiti = kitaiti -. 0.1 *.(minus_kitaiti -.anzendo_f*.10000.0) in 
-    let tmp = (k_lst,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti)::tmp in 
-    if j = 0 then 
-      tmp
-    else
-      loop2 (j-1) tmp
+  let sum = loop 0.0 lst in 
+  let rec loop2 tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (k_lst,t_ritu,agariritu,kitaiti,anzendo)::t -> let minus_kitaiti = sum -. kitaiti in 
+                                                     let anzendo_f = float_of_int anzendo in 
+                                                     let total_kitaiti = kitaiti -. 0.1 *.(minus_kitaiti -.anzendo_f*.10000.0) in
+                                                     loop2 ((k_lst,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti)::tmp) t 
   in
-  loop2 (n-1) []
+  loop2 [] lst
 
 
-
-
-
+(*
 let minus_kitaiti t_lst p_lst = 
   let m = List.length p_lst in
   let rec loop i tmp = 
@@ -1182,8 +1076,8 @@ let minus_kitaiti t_lst p_lst =
     []
   else
     loop (m-1) []
-
-
+*)
+(*
 let minus_kitaiti_f t_lst p_lst = 
   let m = List.length p_lst in
   let rec loop i tmp = 
@@ -1205,24 +1099,8 @@ let minus_kitaiti_f t_lst p_lst =
     []
   else
     loop (m-1) []
-
-let opt_kitaiti p_lst = 
-  let m = List.length p_lst in
-  let rec loop i tmp = 
-    let (a,b,c,d,e,f,g,h,i') = List.nth p_lst i in
-    let h = Int.to_float h in
-    let j = (i' -. (h *. 10000.0)) in
-    let tmp = (a,b,c,d,e,f,g,h,i',j)::tmp in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
-  in
-  if m = 0 then
-    []
-  else
-    loop (m-1) []
-
+*)
+(*
 let max_kitaiti tenpai_lst = 
   let rec loop lst tmp = match lst with
     | [] -> tmp
@@ -1234,6 +1112,7 @@ let max_kitaiti tenpai_lst =
                 loop t tmp
   in
   loop tenpai_lst ([],[],[],[],0.0,0.0,0.0,0.0,0.0,0.0)
+*)
 
 let max_kitaiti_p tenpai_lst = 
   let rec loop lst tmp = match lst with
@@ -1271,6 +1150,7 @@ let max_tenpairitu_p tenpai_lst =
   in
   loop tenpai_lst ([],0.0,0.0,0.0,0,0.0,0.0)
 
+(*
 let max_agariritu tenpai_lst = 
   let rec loop lst tmp = match lst with
     | [] -> tmp
@@ -1282,6 +1162,7 @@ let max_agariritu tenpai_lst =
                 loop t tmp
   in
   loop tenpai_lst ([],[],[],[],0.0,-100.0,0.0,0)
+*)
 
 let max_agariritu_p tenpai_lst = 
   let rec loop lst tmp = match lst with
@@ -1346,6 +1227,37 @@ let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst =
       
 
 
+let kuikae_check kuikae_lst n rm_wan tumo_l tenpai_lst_ary = 
+  let tasks = Array.init n (fun i -> i) in
+  create_work tasks;
+  let rec loop tmp lst = match lst with 
+    | [] -> tmp
+    | (k_lst,tumo_lst,rest_tumo_lst,current_tehai)::t -> let tmp = 
+                                                          let k_lst_len = List.length k_lst in 
+                                                          if k_lst_len = 0 then
+                                                            tmp 
+                                                          else
+                                                            if List.exists (fun a -> a = (List.nth k_lst (k_lst_len-1))) kuikae_lst then
+                                                              tmp
+                                                            else
+                                                              let t_ritu = tenpai_ritu rest_tumo_lst tumo_l rm_wan in 
+                                                              if t_ritu <= 0.0 then 
+                                                                tmp
+                                                              else
+                                                                (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu)::tmp 
+                                                        in
+                                                        loop tmp t
+  in
+  let update p r i = p.(i) <- loop [] r.(i) in 
+  let pre =  Array.make n [] in 
+  let domains = Array.init (num_domains - 1)
+              (fun _ -> Domain.spawn(worker (update pre tenpai_lst_ary))) in
+  worker (update pre tenpai_lst_ary) ();
+  Array.iter Domain.join domains;
+  pre
+
+  
+
 
 let col_tenpai_f_kuikae ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst kuikae_lst = 
   let tenpai_lst = judge_parallel ary zi_ary tehai in
@@ -1353,163 +1265,109 @@ let col_tenpai_f_kuikae ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dor
   let rm_wan = yama_len-14 in
   let tumo_l =  rm_wan / 4 in
   let rm_wan = Int.to_float rm_wan in
-  let rec loop i tmp2 = 
-    let rec loop2 tmp lst = match lst with 
-      | [] -> tmp
-      | (k_lst,tumo_lst,rest_tumo_lst,current_tehai)::t -> 
-        let n = List.length k_lst in
-        let tmp = 
-          if n = 0 then
-            tmp 
-          else
-            if List.exists (fun a -> a = (List.nth k_lst (n-1))) kuikae_lst then
-              tmp
-            else
-              let t_ritu = tenpai_ritu rest_tumo_lst tumo_l rm_wan in 
-              (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu)::tmp 
-        in
-        loop2 tmp t
-    in
-    let tmp2 = loop2 tmp2 tenpai_lst.(i) in 
-    if i = 0 then 
-      tmp2
-    else
-      loop (i-1) tmp2    
-  in
   if a_len = 1 && List.length tenpai_lst.(0) = 0 || a_len = 0 then
-    ([],[],[],[],0.0,0.0,0.0,0.0,0.0,0.0)
+    ([],0.0,0.0,0.0,0,0.0,0.0)
   else
-    let tenpai_lst = loop (a_len-1) [] in
-    if tenpai_lst = [] then 
-      ([],[],[],[],0.0,0.0,0.0,0.0,0.0,0.0)
+    let tenpai_lst = kuikae_check kuikae_lst a_len rm_wan tumo_l tenpai_lst in
+    let tenpai_lst = tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
+    let last_form_tenpai_lst = opt_tenpai_form_p tenpai_lst in
+    if last_form_tenpai_lst = [] then 
+      ([],0.0,0.0,0.0,0,0.0,0.0)
     else
-      let tenpai_lst = tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
-      let (o_current_tehai,o_agariritu,o_kitaiti) = opt_tenpai_form tenpai_lst in
-      let p_lst = List.filter (fun (a,b,c,d,e,f,g) -> d = o_current_tehai) tenpai_lst in
-      let t_lst = List.filter (fun (a,b,c,d,e,f,g) -> d <> o_current_tehai) tenpai_lst in
-      let p_lst = List.map (fun (a,b,c,d,e,f,g) -> (a,b,c,d,e,f,g,(anzen ary zi_ary a))) p_lst in
-      let p_lst = minus_kitaiti t_lst p_lst in
-      let p_lst = opt_kitaiti p_lst in
-      let max = max_kitaiti p_lst in 
-      if max = ([],[],[],[],0.0,0.0,0.0,0.0,0.0,0.0) then 
-        max_tenpairitu p_lst
+      let add_anzendo_lst = List.map (fun (a,b,c,d) -> (a,b,c,d,(anzen ary zi_ary a))) last_form_tenpai_lst in
+      let final_form = minus_kitaiti_p add_anzendo_lst in 
+      let max = max_kitaiti_p final_form in 
+      if max = ([],0.0,0.0,0.0,0,0.0,0.0) then 
+        max_tenpairitu_p final_form
       else
         max
+    
 
 let mode_kokushi ary zi_ary k_lst = 
   let k_lst = tehai_to_anzen ary zi_ary k_lst in
-  let m = List.length k_lst in
-  let rec loop i tmp = 
-    let ((x,y),z) = List.nth k_lst i in
-    let ((x',y'),z') = tmp in
-    let tmp = 
-      if z' < z then
-        ((x,y),z)
-      else
-        tmp
-    in
-    if i = 0 then
-      let (x,_) = tmp in
-      x
-    else
-      loop (i-1) tmp
-  in
-  if m = 0 then
-    (1,Not_hai)
-  else
-    loop (m-1) (List.hd k_lst)
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> let (x,_) = tmp in
+            x 
+    | ((x,y),z)::t -> let (_,z') = tmp in
+                      let tmp = 
+                        if z' < z then
+                          ((x,y),z)
+                        else
+                          tmp
+                      in
+                      loop tmp t 
+  in  
+  loop ((1,Not_hai),0) k_lst
 
 let mode_somete ary zi_ary tehai s_hai =
-  let n_tehai = List.filter (fun (a,b) -> b <> s_hai) tehai in
-  let n_tehai = List.filter (fun (a,b) -> a <> 0 ) n_tehai in
+  let n_tehai = List.filter (fun (_,b) -> b <> s_hai) tehai in
+  let n_tehai = List.filter (fun (a,_) -> a <> 0 ) n_tehai in
   let n_tehai = tehai_to_anzen ary zi_ary n_tehai in
-  let m = List.length n_tehai in
-  let rec loop i tmp = 
-    let ((x,y),z) = List.nth n_tehai i in
-    let ((x',y'),z') = tmp in
-    let tmp = 
-      if z' < z then
-        ((x,y),z)
-      else
-        tmp
-    in
-    if i = 0 then
-      let (x,_) = tmp in
-      x
-    else
-      loop (i-1) tmp
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> let (x,_) = tmp in
+            x
+    | ((x,y),z)::t -> let (_,z') = tmp in
+                      let tmp = 
+                        if z' < z then
+                          ((x,y),z)
+                        else
+                          tmp
+                      in
+                      loop tmp t 
   in
-  if m = 0 then
-    (1,Not_hai)
-  else
-    loop (m-1) (List.hd n_tehai)
+  loop ((1,Not_hai),0) n_tehai
 
 (*anzen_baseの処理未実装*)
 let mode_titoi ary zi_ary t_lst tehai = 
   let t_lst = tehai_to_anzen ary zi_ary t_lst in
-  let m = List.length t_lst in
-  let rec loop i tmp = 
-    let ((x,y),z) = List.nth t_lst i in
-    let ((x',y'),z') = tmp in
-    let tmp = 
-      if z' < z then
-        ((x,y),z)
-      else
-        tmp
-    in
-    if i = 0 then
-      let (x,_) = tmp in
-      x
-    else
-      loop (i-1) tmp
+  let rec loop tmp lst = match lst with 
+    | [] -> let (x,_) = tmp in
+            x
+    | ((x,y),z)::t -> let (_,z') = tmp in
+                      let tmp = 
+                        if z' < z then
+                          ((x,y),z)
+                        else
+                          tmp
+                      in
+                      loop tmp t 
   in
-  let k_hai = 
-    if m = 0 then
-      (1,Not_hai)
-    else
-      loop (m-1) (List.hd t_lst)
-  in
-  k_hai
+  loop ((1,Not_hai),0) t_lst
+
 
 
 let mode_common_b ary zi_ary sutehai_lst tehai player = 
   let (_,n) = syanten tehai in
-  let m = List.length tehai in
-  let rec loop i tmp = 
-    let x = List.nth tehai i in
-    let n_tehai = d_tehai tehai x in 
-    let (_,n') = syanten n_tehai in 
-    let tmp = 
-      if n = n' then
-        if anzen_base ary zi_ary n_tehai sutehai_lst player then
-          x::tmp
-        else
-          tmp
-      else
-        tmp
-    in 
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+  let rec loop tmp double_lst t_lst = match t_lst with
+    | [] -> tmp 
+    | h::t -> if List.exists (fun a -> a = h) double_lst then
+                loop tmp double_lst t 
+              else
+                let n_tehai = d_tehai tehai h in 
+                let (_,n') = syanten n_tehai in 
+                let tmp = 
+                  if n = n' then
+                    if anzen_base ary zi_ary n_tehai sutehai_lst player then
+                      h::tmp
+                    else
+                      tmp
+                  else
+                    tmp
+                in 
+                loop tmp (h::double_lst) t
   in
-  let k_lst = 
-    if m = 0 then
-      [] 
-    else
-      loop (m-1) []
-  in
+  let k_lst = loop [] [] tehai in
   if k_lst = [] then 
     let n_tehai = tehai_to_anzen ary zi_ary tehai in
-    let ((x,y),z) = max_anzen n_tehai in
+    let ((x,y),_) = max_anzen n_tehai in
     (x,y)
   else
     let n_tehai = tehai_to_anzen ary zi_ary k_lst in
-    let ((x,y),z) = max_anzen n_tehai in
+    let ((x,y),_) = max_anzen n_tehai in
     (x,y)
 
 
-let common_b ary zi_ary tehai sutehai_lst tumo_len f_lst dora_lst player = 
+let common_b ary zi_ary tehai sutehai_lst tumo_len f_lst player = 
   let (_,n) = syanten tehai in
   if tumo_len >= n then
     let (k_lst,kind_k) = kind_kokushi tehai in
@@ -1611,13 +1469,13 @@ let judge_suzi k_hai ary zi_ary g_lst =
 let judge_reach ary zi_ary tehai sutehai_lst yaku_lst yama_len f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan yaku = 
   let (_,n) = syanten tehai in 
   if n = 0 then 
-    let (x,(agariritu,kitaiti)) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku dora_lst ary zi_ary in
+    let (x,(_,kitaiti)) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku dora_lst ary zi_ary in
     if kitaiti > 0.0 then
       x
     else
       reach_defence ary zi_ary yaku_lst sutehai_lst tehai
   else
-    let (a,b,c,d,e,f,g) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
+    let (a,_,_,_,_,_,_) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
     let a_len = List.length a in 
     if a_len = 0 then      
       reach_defence ary zi_ary yaku_lst sutehai_lst tehai
@@ -1667,11 +1525,11 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
       let (x,_) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku dora_lst ary zi_ary in
       x
     else 
-      let (a,b,c,d,e,f,g) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
+      let (a,_,_,_,_,_,_) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
       let a_len = List.length a in
       if a_len = 0 then 
         let a_tehai = tehai_to_anzen ary zi_ary tehai in
-        let ((a,b),c) = minimum_anzen a_tehai in
+        let ((a,b),_) = minimum_anzen a_tehai in
         hai_to_int tehai (a,b)
       else
       let x = List.nth a (a_len-1) in
@@ -1680,69 +1538,63 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
     if reach_q = true then
       reach_defence ary zi_ary yaku_lst sutehai_lst tehai 
     else
-      common_b ary zi_ary tehai sutehai_lst tumo_l f_lst dora_lst player
+      common_b ary zi_ary tehai sutehai_lst tumo_l f_lst player
 
 (*(agariritu,kitaiti),furohai*)
 let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst =
-  let m = List.length p_f_lst in
   let n = List.length tehai in
   let rm_wan = (yama_len-14) in
   let tumo_l = rm_wan/4 in
   let rm_wan = Int.to_float rm_wan in
-  let rec loop i tmp = 
-    let (s,(a,(b,c,d))) =List.nth p_f_lst i in
-    let n_f_lst = (s,(a,(b,c,d)))::f_lst in
-    let (xa,ya) = hai_to_ary (x,y) in
-    let n_tehai =
-      if s = Minko then
-        let n_tehai = List.filter (fun z -> z <> (x,y)) tehai in
-        let n_tehai = 
-          if (n-2) = List.length n_tehai then
-            n_tehai
-          else
-            add_tehai n_tehai (x,y)
-        in
-        n_tehai
-      else
-        if ya = b then
-          let n_tehai = d_tehai tehai (c+1,y) in
-          let n_tehai = d_tehai n_tehai (d+1,y) in
-          n_tehai
-        else if ya = c then
-          let n_tehai = d_tehai tehai (b+1,y) in
-          let n_tehai = d_tehai n_tehai (d+1,y) in
-          n_tehai
-        else
-          let n_tehai = d_tehai tehai (b+1,y) in
-          let n_tehai = d_tehai n_tehai (c+1,y) in
-          n_tehai
-    in
-    let (_,n) = syanten n_tehai in
-    let kuikae_lst = kuikae (x,y) (s,(a,(b,c,d))) in 
-    let (t_ritu,agariritu,total_kitaiti,k_hai) = 
-      if n <= 0 then
-        let (k_hai,x) = tenpai_to_opt_f n_tehai tumo_l rm_wan n_f_lst zi_kaze ba_kaze true [] dora_lst ary zi_ary kuikae_lst in
-        let (kitaiti,agariritu) = x in
-        (1.0,agariritu,kitaiti,k_hai)
-      else 
-        let (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti) = col_tenpai_f_kuikae ary zi_ary n_tehai yama_len n_f_lst zi_kaze ba_kaze true dora_lst kuikae_lst in 
-        let k_lst_len = List.length k_lst in 
-        if k_lst_len = 0 then 
-          (t_ritu,agariritu,total_kitaiti,(1,Not_hai))
-        else
-          (t_ritu,agariritu,total_kitaiti,(List.nth k_lst (k_lst_len-1)))
-    in
-    let tmp = ((t_ritu,agariritu,total_kitaiti,k_hai),(s,(a,(b,c,d))))::tmp in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
-  in
-  if m = 0 then
-    []
-  else
-    loop (m-1) []
+  let rec loop tmp t_lst = match t_lst with
+    | [] -> tmp 
+    | (s,(a,(b,c,d)))::t -> let n_f_lst = (s,(a,(b,c,d)))::f_lst in
+                            let (_,ya) = hai_to_ary (x,y) in
+                            let n_tehai =
+                              if s = Minko then
+                                let n_tehai = List.filter (fun z -> z <> (x,y)) tehai in
+                                let n_tehai = 
+                                  if (n-2) = List.length n_tehai then
+                                    n_tehai
+                                  else
+                                    add_tehai n_tehai (x,y)
+                                in
+                                n_tehai
+                              else
+                                if ya = b then
+                                  let n_tehai = d_tehai tehai (c+1,y) in
+                                  let n_tehai = d_tehai n_tehai (d+1,y) in
+                                  n_tehai
+                                else if ya = c then
+                                  let n_tehai = d_tehai tehai (b+1,y) in
+                                  let n_tehai = d_tehai n_tehai (d+1,y) in
+                                  n_tehai
+                                else
+                                  let n_tehai = d_tehai tehai (b+1,y) in
+                                  let n_tehai = d_tehai n_tehai (c+1,y) in
+                                  n_tehai
+                            in
+                            let (_,n) = syanten n_tehai in
+                            let kuikae_lst = kuikae (x,y) (s,(a,(b,c,d))) in 
+                            let (t_ritu,agariritu,total_kitaiti,k_hai) = 
+                              if n <= 0 then
+                                let (k_hai,x) = tenpai_to_opt_f n_tehai tumo_l rm_wan n_f_lst zi_kaze ba_kaze true [] dora_lst ary zi_ary kuikae_lst in
+                                let (kitaiti,agariritu) = x in
+                                (1.0,agariritu,kitaiti,k_hai)
+                              else 
+                                let (k_lst,t_ritu,agariritu,_,_,_,total_kitaiti) = col_tenpai_f_kuikae ary zi_ary n_tehai yama_len n_f_lst zi_kaze ba_kaze true dora_lst kuikae_lst in 
+                                let k_lst_len = List.length k_lst in 
+                                if k_lst_len = 0 then 
+                                  (t_ritu,agariritu,total_kitaiti,(1,Not_hai))
+                                else
+                                  (t_ritu,agariritu,total_kitaiti,(List.nth k_lst (k_lst_len-1)))
+                            in
+                            let tmp = ((t_ritu,agariritu,total_kitaiti,k_hai),(s,(a,(b,c,d))))::tmp in
+                            loop tmp t 
+                          in
+  loop [] p_f_lst
 
+(*
 let min_f_safty lst = 
   let m = List.length lst in 
   let rec loop i tmp = 
@@ -1763,9 +1615,9 @@ let min_f_safty lst =
     (((1,Not_hai),100),(Minko,(0,(0,0,0))))
   else
     loop (m-1) (List.hd lst) 
+*)
 
-
-
+(*
 let f_safty p_f_lst tehai f_lst (x,y) ary zi_ary  =
   let m = List.length p_f_lst in
   let n = List.length tehai in
@@ -1807,7 +1659,7 @@ let f_safty p_f_lst tehai f_lst (x,y) ary zi_ary  =
     []
   else
     loop (m-1) []
-
+*)
 
 
 
@@ -1863,7 +1715,7 @@ let judge_parallel_f ary zi_ary tehai =
   else
     [|operate_tenapai_ritu_f ary zi_ary tehai|]
 
-let col_tenpai_f ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst tenpai_lst  = 
+let col_tenpai_f ary zi_ary yama_len f_lst zi_kaze ba_kaze naki dora_lst tenpai_lst  = 
   let a_len = Array.length tenpai_lst in
   let rm_wan = yama_len-14 in
   let tumo_l =  rm_wan / 4 in
@@ -1881,7 +1733,8 @@ let col_tenpai_f ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst t
       let final_form = minus_kitaiti_p add_anzendo_lst in 
       let max = max_agariritu_p final_form in
       max
-          
+         
+(*
 let max_f_agariritu lst = 
   let m = List.length lst in 
   let rec loop i tmp = 
@@ -1902,116 +1755,101 @@ let max_f_agariritu lst =
     ((0.0,0.0,0.0),(Minko,(0,(0,0,0))))
   else
     loop (m-1) ((0.0,0.0,0.0),(Minko,(0,(0,0,0))))
-
+*)
 let max_f_agariritu_a lst = 
-  let m = List.length lst in 
-  let rec loop i tmp = 
-    let ((a,x,y,z),b) = List.nth lst i in
-    let ((a',x',y',z'),_) = tmp in 
-    let tmp = 
-      if x < x' then 
-        tmp
-      else
-        ((a,x,y,z),b) 
-    in
-    if i = 0 then 
-      tmp 
-    else
-      loop (i-1) tmp 
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | ((a,x,y,z),b)::t -> let ((_,x',_,_),_) = tmp in 
+                          let tmp = 
+                            if x < x' then 
+                              tmp
+                            else
+                              ((a,x,y,z),b) 
+                          in
+                          loop tmp t 
   in
-  if m = 0 then 
-    ((0.0,0.0,0.0,(1,Not_hai)),(Minko,(0,(0,0,0))))
-  else
-    loop (m-1) ((0.0,0.0,0.0,(1,Not_hai)),(Minko,(0,(0,0,0))))
+  loop ((0.0,0.0,0.0,(1,Not_hai)),(Minko,(0,(0,0,0)))) lst 
 
 let tenpai_hai_lst n_tehai = 
-  let m = List.length n_tehai in 
-  let rec loop i tmp = 
-    let (x,y) = List.nth n_tehai i in 
-    let tehai = d_tehai n_tehai (x,y) in 
-    let (_,n) = syanten tehai in
-    let tmp = 
-      if n = 0 then
-        (x,y)::tmp 
-      else
-        tmp
-    in
-    if i = 0 then 
-      tmp
-    else
-      loop (i-1) tmp
+  let rec loop tmp double_lst t_lst = match t_lst with 
+    | [] -> tmp 
+    | h::t -> if List.exists (fun a -> a = h) double_lst then
+                    loop tmp double_lst t
+                  else
+                    let tehai = d_tehai n_tehai h in 
+                    let (_,n) = syanten tehai in
+                    let tmp = 
+                      if n = 0 then
+                        h::tmp 
+                      else
+                        tmp
+                    in
+                    loop tmp (h::double_lst) t
   in
-  if m = 0 then 
-    []
-  else
-    loop (m-1) []
+  loop [] [] n_tehai
 
 
 
 
-let keiten tehai sutehai_lst f_lst p_f_lst yama_len (x,y) yaku_lst ary zi_ary = 
-  let m = List.length p_f_lst in 
-  let n = List.length tehai in
+let keiten tehai sutehai_lst p_f_lst yama_len (x,y) yaku_lst ary zi_ary = 
+  let t_len = List.length tehai in
   let rm_wan = (yama_len-14) in
   let tumo_l = rm_wan/4 in
-  let rec loop i tmp = 
-    let (s,(a,(b,c,d))) =List.nth p_f_lst i in
-    let (xa,ya) = hai_to_ary (x,y) in
-    let n_tehai =
-      if s = Minko then
-        let n_tehai = List.filter (fun z -> z <> (x,y)) tehai in
-        let n_tehai = 
-          if (n-2) = List.length n_tehai then
-            n_tehai
-          else
-            add_tehai n_tehai (x,y)
-        in
-        n_tehai
-      else
-        if ya = b then
-          let n_tehai = d_tehai tehai (c+1,y) in
-          let n_tehai = d_tehai n_tehai (d+1,y) in
-          n_tehai
-        else if ya = c then
-          let n_tehai = d_tehai tehai (b+1,y) in
-          let n_tehai = d_tehai n_tehai (d+1,y) in
-          n_tehai
-        else
-          let n_tehai = d_tehai tehai (b+1,y) in
-          let n_tehai = d_tehai n_tehai (c+1,y) in
-          n_tehai
-    in
-    let (_,n) = syanten n_tehai in
-    let tenpai_lst = 
-      if n = 0 then
-        tenpai_hai_lst n_tehai
-      else 
-        []
-    in
-    let tmp = 
-      if tenpai_lst = [] then 
-          tmp
-      else
-        let genbutu_lst = reach_genbutu yaku_lst sutehai_lst tenpai_lst in 
-        let tenpai_lst = tehai_to_anzen ary zi_ary tenpai_lst in (*((int*hai)*kikendo)*)
-        let kikendo = reach_genbutu_anzen_zero tenpai_lst genbutu_lst in 
-        let min_den = List.hd (List.sort (fun (_,a) (_,b) -> if a < b then -1 else 1) kikendo) in
-        let ((a1,b1),c1) = tmp in 
-        let (a2,b2) = min_den in 
-        if b1 > b2 then 
-                (min_den,(s,(a,(b,c,d))))
-        else
-                tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (s,(a,(b,c,d)))::t -> let (_,ya) = hai_to_ary (x,y) in
+                            let n_tehai =
+                              if s = Minko then
+                                let n_tehai = List.filter (fun z -> z <> (x,y)) tehai in
+                                let n_tehai = 
+                                  if (t_len-2) = List.length n_tehai then
+                                    n_tehai
+                                  else
+                                    add_tehai n_tehai (x,y)
+                                in
+                                n_tehai
+                              else
+                                if ya = b then
+                                  let n_tehai = d_tehai tehai (c+1,y) in
+                                  let n_tehai = d_tehai n_tehai (d+1,y) in
+                                  n_tehai
+                                else if ya = c then
+                                  let n_tehai = d_tehai tehai (b+1,y) in
+                                  let n_tehai = d_tehai n_tehai (d+1,y) in
+                                  n_tehai
+                                else
+                                  let n_tehai = d_tehai tehai (b+1,y) in
+                                  let n_tehai = d_tehai n_tehai (c+1,y) in
+                                  n_tehai
+                            in
+                            let (_,n) = syanten n_tehai in
+                            let tenpai_lst = 
+                              if n = 0 then
+                                tenpai_hai_lst n_tehai
+                              else 
+                                []
+                            in
+                            let tmp = 
+                              if tenpai_lst = [] then 
+                                  tmp
+                              else
+                                let genbutu_lst = reach_genbutu yaku_lst sutehai_lst tenpai_lst in 
+                                let tenpai_lst = tehai_to_anzen ary zi_ary tenpai_lst in (*((int*hai)*kikendo)*)
+                                let kikendo = reach_genbutu_anzen_zero tenpai_lst genbutu_lst in 
+                                let min_den = List.hd (List.sort (fun (_,a) (_,b) -> if a < b then -1 else 1) kikendo) in
+                                let ((_,b1),_) = tmp in 
+                                let (_,b2) = min_den in 
+                                if b1 > b2 then 
+                                        (min_den,(s,(a,(b,c,d))))
+                                else
+                                        tmp
+                            in
+                            loop tmp t 
   in
-  if m = 0 || tumo_l > 6 then
+  if tumo_l > 6 then
     (((1,Not_hai),100),(Minko,(0,(0,0,0))))
   else
-    loop (m-1) (((1,Not_hai),100),(List.hd p_f_lst))
+    loop (((1,Not_hai),100),(Minko,(0,(0,0,0))))p_f_lst
 
 
 (*deebug*)
@@ -2340,7 +2178,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
     if Array.length tenpai_lst = 0 || Array.length tenpai_lst = 1 && List.length tenpai_lst.(0) = 0 then 
       []
     else if reach_q = false then
-      let not_naki = col_tenpai_f ary zi_ary tehai yama_len (List.nth furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
+      let not_naki = col_tenpai_f ary zi_ary yama_len (List.nth furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
       if f_kitaiti_lst = [] then 
         []
       else
@@ -2383,7 +2221,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
       if haitei_s = true && (yama_len-14) < 4 then
         []
       else
-        let ((k_hai,den),f_hai) = keiten tehai sutehai_lst (List.nth furo_lst player) p_f_lst yama_len (x,y) yaku_lst ary zi_ary in
+        let ((k_hai,den),f_hai) = keiten tehai sutehai_lst p_f_lst yama_len (x,y) yaku_lst ary zi_ary in
         if k_hai = (1,Not_hai) || den > 5 then 
           []
         else
