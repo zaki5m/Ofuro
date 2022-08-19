@@ -167,7 +167,7 @@ let ary_to_list ary zi_ary =
     
 
 
-let rec d_tehai list (x,y) = match list with
+let rec d_tehai (list:(int*hai) list) (x,y) = match list with
   | [] -> []
   | [(x1,y1)] -> if (x1,y1) = (x,y) then [] else [(x1,y1)]
   | (x1,y1)::t -> if (x1,y1) = (x,y) then t else (x1,y1)::(d_tehai t (x,y))
@@ -195,15 +195,15 @@ let int_to_hai tehai a =
   else
     (x,y,false)
 
-let furo_to_hai (a,(b,(c,d,e))) = 
+let furo_to_hai (_,(b,(c,d,e))) = 
   let x1 = ary_to_hai (b,c) in
   let x2 = ary_to_hai (b,d) in
   let x3 = ary_to_hai (b,e) in
   [x1;x2;x3]
 
 let ripai2 (list:(int*hai)list) hai = 
-  let list = List.filter (fun ((x,y)) -> y = hai ) list in 
-  let list = List.sort (fun (x1,y1) (x2,y2) -> if x1 < x2 then -1 else 1) list  in
+  let list = List.filter (fun ((_,y)) -> y = hai ) list in 
+  let list = List.sort (fun (x1,_) (x2,_) -> if x1 < x2 then -1 else 1) list  in
   list
 
 let ripai list = 
@@ -355,7 +355,7 @@ let gukei_lst = [(2,[(1,3)]);(3,[(1,2);(2,4)]);(4,[(3,5)]);(5,[(4,6)]);(6,[(5,7)
 
 let possible_furo_patern tehai (x,y) = 
   let (xa,ya) = hai_to_ary (x,y) in
-  let tmp = List.filter (fun (a,b) -> b = y) tehai in
+  let tmp = List.filter (fun (_,b) -> b = y) tehai in
   let p_f_lst =
     if List.length (List.filter (fun a -> a = (x,y)) tmp) >= 2 then
       [(Minko,(xa,(ya,ya,ya)))]
@@ -468,7 +468,7 @@ let kind_kokushi tehai =
 let furo_kind f_lst =
   let m = List.length f_lst in
   let rec loop i tmp = 
-    let (a,(b,(c,d,e))) = List.nth f_lst i in
+    let (_,(b,(_,_,_))) = List.nth f_lst i in
     let tmp = 
       if b = 3 then
         tmp
@@ -507,11 +507,11 @@ let somete tehai f_lst =
   let k = if k_furo = [] then 3 else (List.hd k_furo) in
   let k_furo = List.for_all (fun a -> a = k) k_furo in
   if k_furo = true then
-    let no_zi_lst = List.filter (fun (a,b) -> a = 0) tehai in
+    let no_zi_lst = List.filter (fun (a,_) -> a = 0) tehai in
     let n = List.length no_zi_lst in
-    let m_lst = List.filter (fun (a,b) -> b = Manzu) no_zi_lst in
-    let p_lst = List.filter (fun (a,b) -> b = Pinzu) no_zi_lst in
-    let s_lst = List.filter (fun (a,b) -> b = Souzu) no_zi_lst in
+    let m_lst = List.filter (fun (_,b) -> b = Manzu) no_zi_lst in
+    let p_lst = List.filter (fun (_,b) -> b = Pinzu) no_zi_lst in
+    let s_lst = List.filter (fun (_,b) -> b = Souzu) no_zi_lst in
     let m_count = List.length m_lst in
     let p_count = List.length p_lst in
     let s_count = List.length s_lst in

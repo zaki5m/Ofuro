@@ -248,15 +248,18 @@ let all_k_fase ary zi_ary tenpai_lst =
     | h::t -> if List.exists (fun a -> a = h) double_lst then
                 loop2 k_lst tumo_lst rest_tumo_lst current_tehai n tmp2 double_lst t
               else
-                let new_tehai = d_tehai current_tehai h in
-                let (_,new_n) = syanten new_tehai in
-                let tmp2 = 
-                  if n = new_n then
-                    tmp2 
-                  else
-                    all_tumo ary zi_ary (h::k_lst,tumo_lst,rest_tumo_lst,new_tehai)@tmp2 
-                in
-                loop2 k_lst tumo_lst rest_tumo_lst current_tehai n tmp2 (h::double_lst) t
+                if List.exists (fun a -> a = h) tumo_lst then 
+                  loop2 k_lst tumo_lst rest_tumo_lst current_tehai n tmp2 (h::double_lst) t
+                else
+                  let new_tehai = d_tehai current_tehai h in
+                  let (_,new_n) = syanten new_tehai in
+                  let tmp2 = 
+                    if n = new_n then
+                      tmp2 
+                    else
+                      all_tumo ary zi_ary (h::k_lst,tumo_lst,rest_tumo_lst,new_tehai)@tmp2 
+                  in
+                  loop2 k_lst tumo_lst rest_tumo_lst current_tehai n tmp2 (h::double_lst) t
   in
   let rec loop tmp lst = match lst with 
     | [] -> tmp

@@ -86,19 +86,19 @@ let kokushi_syanten lst =
   let ary = Array.make 14 0 in 
   let rec loop lst = match lst with 
     | [] -> ()
-    | (1,Manzu)::t -> if ary.(0) = 0 then ary.(0) <- 1 else ary.(13) <- 1
-    | (9,Manzu)::t -> if ary.(1) = 0 then ary.(1) <- 1 else ary.(13) <- 1
-    | (1,Pinzu)::t -> if ary.(2) = 0 then ary.(2) <- 1 else ary.(13) <- 1
-    | (9,Pinzu)::t -> if ary.(3) = 0 then ary.(3) <- 1 else ary.(13) <- 1
-    | (1,Souzu)::t -> if ary.(4) = 0 then ary.(4) <- 1 else ary.(13) <- 1
-    | (9,Souzu)::t -> if ary.(5) = 0 then ary.(5) <- 1 else ary.(13) <- 1
-    | (0,Ton)::t -> if ary.(6) = 0 then ary.(6) <- 1 else ary.(13) <- 1
-    | (0,Nan)::t -> if ary.(7) = 0 then ary.(7) <- 1 else ary.(13) <- 1
-    | (0,Sya)::t -> if ary.(8) = 0 then ary.(8) <- 1 else ary.(13) <- 1
-    | (0,Pei)::t -> if ary.(9) = 0 then ary.(9) <- 1 else ary.(13) <- 1
-    | (0,Haku)::t -> if ary.(10) = 0 then ary.(10) <- 1 else ary.(13) <- 1
-    | (0,Hatsu)::t -> if ary.(11) = 0 then ary.(11) <- 1 else ary.(13) <- 1
-    | (0,Tyun)::t -> if ary.(12) = 0 then ary.(12) <- 1 else ary.(13) <- 1
+    | (1,Manzu)::t -> if ary.(0) = 0 then ary.(0) <- 1 else ary.(13) <- 1; loop t 
+    | (9,Manzu)::t -> if ary.(1) = 0 then ary.(1) <- 1 else ary.(13) <- 1; loop t 
+    | (1,Pinzu)::t -> if ary.(2) = 0 then ary.(2) <- 1 else ary.(13) <- 1; loop t 
+    | (9,Pinzu)::t -> if ary.(3) = 0 then ary.(3) <- 1 else ary.(13) <- 1; loop t 
+    | (1,Souzu)::t -> if ary.(4) = 0 then ary.(4) <- 1 else ary.(13) <- 1; loop t 
+    | (9,Souzu)::t -> if ary.(5) = 0 then ary.(5) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Ton)::t -> if ary.(6) = 0 then ary.(6) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Nan)::t -> if ary.(7) = 0 then ary.(7) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Sya)::t -> if ary.(8) = 0 then ary.(8) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Pei)::t -> if ary.(9) = 0 then ary.(9) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Haku)::t -> if ary.(10) = 0 then ary.(10) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Hatsu)::t -> if ary.(11) = 0 then ary.(11) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Tyun)::t -> if ary.(12) = 0 then ary.(12) <- 1 else ary.(13) <- 1; loop t 
     | (_,_)::t -> loop t 
   in
   let _ = loop lst in
