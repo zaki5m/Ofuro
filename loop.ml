@@ -749,7 +749,8 @@ let rm_syuntu ary =
     if n = 0 then
       loop2' ary (i)
     else if i = 2 then
-      let x = ary.(0) + ary.(1) + ary.(2) + ary.(3) + ary.(4) + ary.(5) + ary.(6) + ary.(7) + ary.(8) in      if x = 2 then
+      let x = ary.(0) + ary.(1) + ary.(2) + ary.(3) + ary.(4) + ary.(5) + ary.(6) + ary.(7) + ary.(8) in      
+      if x = 2 then
         tatu_to_mati ary
       else
         Ns
@@ -919,13 +920,13 @@ let possible_head_list lst lst2 =
   else
     loop' lst lst2 (m-1) []
 
-let yaku_kotu lst =
+let yaku_kotu lst tmp =
   let (a,b,c,d) = sp_kotu lst in
   let y_lst =
     if a + b + c + d = 4 then
-      [Toitoi]
+      Toitoi::tmp
     else
-      []
+      tmp
   in
   let y_lst = 
     if a + c = 4 then
@@ -1124,7 +1125,7 @@ let hantei_mentu ary zi_ary lst =
     loop' z (m-1) [] 
 
 
-let sansyoku lst =
+let sansyoku (lst:((int*(int*int*int))list)) tmp =
   if List.length lst = 4 then 
     let (a1,b1) = List.nth lst 0 in
     let (a2,b2) = List.nth lst 1 in
@@ -1133,43 +1134,43 @@ let sansyoku lst =
     if b1 = b2 then
       if b1 = b3 then
         if a1 = 2 && a2 = 1 && a3 = 0 then
-          let (x,y,z) = b1 in
+          let (x,y,_) = b1 in
           if x = y then
-            [Sansyokudoukou]
+            Sansyokudoukou::tmp
           else
-            [Sansyokudouzyun]
+            Sansyokudouzyun::tmp
         else
-          []
+          tmp
       else if b1 = b4 then
         if a1 = 2 && a2 = 1 && a4 = 0 then
-          let (x,y,z) = b1 in
+          let (x,y,_) = b1 in
           if x = y then
-            [Sansyokudoukou]
+            Sansyokudoukou::tmp
           else
-            [Sansyokudouzyun]
+            Sansyokudoukou::tmp
         else
-          []
+          tmp
       else
-        []
+        tmp
     else if b2 = b3 then
       if b2 = b4 then
         if a2 = 2 && a3 = 1 && a4 = 0 then
-          let (x,y,z) = b1 in
+          let (x,y,_) = b1 in
           if x = y then
-            [Sansyokudoukou]
+            Sansyokudoukou::tmp
           else
-            [Sansyokudouzyun]
+            Sansyokudoukou::tmp
         else
-          []
+          tmp
       else
-        []
+        tmp
     else
-      []
+      tmp
   else
-    []
+    tmp
 
 
-let peiko lst = 
+let peiko (lst:(int*(int*int*int)) list) tmp = 
   if List.length lst = 4 then
     let (a1,b1) = List.nth lst 0 in
     let (a2,b2) = List.nth lst 1 in
@@ -1178,33 +1179,33 @@ let peiko lst =
     let n =
       if b1 = b2 && a1 = a2 then
         if b3 = b4 && a3 = a4 then
-          [Ryanpeikou]
+          Ryanpeikou::tmp
         else
-          [Ipeiko]
+          Ipeiko::tmp
       else if b1 = b3 && a1 = a3 then
         if b2 = b4 && a2 = a4 then
-          [Ryanpeikou]
+          Ryanpeikou::tmp
         else
-          [Ipeiko]
+          Ipeiko::tmp
       else if b1 = b4 && a1 = a4 then
         if b2 = b3 && a2 = a3 then
-          [Ryanpeikou]
+          Ryanpeikou::tmp
         else
-          [Ipeiko]
+          Ipeiko::tmp
       else if b2 = b3 && a2 = a3 then
-        [Ipeiko]
+        Ipeiko::tmp
       else if b2 = b4 && a2 = a4 then
-        [Ipeiko]
+        Ipeiko::tmp
       else if b3 = b4 && a3 = a4 then
-        [Ipeiko]
+        Ipeiko::tmp
       else
-        []
+        tmp
     in
     n
   else
-    []
+    tmp
     
-let tyanta lst head =
+let tyanta lst head tmp =
   if List.length lst = 4 then
     let (a1,(b1,_,c1)) = List.nth lst 0 in
     let (a2,(b2,_,c2)) = List.nth lst 1 in
@@ -1213,22 +1214,22 @@ let tyanta lst head =
     let (h1,h2) = head in
     if  a1 <> 3 && a2 <> 3 && a3 <> 3 && a4 <> 3 && h1 <> 3 then 
       if ((b1 = 0 && c1 = 0)||(b1 = 8 && c1 = 8)) && ((b2 = 0 && c2 = 0) ||(b2 = 8 && c2 = 8)) && ((b3 = 0 && c3 = 0) || (b3 = 8 && c3 = 8)) && ((b4 = 0 && c4 = 0) || (b4 = 8 && c4 = 8)) && (h2 = 0 || h2 = 8) then
-        [Tinroutou]
+        Tinroutou::tmp
       else if (b1 = 0 || c1 = 8) && (b2 = 0 || c2 = 8) && (b3 = 0 || c3 = 8) && (b4 = 0 || c4 = 8) && (h2 = 0 || h2 = 8) then
-        [Zyuntyan]
+        Zyuntyan::tmp
       else
-        []
+        tmp
     else if (a1 = 3 || (b1 = 0 && c1 = 0)||(b1 = 8 && c1 = 8)) && (a2 = 3 || (b2 = 0 && c2 = 0) ||(b2 = 8 && c2 = 8)) && (a3 = 3 || (b3 = 0 && c3 = 0) || (b3 = 8 && c3 = 8)) && (a4 = 3 || (b4 = 0 && c4 = 0) || (b4 = 8 && c4 = 8)) && (h1 = 3 || h2 = 0 || h2 = 8) then
-      [Honroutou]
+      Honroutou::tmp
     else 
       if (b1 = 0 || c1 = 8 || a1 = 3) && (b2 = 0 || c2 = 8 || a2 = 3) && (b3 = 0 || c3 = 8 || a3 = 3) && (b4 = 0 || c4 = 8 || a4 = 3) && (h1 = 3 || h2 = 0 || h2 = 8) then
-        [Tyanta]
+        Tyanta::tmp
       else
-        []
+        tmp
   else
-    []
+    tmp
 
-let tanyao lst head =
+let tanyao lst head tmp =
   if List.length lst = 4 then
     let (a1,(b1,_,c1)) = List.nth lst 0 in
     let (a2,(b2,_,c2)) = List.nth lst 1 in
@@ -1238,51 +1239,51 @@ let tanyao lst head =
     if a1 <> 3 && a2 <> 3 && a3 <> 3 && a4 <> 3 && h1 <> 3 then
       if b1 <> 0 && b2 <> 0 && b3 <> 0 && b4 <> 0 && h2 <> 0 then
         if c1 <> 8 && c2 <> 8 && c3 <> 8 && c4 <> 8 && h2 <> 8 then
-          [Tanyao]
+          Tanyao::tmp
         else
-          []
+          tmp
       else
-        []
+        tmp
     else
-      []
+      tmp
   else
-    []
+    tmp
 
 
 
-let issyoku lst head =
+let issyoku lst head tmp =
   let (a1,_) = List.nth lst 0 in
   let (a2,_) = List.nth lst 1 in
   let (a3,_) = List.nth lst 2 in
   let (a4,_) = List.nth lst 3 in
   let (h1,_) = head in
   if a1 = a2 && a1 = a3 && a1 = a4 && a1 = h1 then
-    [Tinitu]
+    Tinitu::tmp
   else
     if (a1 = a2 || a2 = 3) && (a1 = a3 || a3 = 3) && (a1 = a4 || a4 = 3) && (a1 = h1 || h1 = 3) then
-      [Honitu]
+      Honitu::tmp
     else if a1 = 3 then
-      [Honitu]
+      Honitu::tmp
   else
-    []
+    tmp
         
-let pinhu lst mati head zi_kaze ba_kaze =
+let pinhu lst mati head zi_kaze ba_kaze tmp =
   let (a,b) = head in
   if List.length (List.filter (fun x -> x = Syuntu) lst) = 4 then
     if mati = Ryanmen then
       if a = 3 then
         if b <> zi_kaze && b <> ba_kaze && b <> 4 && b <> 5 && b <> 6 then
-          [Pinhu]
+          Pinhu::tmp
         else
-          []
+          tmp
       else
-        [Pinhu]
+        Pinhu::tmp
     else
-      []
+      tmp
   else
-    [] 
+    tmp
 
-let ikki_tukan lst =
+let ikki_tukan lst tmp =
   let (a1,(b1,_,c1)) = List.nth lst 0 in
   let (a2,(b2,_,c2)) = List.nth lst 1 in
   let (a3,(b3,_,c3)) = List.nth lst 2 in
@@ -1290,20 +1291,20 @@ let ikki_tukan lst =
   if a3 <> 3 then    
     if a1 = a2 && a1 = a3 then
       if (b1 = 6 && c1 = 8) && (b2 = 3 && c2 = 5) && (b3 = 0 && c3 = 2) then
-        [Ikkitukan]
+        Ikkitukan::tmp
       else
-        []
+        tmp
     else if a2 = a3 && a2 = a4 then
       if (b2 = 6 && c2 = 8) && (b3 = 3 && c3 = 5) && (b4 = 0 && c4 = 2) then
-        [Ikkitukan]
+        Ikkitukan::tmp
       else
-        []
+        tmp
     else
-      []
+      tmp
   else
-    []
+    tmp
 
-let yakuhai lst zi_kaze ba_kaze =
+let yakuhai lst zi_kaze ba_kaze tmp =
   let m = List.length lst in
   let rec loop' lst n y_lst =
     let (a,(b,_,_)) = List.nth lst n in
@@ -1328,9 +1329,9 @@ let yakuhai lst zi_kaze ba_kaze =
     else
       loop' lst (n-1) y_lst
   in
-  loop' lst (m-1) []
+  loop' lst (m-1) tmp
 
-let sangen lst head = 
+let sangen lst head tmp = 
   let m = List.length lst in
   let rec loop' lst n y_lst = 
     let (a,(b,_,_)) = List.nth lst n in
@@ -1352,29 +1353,30 @@ let sangen lst head =
     if m = 0 then
       []
     else
-      loop' lst (m-1) [] in
+      loop' lst (m-1) []
+  in
   let x = List.fold_left (fun a b -> a + b) 0 lst2  in
   if x = 15 then
-    [Daisangen]
+    Daisangen::tmp
   else if x = 9 then
     if (3,6) = head then
-      [Syousangen]
+      Syousangen::tmp
     else
-      []
+      tmp
   else if x = 10 then
     if (3,5) = head then
-      [Syousangen]
+      Syousangen::tmp
     else
-      []
+      tmp
   else if x = 11 then
     if (3,4) = head then
-      [Syousangen]
+      Syousangen::tmp
     else
-      []
+      tmp
   else
-    []
+    tmp
 
-let tyuren ary = 
+let tyuren ary y_lst = 
   let rec loop ary' j tmp = 
     let tmp = 
       if ary' = tyuren_a.(j) then
@@ -1391,7 +1393,7 @@ let tyuren ary =
     let ary2 = Array.copy ary.(i) in
     let tmp2 = 
       if (loop ary2 0 false) = true then
-        [Tyurenpoutou]
+        Tyurenpoutou::y_lst
       else
         tmp2
     in
@@ -1402,7 +1404,7 @@ let tyuren ary =
     in
   loop' 0 []
 
-let ryuiso ary zi_ary= 
+let ryuiso ary zi_ary y_lst = 
   let rec loop' j tmp = 
     let tmp = ary.(2).(j) + tmp in
     if j = 7 then
@@ -1416,12 +1418,12 @@ let ryuiso ary zi_ary=
   let tmp = loop' 1 0 in
   let tmp = tmp + zi_ary.(5) in
   if tmp = 14 then
-    [Ryuiso]
+    Ryuiso::y_lst
   else
-    []
+    y_lst
 
 
-let sushi lst head = 
+let sushi lst head y_lst = 
   let (h1,h2) = head in
   let tmp =
     if h1 = 3 then
@@ -1464,21 +1466,21 @@ let sushi lst head =
   if List.fold_left (fun a b -> a + b) 0 x = 10 then
     if h1 = 3 then
       if h2 = 0 then
-        [Syoususi]
+        Syoususi::y_lst
       else if h2 = 1 then
-        [Syoususi]
+        Syoususi::y_lst
       else if h2 = 2 then
-        [Syoususi]
+        Syoususi::y_lst
       else if h2 = 3 then
-        [Syoususi]
+        Syoususi::y_lst
       else
-        [Daisusi]
+        Daisusi::y_lst
     else
-      [Daisusi]
+      Daisusi::y_lst
   else
-    []
+    y_lst
 
-let tuisou lst head = 
+let tuisou lst head y_lst = 
   let rec loop' i tmp = 
     let (a,_) = List.nth lst i in
     let tmp =
@@ -1496,11 +1498,11 @@ let tuisou lst head =
     if x = 3 then
       let lst2 = loop' 3 [] in
       if List.length lst2 = 4 then
-        [Tuiso]
+        Tuiso::y_lst
       else
-        []
+        y_lst
     else
-        [] 
+        y_lst 
 
 
 let t_tanyao ary zi_ary = 
@@ -1979,31 +1981,31 @@ let opt_yaku ary zi_ary lst lst2 head mati zi_kaze ba_kaze naki zi_lst oya min_l
         lst
       in
   let rec loop' n y_lst lst3 =
-    let tmp = yaku_kotu (List.nth lst3 n) in
-    let tmp = (sansyoku (List.nth lst2 n))@tmp in
-    let tmp = (tyanta(List.nth lst2 n) head)@tmp in
-    let tmp = (tanyao(List.nth lst2 n) head)@tmp in
-    let tmp = (issyoku(List.nth lst2 n) head)@tmp in
-    let tmp = (ikki_tukan(List.nth lst2 n))@tmp in
-    let tmp = (yakuhai(List.nth lst2 n) zi_kaze ba_kaze)@tmp in
-    let tmp = (sangen(List.nth lst2 n) head)@tmp in
-    let tmp = (sushi (List.nth lst2 n) head)@tmp in
-    let tmp = (tuisou (List.nth lst2 n) head)@tmp in
-    let tmp = (ryuiso ary zi_ary)@tmp in
+    let tmp = yaku_kotu (List.nth lst3 n) [] in
+    let tmp = (sansyoku (List.nth lst2 n)) tmp in
+    let tmp = (tyanta(List.nth lst2 n) head) tmp in
+    let tmp = (tanyao(List.nth lst2 n) head) tmp in
+    let tmp = (issyoku(List.nth lst2 n) head) tmp in
+    let tmp = (ikki_tukan(List.nth lst2 n)) tmp in
+    let tmp = (yakuhai(List.nth lst2 n) zi_kaze ba_kaze) tmp in
+    let tmp = (sangen(List.nth lst2 n) head) tmp in
+    let tmp = (sushi (List.nth lst2 n) head) tmp in
+    let tmp = (tuisou (List.nth lst2 n) head) tmp in
+    let tmp = (ryuiso ary zi_ary) tmp in
     let tmp = if naki = false then 
-                (tyuren ary)@tmp 
+                tyuren ary tmp 
               else
                 tmp
     in
     let tmp = if naki = false then
-                (peiko(List.nth lst2 n))@tmp 
+                peiko (List.nth lst2 n) tmp 
               else
                 tmp
     in
     let tmp = 
       if naki = false then
         if List.exists (fun a -> a = Ryanmen ) mati then
-          (pinhu (List.nth lst3 n) Ryanmen head zi_kaze ba_kaze)@tmp 
+          pinhu (List.nth lst3 n) Ryanmen head zi_kaze ba_kaze tmp 
         else
           tmp
       else

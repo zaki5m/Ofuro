@@ -622,7 +622,7 @@ let kiriban tehai_lst sutehai_lst ary_lst (x,y) player f_lst naki (yaku_lst:Mahj
   let yaku_player = List.filter (fun a -> a <> Ippatu) yaku_player in 
   let zi_kaze = kyoku_to_kaze kyoku player in
   let rec loop' tehai sutehai =
-    t_format tehai_lst f_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;
+    (*t_format tehai_lst f_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
     let n = 
       prob_select sutehai_lst tehai f_lst yaku_lst player yama_len zi_kaze ba naki dora_lst furo_double_lst
     in
