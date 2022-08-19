@@ -563,7 +563,9 @@ let loss_hai b_lst a_lst ary zi_ary =
     0
   else
     loop (m-1) 0
-  
+
+
+(*  
 let opt_yukouhai lst ary zi_ary= 
   let m = List.length lst in
   let base_lst = compile_yukouhai lst in
@@ -588,7 +590,7 @@ let opt_yukouhai lst ary zi_ary=
     (-1,(1,Not_hai))
   else
     loop (m-1) (30,(1,Not_hai))
-
+*)
 (*mentsu,mentsukouho*)
 let mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len = 
   let m_ary = lst_to_ary_type m_lst in
@@ -738,7 +740,7 @@ let create_table sutehai_lst tehai =
     (ary,zi_ary)
 
 
-
+(*
 let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst = 
   let yaku = List.nth yaku_lst player in
   let reach_q = List.exists (fun a -> List.exists (fun b -> b = Reach || b = Doublereach) a) yaku_lst in
@@ -776,7 +778,7 @@ let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst =
     loop ((List.length tehai) - 1) trush
   else
     loop ((List.length tehai) - 1) (1,Not_hai)
-
+*)
 
 
 (*let _ = 
