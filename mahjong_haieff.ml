@@ -141,7 +141,7 @@ let kokushi_syanten lst =
     12 - b
 *)
 
-let titoi_syanten lst = 
+let titoi_syanten (lst:(int*hai)list) = 
   let rec loop' lst tmp i = 
     let x = List.hd lst in 
     let tmp = 
@@ -293,7 +293,7 @@ let midium_mentsu ary =
     in
     if mentsu = mentsu' then
       if i = 3 then
-        (ary,mentsu')
+        mentsu'
       else
         loop' (i+1) mentsu'
     else
@@ -321,7 +321,7 @@ let midium_mentsu ary =
     else
       loop i mentsu'
   in
-  let (ary,n) = loop' 0 0 in
+  let n = loop' 0 0 in
   loop 8 n
 
 
@@ -399,30 +399,22 @@ let mentsu_kouho_syuntsu ary f_lst_len =
 
 
 
-let serch_koritsu lst m = 
-  let n = List.length lst in
-  let rec loop i tmp = 
-    let (ary,(a,b)) = List.nth lst i in
-    let tmp =     
-      if (a,b) = m then
-        ary::tmp
-      else
-        tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+let serch_koritsu (lst:(int array*(int*int))list) m = 
+  let fil_lst = List.filter (fun (_,(a,b)) -> if (a,b) = m then true else false) lst in 
+  let rec loop i tmp t_lst = match t_lst with 
+    | [] -> tmp
+    | (ary,_)::t -> loop i (tmp + ary.(i)) t
   in
-  let ary = 
-    if n = 0 then
-      []
-    else
-      loop (n-1) [] 
+  let rec loop2 i tmp = match i with 
+  | 0 -> tmp
+  | _ -> let x = loop i 0 fil_lst in 
+          loop2 (i-1) (x::tmp)
   in
-  let ary = Array.concat ary in
-  let lst = Array.to_list ary in
-  lst
+  if fil_lst = [] then 
+    []
+  else
+    loop2 8 []
+
 
 
 
@@ -446,7 +438,7 @@ let mentsu_kouho_kotsu ary f_lst_len =
       loop' ary (i+1) mentsu
     in
   let n = loop' ary 0 [] in 
-  let lst = List.map (fun (a,(b,c)) -> (b,c)) n in
+  let lst = List.map (fun (_,(b,c)) -> (b,c)) n in
   let m = opt_kouho lst f_lst_len in 
   let x = serch_koritsu n m in
   (x,m) 
@@ -524,7 +516,7 @@ let koritsu m p s zi =
 
 
 
-
+(*
 let compile_yukouhai lst = 
   let m = List.length lst in
   let rec loop i tmp = 
@@ -563,7 +555,7 @@ let loss_hai b_lst a_lst ary zi_ary =
     0
   else
     loop (m-1) 0
-
+*)
 
 (*  
 let opt_yukouhai lst ary zi_ary= 

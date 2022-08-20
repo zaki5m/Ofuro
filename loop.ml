@@ -169,24 +169,26 @@ let hantei_syuntu array list =
       else
         tmp
       in
-
-    if i = 2 then
-      if j = 6 then
-        if array.(i).(7) >= 1 || array.(i).(8) >= 1 then 
-          [Ws]
-        else
-          lst
-      else
-        loops i (j+1) lst
+    if lst = [Ws] then 
+      [Ws]
     else
-      if j = 6 then
-        if array.(i).(7) >= 1 || array.(i).(8) >= 1 then 
-          loops (i+1) 0 [Ws]
+      if i = 2 then
+        if j = 6 then
+          if array.(i).(7) >= 1 || array.(i).(8) >= 1 then 
+            [Ws]
+          else
+            lst
         else
-          loops (i+1) 0 lst
+          loops i (j+1) lst
       else
-        loops i (j+1) lst
-  in
+        if j = 6 then
+          if array.(i).(7) >= 1 || array.(i).(8) >= 1 then 
+            loops (i+1) 0 [Ws]
+          else
+            loops (i+1) 0 lst
+        else
+          loops i (j+1) lst
+    in
     loops 0 0 list
 
 
@@ -2078,7 +2080,7 @@ let opt_ten2 lst =
   let m = List.length lst in
   let rec loop' i tmp =
     let (z,(x,y)) = List.nth lst i in
-    let (_,(x2,y2)) = tmp in
+    let (_,(x2,_)) = tmp in
     let tmp = 
       if x >= x2 then
         (z,(x,y))
