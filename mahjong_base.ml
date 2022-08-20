@@ -70,7 +70,7 @@ let list_to_ary lst =
   in
   loop (m-1) (Array.make_matrix 3 9 0) (Array.make 7 0)
 
-let rec add_tehai list (x,y) = match list with
+let rec add_tehai (list:(int*hai)list) (x,y) = match list with
   | [] -> [(x,y)]
   | [(x1,y1)] -> [(x1,y1);(x,y)]
   | h::t -> h::(add_tehai t (x,y))
@@ -188,7 +188,7 @@ let hyouzi_to_dora (x,y) =
       (x,y+1)
 
 (*数字から切る牌を選択*)
-let int_to_hai tehai a = 
+let int_to_hai (tehai:(int*hai)list) a = 
   let (x,y) = List.nth tehai a in
   if a = 13 then
     (x,y,true)
@@ -220,7 +220,7 @@ let ripai list =
   let list = listm @ listp @ lists @ listt @ listn @ listsy @ listpe @ listh @ listr @ listty in
   list
 
-let hai_to_int tehai (x,y) =
+let hai_to_int (tehai:(int*hai)list) (x,y) =
   let m = List.length tehai in
   let rec loop i = 
     let a = List.nth tehai i in
@@ -234,25 +234,18 @@ let hai_to_int tehai (x,y) =
   loop (m-1)
 
 (*furo_lstから副露されている牌の配列の座標のリストを返す*)  
-let furo_to_ary f_lst = 
-  let m = List.length f_lst in
-  let rec loop i tmp = 
-    let (a,(b,(c,d,e))) = List.nth f_lst i in
-    let tmp = 
-      if a = Minkan || a = Ankan then
-        [(b,c);(b,c);(b,c);(b,c)]@tmp
-      else
-        [(b,c);(b,d);(b,e)]@tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+let furo_to_ary (f_lst:((state*(int*(int*int*int)))) list) other_furo_lst = 
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (a,(b,(c,d,e)))::t -> let tmp = 
+                              if a = Minkan || a = Ankan then
+                                (b,c)::(b,c)::(b,c)::(b,c)::tmp
+                              else
+                                (b,c)::(b,d)::(b,e)::tmp
+                            in
+                            loop tmp t 
   in
-  if m = 0 then
-    []
-  else
-    loop (m-1) []
+  loop other_furo_lst f_lst
 
 let rm_furo_double ary zi_ary furo_double_lst =
   let m = List.length furo_double_lst in 
@@ -281,32 +274,26 @@ let rm_furo_double ary zi_ary furo_double_lst =
 
 (*furo_lstから副露されている牌を配列から引いた配列を返す。(ary,zi_ary)*)     
 let furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary =
-  let a_lst = furo_to_ary (List.nth furo_lst 0) in
-  let b_lst = furo_to_ary (List.nth furo_lst 1) in
-  let c_lst = furo_to_ary (List.nth furo_lst 2) in
-  let d_lst = furo_to_ary (List.nth furo_lst 3) in
-  let lst = a_lst@b_lst@c_lst@d_lst in
-  let m = List.length lst in
-  let rec loop i = 
-    let (x,y) = List.nth lst i in
-    let _ = 
-      if x = 3 then
-        let n = zi_ary.(y) in
-        zi_ary.(y) <- n - 1;
-      else
-        let n = ary.(x).(y) in
-        ary.(x).(y) <- n - 1;
-    in
-    if i = 0 then
-      (ary,zi_ary)
-    else
-      loop (i-1)
+  let a_lst = furo_to_ary (List.nth furo_lst 0) [] in
+  let b_lst = furo_to_ary (List.nth furo_lst 1) a_lst in
+  let c_lst = furo_to_ary (List.nth furo_lst 2) b_lst in
+  let lst = furo_to_ary (List.nth furo_lst 3) c_lst in
+  let rec loop t_lst = match t_lst with 
+    | [] -> ()
+    | (x,y)::t -> let _ = if x = 3 then
+                            let n = zi_ary.(y) in
+                            zi_ary.(y) <- n - 1;
+                          else
+                            let n = ary.(x).(y) in
+                            ary.(x).(y) <- n - 1;
+                        in
+                  loop t 
   in
-  if m = 0 then
+  if lst = [] then
     (ary,zi_ary)
   else
-    let (ary2,zi_ary2) = loop (m-1) in 
-    rm_furo_double ary2 zi_ary2 furo_double_lst
+    (loop lst;
+    rm_furo_double ary zi_ary furo_double_lst)
 
 
 

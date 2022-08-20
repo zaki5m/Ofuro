@@ -41,17 +41,17 @@ let hai_lst = [(1,Manzu);
               (0,Hatsu);
               (0,Tyun)]
 
-let rec add_tehai list (x,y) = match list with
+let rec add_tehai (list:(int*hai) list) (x,y) = match list with
   | [] -> [(x,y)]
   | [(x1,y1)] -> [(x1,y1);(x,y)]
   | h::t -> h::(add_tehai t (x,y))
 
-let rec add_tehai2 list (x,y,z) = match list with
+let rec add_tehai2 (list:(int*hai*bool) list) (x,y,z) = match list with
   | [] -> [(x,y,z)]
   | [(x1,y1,z1)] -> [(x1,y1,z1);(x,y,z)]
   | h::t -> h::(add_tehai2 t (x,y,z))
 
-let add_ary_lst lst ary zi_ary player = 
+let add_ary_lst (lst:(int array array * int array) list) ary zi_ary player = 
   let rec loop i new_lst = 
     let new_lst = 
       if i = player then
@@ -66,7 +66,7 @@ let add_ary_lst lst ary zi_ary player =
   in
   loop 3 []
 
-let add_furo_lst lst furo_lst player = 
+let add_furo_lst (lst:(state*(int*(int*int*int)))list list) furo_lst player = 
   let rec loop i new_lst = 
     let new_lst = 
       if i = player then
@@ -207,8 +207,8 @@ let rec s_to_hai (x,y) = match y with
 
 
 let ripai2 (list:(int*hai)list) hai = 
-  let list = List.filter (fun ((x,y)) -> y = hai ) list in 
-  let list = List.sort (fun (x1,y1) (x2,y2) -> if x1 < x2 then -1 else 1) list  in
+  let list = List.filter (fun ((_,y)) -> y = hai ) list in 
+  let list = List.sort (fun (x1,_) (x2,_) -> if x1 < x2 then -1 else 1) list  in
   list
 
 let ripai list = 
@@ -561,12 +561,13 @@ let tenpai_ryo lst =
     let tmp = loop' 3 [] in
     ((List.nth tmp 0),(List.nth tmp 1),(List.nth tmp 2),(List.nth tmp 3))
 
-
+(*
 let print_player kyoku ba sutehai_lst tehai_lst player = 
   if ba = 0 then
     (Printf.printf "東%d局" kyoku;)
   else
     (Printf.printf "東%d局" kyoku;)
+*)
 
 let reach_inq () = 
   let rec loop' () = 
@@ -883,8 +884,8 @@ let furo_naumber ary f (x,y) =
 let remove_furo_hai tehai_lst furo_hai (x,y) = 
   let (a,(b,(c,d,e))) = furo_hai in
   let (x,y) = ary_to_hai (x,y) in
-  let (c,b') = ary_to_hai (b,c) in
-  let (d,b') = ary_to_hai (b,d) in
+  let (c,_) = ary_to_hai (b,c) in
+  let (d,_) = ary_to_hai (b,d) in
   let (e,b') = ary_to_hai (b,e) in
   let tehai = 
     if a = Minkan then
@@ -968,7 +969,7 @@ let furo_inq2 lst ary_lst sutehai_lst furo_lst yaku_lst yama_len ba kyoku naki_l
         if furo_t_f = [] then 
           tmp 
         else
-          let (k_hai,f_hai) = List.hd furo_t_f in 
+          let (_,f_hai) = List.hd furo_t_f in 
           (m,f_hai)::tmp
       else
         tmp
@@ -1200,7 +1201,7 @@ let furo_inq ary_lst furo_lst naki_lst (x,y) player yama_lst tehai_lst yaku_lst 
       (furo_lst,naki_lst,j,yama_lst,dora_lst,tehai_lst,(a,b,c,d),(x,y)::furo_double_lst,yaku_lst)
 
 
-let possible_furiten furiten_lst yaku_lst (x,y) player = 
+let possible_furiten (furiten_lst:(int*hai) list list) yaku_lst (x,y) player = 
   let rec loop' i tmp furiten_lst' = 
     let furiten = List.nth furiten_lst i in
     let yaku = List.nth yaku_lst i in
