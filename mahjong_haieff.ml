@@ -334,48 +334,40 @@ let mentsu_kouho_syuntsu ary f_lst_len =
   let (arym,m) = midium_mentsu arym in
   let rec loop2' ary i kouho = 
     let kouho' = 
-      if i < 7  then
-        if ary.(i) > 0 && ary.(i+1) > 0 then
-          (let n1 = ary.(i) in
-          let n2 = ary.(i+1) in
-          ary.(i) <- n1 - 1;
-          ary.(i+1) <- n2 - 1;
-          kouho+1
-          )
-        else if ary.(i) > 0 && ary.(i+2) > 0 then
-          (let n1 = ary.(i) in
-          let n2 = ary.(i+2) in
-          ary.(i) <- n1 - 1;
-          ary.(i+2) <- n2 - 1;
-          kouho+1
-          )
-        else if ary.(i) = 2 then
-          (let n = ary.(i) in
-          ary.(i) <- n - 2;
-          kouho + 1)
-        else
-          kouho
-      else if i < 8 then
-        if ary.(i) > 0 && ary.(i+1) > 0 then
-          (let n1 = ary.(i) in
-          let n2 = ary.(i+1) in
-          ary.(i) <- n1 - 1;
-          ary.(i+1) <- n2 - 1;
-          kouho+1
-          )
-        else if ary.(i) = 2 then
-          (let n = ary.(i) in
-          ary.(i) <- n - 2;
-          kouho + 1)
-        else
-          kouho
-      else
+      if ary.(i) > 0 then 
         if ary.(i) = 2 then
-          (let n = ary.(i) in
+          let n = ary.(i) in
           ary.(i) <- n - 2;
-          kouho + 1)
+          kouho + 1
         else
-          kouho
+          if i < 7  then
+            if ary.(i+1) > 0 then
+              let n1 = ary.(i) in
+              let n2 = ary.(i+1) in
+              ary.(i) <- n1 - 1;
+              ary.(i+1) <- n2 - 1;
+              kouho+1
+            else if ary.(i+2) > 0 then
+              let n1 = ary.(i) in
+              let n2 = ary.(i+2) in
+              ary.(i) <- n1 - 1;
+              ary.(i+2) <- n2 - 1;
+              kouho+1
+            else
+              kouho
+          else if i < 8 then
+            if ary.(i+1) > 0 then
+              let n1 = ary.(i) in
+              let n2 = ary.(i+1) in
+              ary.(i) <- n1 - 1;
+              ary.(i+1) <- n2 - 1;
+              kouho+1
+            else
+              kouho
+          else
+              kouho
+      else
+        kouho
     in
     if kouho = kouho' then
       if i = 8 then
@@ -754,8 +746,9 @@ let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst =
     loop ((List.length tehai) - 1) (1,Not_hai)
 *)
 
-
-(*let _ = 
-  let (_,n)  = common_syanten [(8,Manzu);(9,Manzu);(9,Souzu);(9,Souzu);(0,Nan);(0,Nan);(0,Sya);(0,Sya);(0,Pei);(0,Pei);(0,Pei)] in
-
-  Printf.printf "%d\n" n;*)
+(*
+let _ = 
+  (*let (_,n)  = common_syanten [(1,Manzu);(9,Manzu);(1,Pinzu);(4,Pinzu);(7,Pinzu);(5,Souzu);(8,Souzu);(9,Souzu);(9,Souzu);(9,Souzu);(9,Souzu);(0,Sya);(0,Sya)] in
+*)
+  let (x,(y,z)) = mentsu_kouho_syuntsu [|2;2;2;0;0;0;2;2;0|] 0 in
+  Printf.printf "%d %d\n" y z;*)
