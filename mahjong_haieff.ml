@@ -678,58 +678,40 @@ let syanten lst =
 let create_table sutehai_lst tehai = 
   let ary = Array.make_matrix 3 9 4 in
   let zi_ary = Array.make 7 4 in
-  let rec loop2 lst j = 
-    let (x,y,_) = List.nth lst j in
-    let (x,y) = hai_to_ary (x,y) in
-    let _ = 
-      if  x = 3 then
-        let n = zi_ary.(y) in
-        zi_ary.(y) <- n - 1;
-      else
-        let n = ary.(x).(y) in
-        ary.(x).(y) <- n - 1;
-    in
-    if j = 0 then
-      ()
-    else
-      loop2 lst (j-1)
+  let rec loop2 t_lst = match t_lst with 
+    | [] -> ()
+    | (x,y,_)::t -> let (x,y) = hai_to_ary (x,y) in 
+                 let _ = if x = 3 then 
+                            let n = zi_ary.(y) in 
+                            zi_ary.(y) <- n-1
+                         else
+                            let n = ary.(x).(y) in
+                            ary.(x).(y) <- n - 1
+                  in
+                  loop2 t
   in
-  let rec loop2' lst j = 
-    let (x,y) = List.nth lst j in
-    let (x,y) = hai_to_ary (x,y) in
-    let _ = 
-      if  x = 3 then
-        let n = zi_ary.(y) in
-        zi_ary.(y) <- n - 1;
-      else
-        let n = ary.(x).(y) in
-        ary.(x).(y) <- n - 1;
-    in
-    if j = 0 then
-      ()
-    else
-      loop2' lst (j-1)
+  let rec loop3 t_lst = match t_lst with 
+    | [] -> ()
+    | (x,y)::t -> let (x,y) = hai_to_ary (x,y) in 
+                 let _ = if x = 3 then 
+                            let n = zi_ary.(y) in 
+                            zi_ary.(y) <- n-1
+                         else
+                            let n = ary.(x).(y) in
+                            ary.(x).(y) <- n - 1
+                  in
+                  loop3 t
   in
   let rec loop i = 
-    let n = List.length (List.nth sutehai_lst i) in
-    let _ = 
-      if n = 0 then
-        ()
-      else
-        loop2 (List.nth sutehai_lst i) (n-1)
-    in
+    let _ = loop2 (List.nth sutehai_lst i) in
     if i = 0 then
       ()
     else
       loop (i-1)
   in
   let _ = loop 3 in
-  let m = List.length tehai in
-  if m = 0 then
-    (ary,zi_ary)
-  else
-    let _ = loop2' tehai (m-1) in
-    (ary,zi_ary)
+  let _ = loop3 tehai in
+  (ary,zi_ary)
 
 
 (*
