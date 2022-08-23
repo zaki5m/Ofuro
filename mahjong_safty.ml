@@ -17,25 +17,17 @@ let serch_kanzen_anpai_zi zi_ary =
   in
   loop 6 []
 
-let d_suzi lst d_lst = 
-  let m = List.length lst in
-  let rec loop i tmp = 
-    let x = List.nth lst i in
-    let tmp = 
-      if List.exists (fun a -> a = x) d_lst then
-        tmp
-      else
-        x::tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+let d_suzi (lst:(int*int) list) d_lst = 
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | x::t -> let tmp = if List.exists (fun a -> a = x) d_lst then
+                          tmp
+                        else
+                          x::tmp
+                        in
+              loop tmp t 
   in
-  if m = 0 then
-    []
-  else
-    loop (m-1) []
+  loop [] lst
 
 
 let serch_kabe_to_suzi ary = 
@@ -397,7 +389,7 @@ let tehai_to_anzen ary zi_ary tehai =
 
 
 (*((int*hai)*int) List -> ((int*hai)*int*bool List) List*)    
-let kyoutu_anpai sutehai_lst tehai player =
+let kyoutu_anpai (sutehai_lst:(int*hai*bool)list list) (tehai:((int*hai)*int)list) player =
   let tehai_len = List.length tehai in
   let rec loop i tmp_s = 
     let ((x,y),z) = List.nth tehai i in
@@ -550,7 +542,7 @@ let second_anzen n_tehai =
 
 
 (*sutehai, tehai, anpai_lst*)
-let player_anpai sutehai tehai =
+let player_anpai (sutehai:(int*hai*bool)list) tehai =
   let m = List.length tehai in
   let rec loop i tmp = 
     let x = List.nth tehai i in
