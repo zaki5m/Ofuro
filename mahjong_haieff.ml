@@ -142,7 +142,7 @@ let kokushi_syanten lst =
 *)
 
 let titoi_syanten (lst:(int*hai)list) = 
-  let rec loop' lst tmp i = 
+  let rec loop' (lst:(int*hai)list) tmp i = 
     let x = List.hd lst in 
     let tmp = 
       if List.exists (fun a -> a = x) (List.tl lst) then

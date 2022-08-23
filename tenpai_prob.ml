@@ -1059,7 +1059,7 @@ let opt_tenpai_form_p tenpai_lst =
   
   
 
-
+(*
 let opt_tenpai_form tenpai_lst = 
   let rec loop tmp t_lst = 
     let (_,_,_,current_tehai,_,_,_) = List.hd t_lst in
@@ -1074,6 +1074,7 @@ let opt_tenpai_form tenpai_lst =
   let kitaiti_lst = loop [] tenpai_lst in
   let kitaiti_lst = List.sort (fun (_,_,z) (_,_,z') -> if z > z' then -1 else 1) kitaiti_lst in
   List.hd kitaiti_lst
+  *)
 
 (*recieve (k_lst,t_ritu,agariritu,kitaiti,anzendo)lst
    return (k_lst,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti)lst*)
@@ -1465,7 +1466,7 @@ let mode_common_b ary zi_ary sutehai_lst tehai player =
     (x,y)
 
 
-let common_b ary zi_ary tehai sutehai_lst tumo_len f_lst player = 
+let common_b ary zi_ary tehai (sutehai_lst:(int*hai*bool)list list) tumo_len (f_lst:(state*(int*(int*int*int)))list) player = 
   let (_,n) = syanten tehai in
   if tumo_len >= n then
     let (k_lst,kind_k) = kind_kokushi tehai in

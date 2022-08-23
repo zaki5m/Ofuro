@@ -571,7 +571,7 @@ let player_anpai sutehai tehai =
     loop (m-1) []
 
 
-let other_reach yaku_lst sutehai_lst tehai =  
+let other_reach (yaku_lst:yaku list list) sutehai_lst tehai =  
   let rec loop i tmp = 
     let reach = List.nth yaku_lst i in 
     let tmp = 
@@ -588,7 +588,7 @@ let other_reach yaku_lst sutehai_lst tehai =
   loop 3 tehai
 
 (*立直者の現物を危険度0として((int*hai)*int)listを返す*)
-let reach_genbutu_anzen_zero tehai genbutu_lst = 
+let reach_genbutu_anzen_zero (tehai:((int*hai)*int)list) genbutu_lst = 
   let m = List.length tehai in 
   let rec loop i tmp = 
     let (x,y) = List.nth tehai i in 

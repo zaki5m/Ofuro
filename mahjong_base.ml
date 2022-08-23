@@ -489,7 +489,7 @@ let which_some n_count m_count p_count s_count =
 
 
 
-let somete tehai f_lst = 
+let somete tehai (f_lst:(state*(int*(int*int*int)))list) = 
   let k_furo = furo_kind f_lst in
   let k = if k_furo = [] then 3 else (List.hd k_furo) in
   let k_furo = List.for_all (fun a -> a = k) k_furo in
@@ -518,7 +518,7 @@ let somete tehai f_lst =
     (Ton,0)
 
 
-let titoi_allow tehai f_lst = 
+let titoi_allow tehai (f_lst:(state*(int*(int*int*int)))list) = 
   let m = List.length tehai in
   let rec loop i tmp count = 
     let x = List.nth tehai i in
