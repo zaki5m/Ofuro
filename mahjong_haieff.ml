@@ -655,7 +655,7 @@ let common_syanten lst =
     let n = opt_syanten sy_lst' in
     let lst = List.filter (fun (a,b) -> b = n) sy_lst in
     let lst = List.map (fun (a,b) -> a) lst in
-    let lst = List.fold_right (fun a b -> a@b) lst [] in
+    let lst = List.fold_left (fun a b -> a@b) [] lst in
     (lst,n)
 
     
