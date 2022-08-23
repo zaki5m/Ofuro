@@ -1674,7 +1674,7 @@ let swap_kotu lst lst2 =
 
 
 (*tumo,ron*)
-let tehai_to_fu naki mati zi_lst lst min_lst f_lst =
+let tehai_to_fu naki mati zi_lst lst (min_lst:(state*(int*(int*int*int)))list) f_lst =
   let ft = 
     if naki = true then
       (22,20)

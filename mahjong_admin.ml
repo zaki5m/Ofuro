@@ -299,7 +299,7 @@ let haipai yama_lst =
   let dora = hyouzi_to_dora dora in
   (yama_lst,(ripai tehai_lst_0),(ripai tehai_lst_1),(ripai tehai_lst_2),(ripai tehai_lst_3),[dora])
 
-let r_hai2 lst lsgs = 
+let r_hai2 (lst:(int*hai)list) lsgs = 
   Random.init lsgs;
   let m = List.length lst in 
   let rec loop i tmp = 
@@ -315,7 +315,7 @@ let r_hai2 lst lsgs =
 
 
 
-let r_hai lst = 
+let r_hai (lst:(int*hai)list) = 
   Random.self_init();
   let rec loop tmp = function
     | [] -> tmp 
@@ -324,7 +324,7 @@ let r_hai lst =
   in
   loop [] lst
 
-let tumo_from_yama player yama_lst = 
+let tumo_from_yama (player:int) (yama_lst:(int*hai*int)list) = 
   let (x,y,_) = List.hd yama_lst in
   (player,(x,y))
 
@@ -377,7 +377,7 @@ let possible_furo ary zi_ary (x,y) =
     tmp
 
 
-let tumo_or_te (k_x,k_y) (t_x,t_y) =
+let tumo_or_te ((k_x,k_y):(int*hai)) (t_x,t_y) =
   if (k_x,k_y) = (t_x,t_y) then
     let (x,y,z) = (k_x,k_y,true) in
     (x,y,z)
@@ -618,7 +618,7 @@ let kyoku_to_kaze kyoku player =
     else
       player + 1
 
-let kiriban tehai_lst sutehai_lst ary_lst (x,y) player f_lst naki (yaku_lst:Mahjong_base.yaku list list) dora_lst kyoku ba kyotaku player_score honba yama_len furo_double_lst = 
+let kiriban tehai_lst sutehai_lst ary_lst player f_lst naki (yaku_lst:Mahjong_base.yaku list list) dora_lst kyoku ba kyotaku player_score yama_len furo_double_lst = 
   let yaku_player = List.nth yaku_lst player in
   let yaku_player = List.filter (fun a -> a <> Ippatu) yaku_player in 
   let zi_kaze = kyoku_to_kaze kyoku player in
@@ -957,7 +957,7 @@ let furo_inq2 lst ary_lst sutehai_lst furo_lst yaku_lst yama_len ba kyoku naki_l
 *)
 
 (*automatic*)
-let furo_inq2 lst ary_lst sutehai_lst furo_lst yaku_lst yama_len ba kyoku naki_lst dora_lst (x,y) furo_double_lst furoritu_lst = 
+let furo_inq2 (lst:(int*furo list) list) ary_lst (sutehai_lst:(int*hai*bool) list list) furo_lst yaku_lst yama_len ba kyoku naki_lst dora_lst (x,y) furo_double_lst furoritu_lst = 
   let rec loop' i tmp = 
     let (m,n) = List.nth lst i in
     let (ary,zi_ary) = List.nth ary_lst m in
@@ -1536,7 +1536,7 @@ let rec furo_loop yama_lst tehai_lst sutehai_lst ary_lst (x,y) player furo_lst n
       else
         (yama_lst,naki_lst,player,dora_lst,furo_lst,tehai_lst,sutehai_lst,ary_lst,yaku_lst,player_score,kyotaku,(x,y),(a1,b1,c1,d1),furo_double_lst)
     else
-      let (tehai_lst,sutehai_lst,ary_lst,yaku_lst,player_score,kyotaku) = kiriban tehai_lst sutehai_lst ary_lst (x,y) player furo_lst (List.nth naki_lst player) yaku_lst dora_lst kyoku ba kyotaku player_score honba (List.length yama_lst) furo_double_lst in
+      let (tehai_lst,sutehai_lst,ary_lst,yaku_lst,player_score,kyotaku) = kiriban tehai_lst sutehai_lst ary_lst  player furo_lst (List.nth naki_lst player) yaku_lst dora_lst kyoku ba kyotaku player_score (List.length yama_lst) furo_double_lst in
       let (kyotaku,(a,b,c,d)) = possible_ron ary_lst player naki_lst furo_lst (last_sutehai sutehai_lst player) kyoku ba yaku_lst dora_lst honba kyotaku furiten_lst sutehai_lst yama_lst in
       if (a,b,c,d) <> (0,0,0,0) then
         (yama_lst,naki_lst,player,dora_lst,furo_lst,tehai_lst,sutehai_lst,ary_lst,yaku_lst,player_score,kyotaku,(x,y),(a,b,c,d),furo_double_lst)
