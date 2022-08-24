@@ -304,7 +304,7 @@ let minimum_anzen lst =
   let m = List.length lst in
   let rec loop i tmp = 
     let ((a,b),c) = List.nth lst i in
-    let ((a',b'),c') = tmp in
+    let (_,c') = tmp in
     let tmp = 
       if c' > c then
         ((a,b),c)
