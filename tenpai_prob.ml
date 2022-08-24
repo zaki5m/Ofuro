@@ -29,6 +29,26 @@ let rec worker f () =
       worker f ()
   | Quit -> ()
 
+let myhash = Hashtbl.create 123456
+
+let hash_number tehai  = 
+  let rec loop tmp t_lst = match t_lst with
+    | [] -> tmp 
+    | (x,y)::t -> if x = 0 then 
+                    loop tmp t 
+                  else if y = Manzu then 
+                    loop (tmp+x) t
+                  else if  y = Pinzu then 
+                    loop (tmp+x*5) t 
+                  else
+                    loop (tmp+x*10) t
+  in
+  let score = loop 0 tehai in
+  score
+
+
+
+
 (*ary,zi_aryは残り枚数のテーブル。　返り値(kitaiti,agariritu) 0th: reach無し 1th:reachあり*)
 let tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary tumo_l rm_wan =
   let (t_ary,t_zi_ary) = list_to_ary lst in
@@ -1269,10 +1289,31 @@ let col_tenpai_parallel tenpai_lst_ary tumo_l rm_wan =
   pre
 *)
 
+let hash_serch ary zi_ary tehai = 
+  let tehai2 = ripai tehai in 
+  let x = hash_number tehai in 
+  let lst = Hashtbl.find_all myhash x in
+  let rec loop t_lst = match t_lst with 
+   | [] -> []
+   | (current_tehai,info_lst)::t -> if current_tehai = tehai2 then 
+                                      info_lst
+                                    else
+                                      loop t
+  in
+  let tmp = loop lst in 
+  if tmp = [] then 
+    let p_tmp = judge_parallel ary zi_ary tehai in 
+    Hashtbl.add myhash x (tehai2,[p_tmp]);
+    p_tmp
+  else
+    List.hd tmp
+       
+
 
 (*list list array*)
 let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst = 
-  let tenpai_lst = judge_parallel ary zi_ary tehai in (*list list Array*)
+  (*let tenpai_lst = judge_parallel ary zi_ary tehai in (*list list Array*)*)
+  let tenpai_lst = hash_serch ary zi_ary tehai in 
   let a_len = Array.length tenpai_lst in 
   let rm_wan = yama_len-14 in
   let tumo_l =  rm_wan / 4 in
@@ -1588,14 +1629,6 @@ let judge_reach ary zi_ary tehai sutehai_lst yaku_lst yama_len f_lst zi_kaze ba_
           hai_to_int tehai k_hai
         else
           reach_defence ary zi_ary yaku_lst sutehai_lst tehai
-
-    
-
-
-
-
-       
-
 
   
 

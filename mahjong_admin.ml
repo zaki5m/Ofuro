@@ -1255,7 +1255,7 @@ let last_sutehai sutehai_lst player =
   let (a,b,_) = List.nth lst (m-1) in
   (a,b)
 
-let same_matihai_sutehai (x,y) lst = 
+let same_matihai_sutehai ((x,y):(int*int)) lst = 
   let m = List.length lst in
   let rec loop' i tmp = 
     let (a,b) = List.nth lst i in

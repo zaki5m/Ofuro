@@ -22,6 +22,12 @@ let rename (m, n) = match n with
   | Tyun -> "tyun"
   | _ -> "not"             
 
+let tapl_player tapl player = match player with 
+  | 0 -> let (x,_,_,_) = tapl in x
+  | 1 -> let (_,x,_,_) = tapl in x
+  | 2 -> let (_,_,x,_) = tapl in x
+  | _ -> let (_,_,_,x) = tapl in x
+
 let print_list lst = 
     List.iter (fun (m,n) -> Printf.printf "%s " (rename (m,n)); ) lst;
     Printf.printf "\n"
