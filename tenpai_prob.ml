@@ -534,37 +534,59 @@ let operate_tenapai_ritu ary zi_ary tehai =
     let tmp = syanten_to_tenpai ary zi_ary all_t tmp' in
     tmp
 *)
+
+let hash_serch tehai = 
+  let tehai2 = ripai tehai in 
+  let x = hash_number tehai in 
+  let lst = Hashtbl.find_all myhash x in
+  let rec loop t_lst = match t_lst with 
+   | [] -> []
+   | (current_tehai,info_lst)::t -> if current_tehai = tehai2 then 
+                                      info_lst
+                                    else
+                                      loop t
+  in
+  let tmp = loop lst in 
+  tmp
+
+
 let operate_tenpai_ritu_parallel ary zi_ary tenpai_lst = 
   let (_,_,current_tehai) = tenpai_lst in 
-  let (_,n) = syanten current_tehai in 
-  let tenpai_lst = [[tenpai_lst]] in 
-  let rec loop3 tmp3 t_lst = match t_lst with
-    | [] -> tmp3 
-    | (k_lst,tumo_lst,current_tehai)::t ->  let tmp3 = (k_fase ary zi_ary (k_lst,tumo_lst,current_tehai))::tmp3 in
-                                                          loop3 tmp3 t
-  in
-  let rec loop i tmp =
-    let rec loop2 tmp2 lst = match lst with
-      | [] -> tmp2 
-      | h::t ->  let tmp2 = loop3 tmp2 h in
-                 loop2 tmp2 t
-      in
-    if tmp = [] then 
-      ([],[])
-    else
-      let tmp' = loop2 [] tmp in
-      if i = 0 then
-        (tmp,tmp')
+  let judge_hash = hash_serch current_tehai in 
+  if judge_hash = [] then 
+    let (_,n) = syanten current_tehai in 
+    let x = hash_number current_tehai in 
+    let tenpai_lst = [[tenpai_lst]] in 
+    let rec loop3 tmp3 t_lst = match t_lst with
+      | [] -> tmp3 
+      | (k_lst,tumo_lst,current_tehai)::t ->  let tmp3 = (k_fase ary zi_ary (k_lst,tumo_lst,current_tehai))::tmp3 in
+                                                            loop3 tmp3 t
+    in
+    let rec loop i tmp =
+      let rec loop2 tmp2 lst = match lst with
+        | [] -> tmp2 
+        | h::t ->  let tmp2 = loop3 tmp2 h in
+                  loop2 tmp2 t
+        in
+      if tmp = [] then 
+        ([],[])
       else
-        loop (i-1) tmp'
-  in
-  let (tmp,tmp') = loop (n-1) tenpai_lst in
-  if tmp = [] then 
-    tmp'
+        let tmp' = loop2 [] tmp in
+        if i = 0 then
+          (tmp,tmp')
+        else
+          loop (i-1) tmp'
+    in
+    let (tmp,tmp') = loop (n-1) tenpai_lst in
+    if tmp = [] then 
+      tmp'
+    else
+      let all_t = all_k_fase ary zi_ary tmp in
+      let tmp = syanten_to_tenpai ary zi_ary all_t tmp' in
+      Hashtbl.add myhash x (current_tehai,tmp);
+      tmp
   else
-    let all_t = all_k_fase ary zi_ary tmp in
-    let tmp = syanten_to_tenpai ary zi_ary all_t tmp' in
-    tmp
+    judge_hash
 (*
 let operate_tenpai_ritu_parallel ary zi_ary tenpai_lst = 
   let (_,_,_,current_tehai) = tenpai_lst in 
@@ -1091,7 +1113,6 @@ let parallel ary zi_ary pool lst =
 *)
 
 
-
 let parallel ary zi_ary tmp =
   let n = List.length tmp in 
   let tasks = Array.init n (fun i -> i) in
@@ -1520,7 +1541,7 @@ let col_tenpai_parallel tenpai_lst_ary tumo_l rm_wan =
   Array.iter Domain.join domains;
   pre
 *)
-
+(*
 let hash_serch ary zi_ary tehai = 
   let tehai2 = ripai tehai in 
   let x = hash_number tehai in 
@@ -1539,13 +1560,12 @@ let hash_serch ary zi_ary tehai =
     p_tmp
   else
     List.hd tmp
-       
+*)    
 
 
 (*list list array*)
 let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst = 
-  (*let tenpai_lst = judge_parallel ary zi_ary tehai in (*list list Array*)*)
-  let tenpai_lst = hash_serch ary zi_ary tehai in 
+  let tenpai_lst = judge_parallel ary zi_ary tehai in (*list list Array*)
   let tenpai_lst = parallel_rest_tumo_lst ary zi_ary tenpai_lst in 
   let a_len = Array.length tenpai_lst in 
   let rm_wan = yama_len-14 in
@@ -1571,7 +1591,7 @@ let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst =
 
 (*(k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti)*)    
 let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst = 
-  let tenpai_lst = hash_serch ary zi_ary tehai in 
+  let tenpai_lst = judge_parallel ary zi_ary tehai in (*list list Array*)
   let tenpai_lst = parallel_rest_tumo_lst ary zi_ary tenpai_lst in 
   let a_len = Array.length tenpai_lst in 
   let rm_wan = yama_len-14 in
@@ -1662,7 +1682,7 @@ let kuikae_check kuikae_lst n rm_wan tumo_l tenpai_lst_ary =
 
 
 let col_tenpai_f_kuikae ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst kuikae_lst = 
-  let tenpai_lst = hash_serch ary zi_ary tehai in 
+  let tenpai_lst = judge_parallel ary zi_ary tehai in (*list list Array*)
   let tenpai_lst = parallel_rest_tumo_lst ary zi_ary tenpai_lst in 
   let a_len = Array.length tenpai_lst in 
   let rm_wan = yama_len-14 in
