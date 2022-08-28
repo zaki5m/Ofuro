@@ -1812,6 +1812,7 @@ let hantyan furoritu_lst =
   let rec loop' kyoku ba honba kyotaku player_score total_kyoku  = 
     let total_kyoku = total_kyoku + 1 in 
     let (kyotaku,(a,b,c,d),player_score) = kyoku_s ba kyoku honba kyotaku player_score furoritu_lst (total_kyoku+seed) in
+    Hashtbl.clear myhash;
     let rentyan = 
       if kyoku = 1 then
         if a > 0 then
