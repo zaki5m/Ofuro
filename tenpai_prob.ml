@@ -31,17 +31,56 @@ let rec worker f () =
 
 let myhash = Hashtbl.create 123456
 
+let hash_number_manzu x = match x with 
+  | 1 -> 1
+  | 2 -> 4
+  | 3 -> 7
+  | 4 -> 100
+  | 5 -> 111
+  | 6 -> 231
+  | 7 -> 283
+  | 8 -> 313
+  | 9 -> 541
+
+let hash_number_pinzu x = match x with 
+  | 1 -> 17
+  | 2 -> 31
+  | 3 -> 621
+  | 4 -> 677
+  | 5 -> 857
+  | 6 -> 317
+  | 7 -> 463
+  | 8 -> 71
+  | 9 -> 751
+
+let hash_number_souzu x = match x with 
+  | 1 -> 21
+  | 2 -> 32
+  | 3 -> 45
+  | 4 -> 56
+  | 5 -> 69
+  | 6 -> 86
+  | 7 -> 97
+  | 8 -> 108
+  | 9 -> 115
+
+let hash_number_match (x,y) = match y with 
+  | Manzu -> hash_number_manzu x
+  | Pinzu -> hash_number_pinzu x 
+  | Souzu -> hash_number_souzu x
+  | Ton -> 11
+  | Nan -> 12
+  | Sya -> 13
+  | Pei -> 14
+  | Haku -> 15
+  | Hatsu -> 16
+  | Tyun -> 17
+
 let hash_number tehai  = 
   let rec loop tmp t_lst = match t_lst with
     | [] -> tmp 
-    | (x,y)::t -> if x = 0 then 
-                    loop tmp t 
-                  else if y = Manzu then 
-                    loop (tmp+x) t
-                  else if  y = Pinzu then 
-                    loop (tmp+x*5) t 
-                  else
-                    loop (tmp+x*10) t
+    | (x,y)::t -> let tmp2 = hash_number_match (x,y) in 
+                  loop (tmp+tmp2) t
   in
   let score = loop 0 tehai in
   score
@@ -583,7 +622,8 @@ let operate_tenpai_ritu_parallel ary zi_ary tenpai_lst =
     else
       let all_t = all_k_fase ary zi_ary tmp in
       let tmp = syanten_to_tenpai ary zi_ary all_t tmp' in
-      Hashtbl.add myhash x (current_tehai,tmp);
+      let tehai2 = ripai current_tehai in 
+      Hashtbl.add myhash x (tehai2,tmp);
       tmp
   else
     judge_hash
