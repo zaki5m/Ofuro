@@ -41,6 +41,7 @@ let hash_number_manzu x = match x with
   | 7 -> 283
   | 8 -> 313
   | 9 -> 541
+  | _ -> 0
 
 let hash_number_pinzu x = match x with 
   | 1 -> 17
@@ -52,6 +53,7 @@ let hash_number_pinzu x = match x with
   | 7 -> 463
   | 8 -> 71
   | 9 -> 751
+  | _ -> 0
 
 let hash_number_souzu x = match x with 
   | 1 -> 21
@@ -63,6 +65,7 @@ let hash_number_souzu x = match x with
   | 7 -> 97
   | 8 -> 108
   | 9 -> 115
+  | _ -> 0
 
 let hash_number_match (x,y) = match y with 
   | Manzu -> hash_number_manzu x
@@ -75,6 +78,7 @@ let hash_number_match (x,y) = match y with
   | Haku -> 15
   | Hatsu -> 16
   | Tyun -> 17
+  | _ -> 0
 
 let hash_number tehai  = 
   let rec loop tmp t_lst = match t_lst with
@@ -1152,6 +1156,16 @@ let parallel ary zi_ary pool lst =
   create_work_lst tasks;
 *)
 
+let hash_serch_lst_to_ary lst = 
+  let m = List.length lst in 
+  let ary = Array.make m [] in 
+  let rec loop i t_lst = match t_lst with
+    | [] -> ()
+    | h::t -> ary.(i) <- [h];
+              loop (i+1) t
+  in
+  loop 0 lst;
+  ary
 
 let parallel ary zi_ary tmp =
   let n = List.length tmp in 
@@ -1169,20 +1183,24 @@ let parallel ary zi_ary tmp =
   
 
 let judge_parallel ary zi_ary tehai = 
-  let (_,n) = syanten tehai in
-  if n  >=  1 then 
-    let tenpai_lst = [([],[],tehai)] in 
-    let (k_lst,tumo_lst,current_tehai) = List.hd tenpai_lst in
-    let tmp = k_fase ary zi_ary (k_lst,tumo_lst,current_tehai) in
-    (*let pool = Task.setup_pool ~num_additional_domains:20 () in
-    (*let res = Task.run pool (fun () -> parallel ary zi_ary pool tmp [])  in*)
-    let res = Task.run pool (fun () -> parallel ary zi_ary pool tmp)  in
-    Task.teardown_pool pool;*)
-    let res = parallel ary zi_ary tmp in 
-    res
+  let lst = hash_serch tehai in 
+  if lst = [] then 
+    let (_,n) = syanten tehai in
+    if n  >=  1 then 
+      let tenpai_lst = [([],[],tehai)] in 
+      let (k_lst,tumo_lst,current_tehai) = List.hd tenpai_lst in
+      let tmp = k_fase ary zi_ary (k_lst,tumo_lst,current_tehai) in
+      (*let pool = Task.setup_pool ~num_additional_domains:20 () in
+      (*let res = Task.run pool (fun () -> parallel ary zi_ary pool tmp [])  in*)
+      let res = Task.run pool (fun () -> parallel ary zi_ary pool tmp)  in
+      Task.teardown_pool pool;*)
+      let res = parallel ary zi_ary tmp in 
+      res
+    else
+      (*[|operate_tenapai_ritu ary zi_ary tehai|]*)
+      [|[]|] 
   else
-    (*[|operate_tenapai_ritu ary zi_ary tehai|]*)
-    [|[]|]   
+    hash_serch_lst_to_ary lst  
 
 
 (*
