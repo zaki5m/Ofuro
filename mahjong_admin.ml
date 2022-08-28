@@ -623,7 +623,7 @@ let kiriban tehai_lst sutehai_lst ary_lst player f_lst naki (yaku_lst:Mahjong_ba
   let yaku_player = List.filter (fun a -> a <> Ippatu) yaku_player in 
   let zi_kaze = kyoku_to_kaze kyoku player in
   let rec loop' tehai sutehai =
-    (*t_format tehai_lst f_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
+    (*t_format tehai_lst f_lst sutehai_lst ba kyoku 0 kyotaku player_score yaku_lst dora_lst; flush stdout;*)
     let n = 
       prob_select sutehai_lst tehai f_lst yaku_lst player yama_len zi_kaze ba naki dora_lst furo_double_lst
     in
@@ -1812,6 +1812,7 @@ let hantyan furoritu_lst =
   let rec loop' kyoku ba honba kyotaku player_score total_kyoku  = 
     let total_kyoku = total_kyoku + 1 in 
     let (kyotaku,(a,b,c,d),player_score) = kyoku_s ba kyoku honba kyotaku player_score furoritu_lst (total_kyoku+seed) in
+    Hashtbl.clear myhash;
     let rentyan = 
       if kyoku = 1 then
         if a > 0 then
