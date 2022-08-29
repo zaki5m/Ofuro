@@ -677,3 +677,37 @@ let anzen_base ary zi_ary tehai sutehai_lst player =
     second_anzen n_tehai2
   else
     false
+
+
+let furo_judge furo_lst sutehai_lst tehai = 
+  let rec loop tmp i t_lst = match t_lst with 
+    | [] -> tmp 
+    | h::t -> let m = List.length h in 
+              let tmp = 
+                if m > 2 then 
+                  player_anpai (List.nth sutehai_lst i) tmp
+                else
+                  tmp
+              in
+              loop tmp (i+1) t 
+  in
+  loop tehai 0 furo_lst
+                
+
+
+let furo_defence ary zi_ary yaku_lst sutehai_lst furo_lst tehai = 
+  let n_tehai = other_reach yaku_lst sutehai_lst tehai in 
+  let n_tehai = furo_judge furo_lst sutehai_lst n_tehai in 
+  if n_tehai = tehai then
+    -1
+  else if n_tehai = [] then
+    let a_tehai = tehai_to_anzen ary zi_ary tehai in
+    let ((a,b),c) = minimum_anzen a_tehai in
+    hai_to_int tehai (a,b)
+  else
+    let a_lst = tehai_to_anzen ary zi_ary n_tehai in
+    let ((a,b),c) = max_anzen a_lst in
+    hai_to_int tehai (a,b)
+
+
+
