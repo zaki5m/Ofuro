@@ -13,6 +13,8 @@ type 'a message = Task of 'a | Quit
 
 let c = C.make_unbounded ()
 
+let lk = Mutex.create ()
+
 let create_work tasks =
   Array.iter (fun t -> C.send c (Task t)) tasks;
   for _ = 1 to num_domains do
@@ -627,7 +629,9 @@ let operate_tenpai_ritu_parallel ary zi_ary tenpai_lst =
       let all_t = all_k_fase ary zi_ary tmp in
       let tmp = syanten_to_tenpai ary zi_ary all_t tmp' in
       let tehai2 = ripai current_tehai in 
+      Mutex.lock lk;
       Hashtbl.add myhash x (tehai2,tmp);
+      Mutex.unlock lk;
       tmp
   else
     judge_hash
