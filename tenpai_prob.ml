@@ -31,7 +31,7 @@ let rec worker f () =
       worker f ()
   | Quit -> ()
 
-let myhash = Hashtbl.create 123456
+let myhash = Hashtbl.create 12345
 
 let hash_number_manzu x = match x with 
   | 1 -> 1
@@ -1989,6 +1989,7 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
   let n' = titoi_syanten tehai in 
   let (ary,zi_ary) = create_table sutehai_lst tehai in
   let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary in   
+  let furo_q = furo_defence ary zi_ary yaku_lst sutehai_lst furo_lst tehai in 
   let f_lst = List.nth furo_lst player in
   let rm_wan = (yama_len-14) in
   let tumo_l = (rm_wan)/4 in
@@ -1998,6 +1999,8 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
       tumogiri tehai 
     else if reach_q = true then 
       judge_reach ary zi_ary tehai sutehai_lst yaku_lst yama_len f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan yaku 
+    else if furo_q <> -1 then 
+      furo_q
     else if n = 0 then
       let (x,_) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku dora_lst ary zi_ary in
       x
