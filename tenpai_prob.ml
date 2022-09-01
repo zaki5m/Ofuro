@@ -1225,6 +1225,7 @@ let judge_parallel ary zi_ary tehai =
     (*[|operate_tenapai_ritu ary zi_ary tehai|]*)
     [|[]|]
 *)
+(*
 let tenpai_ritu rest_tumo_lst tumo_l rm_wan = 
   let rec loop i tmp r_lst = match r_lst with 
     | [] -> tmp 
@@ -1234,6 +1235,55 @@ let tenpai_ritu rest_tumo_lst tumo_l rm_wan =
               loop (i+1) tmp t
   in
   loop 0 1.0 rest_tumo_lst
+*)
+
+let combination n r = 
+  let rec fib i tmp = match i with  
+    | 0 -> tmp
+    | _ -> fib (i-1) (i::tmp)
+  in
+  let rec loop i tmp = match i with 
+    | 0 -> tmp
+    | _ -> let rec loop2 t_lst tmp = match t_lst with 
+              | [] -> []
+              | h::t -> (h+tmp)::(loop2 t (h+tmp))
+           in
+           let tmp = loop2 tmp 0 in 
+           loop (i-1) tmp 
+  in
+  if r = 0 then 
+    1.0
+  else if r = 1 then 
+    float_of_int n
+  else
+    let lst = fib n [] in 
+    let lst = loop (r-2) lst in 
+    float_of_int (List.fold_left (fun a b -> a + b) 0 lst)
+
+
+
+let tenpai_ritu (rest_tumo_lst:int list) tumo_l rm_wan = 
+  let rm_wan = rm_wan +. 14. in (*cosion*)
+  let m = List.length rest_tumo_lst in 
+  let above = List.fold_left (fun a b -> a*b) 1 rest_tumo_lst in 
+  let above = float_of_int above in 
+  let rec loop_under tmp i len = match len with 
+    | 0 -> tmp
+    | _ -> let tmp = tmp *. (rm_wan -. (4.0 *. (float_of_int (len)))) in 
+           loop_under tmp i (len-1)
+  in
+  let rec loop tmp i = 
+    let under = loop_under rm_wan i (m-1) in 
+    let ex = above /. under *. (combination m i) in 
+    if i = (tumo_l-m) then 
+      tmp +. ex
+    else
+      loop (tmp +. ex) (i+1)
+  in
+  if m > tumo_l then 
+    0.0
+  else
+    loop 0.0 0
 
 let tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan = 
   let rec loop tmp t_lst = match t_lst with 
@@ -1273,7 +1323,7 @@ let tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_ls
   Array.iter Domain.join domains;
   pre
   
-
+(*
 let compile_kitaiti p_lst current_tehai = 
   let rec loop tmp t_lst = match t_lst with 
     | [] -> tmp 
@@ -1285,7 +1335,7 @@ let compile_kitaiti p_lst current_tehai =
   else
     let (agariritu,kitaiti) = loop (0.0,0.0) p_lst in
     (current_tehai,agariritu,kitaiti)
-
+*)
 
 (*最初の捨て牌が同じものを一つのindexにまとめる
   recieve(k_lst,t_ritu,agariritu,kitaiti)array
@@ -1342,10 +1392,10 @@ let opt_tenpai_form_p tenpai_lst =
   let tasks = Array.init n (fun i -> i) in
   create_work tasks;
   let rec kitaiti_find (tmp_a, tmp_b, tmp_c) (tmp_lst, most_a, most_b, most_c) tenpai_lst = match tenpai_lst with
-    | [] -> (tmp_lst, tmp_a, tmp_b, tmp_c)
-    | (k_lst,t_ritu,agariritu,kitaiti)::t -> 
-      let (tmp_a, tmp_b, tmp_c) = (tmp_a+.t_ritu, tmp_b+.agariritu, tmp_c+.kitaiti) in 
-      let (tmp_lst, most_a, most_b, most_c) = 
+    | [] -> flush stdout; (tmp_lst, tmp_a, tmp_b, tmp_c)
+    | (k_lst,t_ritu,agariritu,kitaiti)::t ->
+      let (tmp_a, tmp_b, tmp_c) = (tmp_a+.t_ritu, tmp_b+.agariritu, tmp_c+.kitaiti) in
+      let (tmp_lst, most_a, most_b, most_c) =  
         if most_c > kitaiti then 
           (tmp_lst, most_a, most_b, most_c)
         else if most_c < kitaiti then 
@@ -1538,7 +1588,8 @@ let col_tenpai_parallel tenpai_lst_ary tumo_l rm_wan =
   let rec loop tmp lst = match lst with
     | [] -> tmp
     | (k_lst,tumo_lst,rest_tumo_lst,current_tehai)::t -> 
-            let t_ritu = tenpai_ritu rest_tumo_lst tumo_l rm_wan in
+            let t_ritu = tenpai_ritu rest_tumo_lst tumo_l rm_wan in 
+            (*let _ =  if true then (Printf.printf "%d, " tumo_l; Printf.printf "%f, " t_ritu; List.iter (fun a -> Printf.printf "%d "a) rest_tumo_lst; Printf.printf "\n") else () in*)
             if t_ritu <= 0.0 then
               loop tmp t
             else
