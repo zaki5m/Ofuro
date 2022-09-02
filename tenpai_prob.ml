@@ -94,15 +94,19 @@ let hash_number tehai  =
 (*recieve (k_lst,tumo_lst,current_tehai) list
    return (k_lst,tumo_lst,rest_tumo_lst,current_tehai) list*)  
 let make_rest_tumo_lst ary zi_ary lst= 
+  let rec filter_loop ((x,y):(int*int)) m t_lst = match t_lst with 
+    | [] ->  m
+    | h::t -> if h = (x,y) then filter_loop (x,y) (m+1) t else filter_loop (x,y) m t 
+  in
   let rec rest_tumo_loop tmp tmp2 t_lst = match t_lst with 
     | [] -> tmp
     | (x,y)::t -> let (x,y) = hai_to_ary (x,y) in
-                  let tmp3 = List.filter (fun (a,b) -> (a,b) = (x,y)) tmp2 in 
+                  let m = filter_loop (x,y) 0 tmp2 in 
                   let n = 
                       if x = 3 then 
-                        zi_ary.(y) - (List.length tmp3)
+                        zi_ary.(y) - m
                       else
-                        ary.(x).(y) - (List.length tmp3)
+                        ary.(x).(y) - m
                   in
                   if n = 0 then
                     []
