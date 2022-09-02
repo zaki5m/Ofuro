@@ -1028,6 +1028,7 @@ let furo_inq ary_lst furo_lst naki_lst (x,y) player yama_lst tehai_lst yaku_lst 
 
 (*automatic*)
 let furo_inq ary_lst furo_lst naki_lst (x,y) player yama_lst tehai_lst yaku_lst dora_lst ba kyoku kyotaku honba sutehai_lst furo_double_lst furoritu_lst = 
+  Printf.printf "step2\n"; flush stdout;
   let (x,y) = hai_to_ary (x,y) in
   let rec loop' i tmp = 
     let furo = tapl_player furo_lst i in
@@ -1577,6 +1578,7 @@ let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_sc
   let sutehai_lst = ([],[],[],[]) in
   let furiten_lst = ([],[],[],[]) in
   let rec loop' player tehai_lst sutehai_lst yama_lst furo_lst ary_lst naki_lst dora_lst yaku_lst kyotaku player_score furiten_lst furo_double_lst = 
+    Printf.printf "step1\n"; flush stdout;
     let zi_kaze = kyoku_to_kaze kyoku player in
     let tehai = tapl_player tehai_lst player in
     let (x,y,_) = List.hd yama_lst in

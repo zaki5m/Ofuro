@@ -2048,7 +2048,7 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
   let n' = titoi_syanten tehai in 
   let (ary,zi_ary) = create_table sutehai_lst tehai in
   let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary in   
-  let furo_q = furo_defence ary zi_ary yaku_lst sutehai_lst furo_lst tehai in 
+  let furo_q = furo_defence ary zi_ary yaku_lst sutehai_lst furo_lst tehai in
   let f_lst = tapl_player furo_lst player in
   let rm_wan = (yama_len-14) in
   let tumo_l = (rm_wan)/4 in

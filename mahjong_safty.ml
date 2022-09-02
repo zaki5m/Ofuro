@@ -691,7 +691,7 @@ let furo_judge furo_lst sutehai_lst tehai =
       else
         tmp
     in
-    loop tmp i
+    loop tmp (i-1)
   in
   loop tehai 0 
                 
@@ -700,6 +700,7 @@ let furo_judge furo_lst sutehai_lst tehai =
 let furo_defence ary zi_ary yaku_lst sutehai_lst furo_lst tehai = 
   let n_tehai = other_reach yaku_lst sutehai_lst tehai in 
   let n_tehai = furo_judge furo_lst sutehai_lst n_tehai in 
+  Printf.printf "step3\n"; flush stdout;
   if n_tehai = tehai then
     -1
   else if n_tehai = [] then
