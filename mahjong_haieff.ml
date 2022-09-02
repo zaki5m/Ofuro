@@ -694,12 +694,10 @@ let create_table sutehai_lst tehai =
                   in
                   loop3 t
   in
-  let rec loop i = 
-    let _ = loop2 (List.nth sutehai_lst i) in
-    if i = 0 then
-      ()
-    else
-      loop (i-1)
+  let rec loop i = match i with 
+    | -1 -> ()
+    | _ -> let _ = loop2 (tapl_player sutehai_lst i) in
+           loop (i-1)
   in
   let _ = loop 3 in
   let _ = loop3 tehai in

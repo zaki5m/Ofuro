@@ -344,12 +344,12 @@ let print_furo lst x =
 let print_info ba kyoku honba kyotaku player_score yaku_lst dora_lst = 
   let _ = 
     if ba = 0 then
-      (Printf.printf "東%d局 %d本場 供託:%d A:%d B:%d C:%d D:%d\n" kyoku honba kyotaku (List.nth player_score 0) (List.nth player_score 1) (List.nth player_score 2) (List.nth player_score 3);)
+      (Printf.printf "東%d局 %d本場 供託:%d A:%d B:%d C:%d D:%d\n" kyoku honba kyotaku (tapl_player_1 player_score) (tapl_player_2 player_score) (tapl_player_3 player_score) (tapl_player_4 player_score);)
     else
-      Printf.printf "南%d局 %d本場 供託:%d A:%d B:%d C:%d D:%d\n" kyoku honba kyotaku (List.nth player_score 0) (List.nth player_score 1) (List.nth player_score 2) (List.nth player_score 3);
+      Printf.printf "南%d局 %d本場 供託:%d A:%d B:%d C:%d D:%d\n" kyoku honba kyotaku (tapl_player_1 player_score) (tapl_player_2 player_score) (tapl_player_3 player_score) (tapl_player_4 player_score);
   in
   let rec loop i = 
-    let n = List.nth yaku_lst i in
+    let n = tapl_player yaku_lst i in
     let _ = 
       if List.exists (fun a -> a = Reach) n then
         if i = 0 then

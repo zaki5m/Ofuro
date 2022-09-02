@@ -22,6 +22,14 @@ let rename (m, n) = match n with
   | Tyun -> "tyun"
   | _ -> "not"             
 
+let tapl_player_1 (x,_,_,_) = x 
+
+let tapl_player_2 (_,x,_,_) = x
+
+let tapl_player_3 (_,_,x,_) = x
+
+let tapl_player_4 (_,_,_,x) = x 
+
 let tapl_player tapl player = match player with 
   | 0 -> let (x,_,_,_) = tapl in x
   | 1 -> let (_,x,_,_) = tapl in x
@@ -280,10 +288,10 @@ let rm_furo_double ary zi_ary furo_double_lst =
 
 (*furo_lstから副露されている牌を配列から引いた配列を返す。(ary,zi_ary)*)     
 let furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary =
-  let a_lst = furo_to_ary (List.nth furo_lst 0) [] in
-  let b_lst = furo_to_ary (List.nth furo_lst 1) a_lst in
-  let c_lst = furo_to_ary (List.nth furo_lst 2) b_lst in
-  let lst = furo_to_ary (List.nth furo_lst 3) c_lst in
+  let a_lst = furo_to_ary (tapl_player_1 furo_lst) [] in
+  let b_lst = furo_to_ary (tapl_player_2 furo_lst) a_lst in
+  let c_lst = furo_to_ary (tapl_player_3 furo_lst) b_lst in
+  let lst = furo_to_ary (tapl_player_4 furo_lst) c_lst in
   let rec loop t_lst = match t_lst with 
     | [] -> ()
     | (x,y)::t -> let _ = if x = 3 then
@@ -417,7 +425,7 @@ let possible_furo_patern tehai (x,y) =
       in
       p_f_lst
 
-
+(*
 let exist_reach yaku_lst player =
   let p_r = List.nth yaku_lst player in
   let x = 
@@ -432,6 +440,7 @@ let exist_reach yaku_lst player =
     false
   else
     true
+*)
 
 let kind_kokushi tehai = 
   let m = List.length tehai in
@@ -574,7 +583,7 @@ let haitei_slide rm_wan yaku_lst player =
       if player = i then 
         []
       else
-        List.nth yaku_lst i
+        tapl_player yaku_lst i
     in
     let tmp = 
       if List.exists (fun a -> a = Reach || a = Doublereach) yaku then
@@ -588,7 +597,7 @@ let haitei_slide rm_wan yaku_lst player =
       loop (i-1) tmp
   in
   let r_lst = 
-    if List.exists (fun a -> a = Reach || a = Doublereach) (List.nth yaku_lst player) then 
+    if List.exists (fun a -> a = Reach || a = Doublereach) (tapl_player yaku_lst player) then 
       []
     else
       loop 3 []

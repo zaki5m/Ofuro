@@ -194,7 +194,7 @@ let sutehai_common_hai ary zi_ary sutehai_lst player =
       if player = i then
         lst_tmp
       else
-        (List.nth sutehai_lst i)::lst_tmp
+        (tapl_player sutehai_lst i)::lst_tmp
     in
     if i = 0 then
       lst_tmp
@@ -389,26 +389,26 @@ let tehai_to_anzen ary zi_ary tehai =
 
 
 (*((int*hai)*int) List -> ((int*hai)*int*bool List) List*)    
-let kyoutu_anpai (sutehai_lst:(int*hai*bool)list list) (tehai:((int*hai)*int)list) player =
+let kyoutu_anpai sutehai_lst (tehai:((int*hai)*int)list) player =
   let tehai_len = List.length tehai in
   let rec loop i tmp_s = 
     let ((x,y),z) = List.nth tehai i in
     let kyoutu_lst = 
       if player = 0 then
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 3) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 3) then
             [true]
           else
             [false]
         in
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 2) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 2) then
             true::tmp
           else
             false::tmp
         in
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 1) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 1) then
             true::tmp
           else
             false::tmp
@@ -416,19 +416,19 @@ let kyoutu_anpai (sutehai_lst:(int*hai*bool)list list) (tehai:((int*hai)*int)lis
         tmp
       else if player = 1 then
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 3) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 3) then
             [true]
           else
             [false]
         in
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 2) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 2) then
             true::tmp
           else
             false::tmp
         in
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 0) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 0) then
             true::tmp
           else
             false::tmp
@@ -436,19 +436,19 @@ let kyoutu_anpai (sutehai_lst:(int*hai*bool)list list) (tehai:((int*hai)*int)lis
         tmp
       else if player = 2 then
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 3) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 3) then
             [true]
           else
             [false]
         in
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 1) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 1) then
             true::tmp
           else
             false::tmp
         in
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 0) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 0) then
             true::tmp
           else
             false::tmp
@@ -456,19 +456,19 @@ let kyoutu_anpai (sutehai_lst:(int*hai*bool)list list) (tehai:((int*hai)*int)lis
         tmp
       else 
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 2) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 2) then
             [true]
           else
             [false]
         in
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 1) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 1) then
             true::tmp
           else
             false::tmp
         in
         let tmp = 
-          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (List.nth sutehai_lst 0) then
+          if List.exists (fun (a,b,c) -> (a,b) = (x,y)) (tapl_player sutehai_lst 0) then
             true::tmp
           else
             false::tmp
@@ -563,12 +563,12 @@ let player_anpai (sutehai:(int*hai*bool)list) tehai =
     loop (m-1) []
 
 
-let other_reach (yaku_lst:yaku list list) sutehai_lst tehai =  
+let other_reach yaku_lst sutehai_lst tehai =  
   let rec loop i tmp = 
-    let reach = List.nth yaku_lst i in 
+    let reach = tapl_player yaku_lst i in 
     let tmp = 
       if reach <> [] then
-        player_anpai (List.nth sutehai_lst i) tmp
+        player_anpai (tapl_player sutehai_lst i) tmp
       else
         tmp
     in
@@ -605,7 +605,7 @@ let reach_genbutu_anzen_zero (tehai:((int*hai)*int)list) genbutu_lst =
 let reach_genbutu yaku_lst sutehai_lst tehai = 
   let rec r_loop i tmp =
     let tmp = 
-      if List.exists (fun b -> b = Reach || b = Doublereach) (List.nth yaku_lst i) then
+      if List.exists (fun b -> b = Reach || b = Doublereach) (tapl_player yaku_lst i) then
         i::tmp
       else
         tmp
@@ -618,7 +618,7 @@ let reach_genbutu yaku_lst sutehai_lst tehai =
   let r_lst = r_loop 3 [] in
   let r_lst_len = List.length r_lst in 
   let rec loop i tmp = 
-    let sutehai = List.nth sutehai_lst i in
+    let sutehai = tapl_player sutehai_lst i in
     let lst = player_anpai sutehai tehai in
     let tmp =  
       let rec loop' i tmp2 = 
@@ -680,18 +680,20 @@ let anzen_base ary zi_ary tehai sutehai_lst player =
 
 
 let furo_judge furo_lst sutehai_lst tehai = 
-  let rec loop tmp i t_lst = match t_lst with 
-    | [] -> tmp 
-    | h::t -> let m = List.length h in 
-              let tmp = 
-                if m > 2 then 
-                  player_anpai (List.nth sutehai_lst i) tmp
-                else
-                  tmp
-              in
-              loop tmp (i+1) t 
+ let rec loop tmp i = match i with 
+  | -1 -> tmp
+  | _ -> 
+    let lst = tapl_player furo_lst i in
+    let m = List.length lst in 
+    let tmp = 
+      if m > 2 then 
+        player_anpai (tapl_player sutehai_lst i) tmp
+      else
+        tmp
+    in
+    loop tmp i
   in
-  loop tehai 0 furo_lst
+  loop tehai 0 
                 
 
 
