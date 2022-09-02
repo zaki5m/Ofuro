@@ -104,13 +104,19 @@ let make_rest_tumo_lst ary zi_ary lst=
                       else
                         ary.(x).(y) - (List.length tmp3)
                   in
-                  let tmp = n::tmp in
-                  rest_tumo_loop tmp ((x,y)::tmp2) t
+                  if n = 0 then
+                    []
+                  else 
+                    let tmp = n::tmp in
+                    rest_tumo_loop tmp ((x,y)::tmp2) t
   in
   let rec loop tmp t_lst = match t_lst with 
     | [] -> tmp 
     | (k_lst,tumo_lst,current_tehai)::t -> let tmp2 = rest_tumo_loop [] [] tumo_lst in
-                                           loop ((k_lst,tumo_lst,tmp2,current_tehai)::tmp) t 
+                                           if tmp2 = [] then 
+                                            loop tmp t 
+                                           else
+                                            loop ((k_lst,tumo_lst,tmp2,current_tehai)::tmp) t 
   in
   let rec loop2 tmp2 t_lst2 = match t_lst2 with
     | [] -> tmp2
@@ -1394,7 +1400,7 @@ let opt_tenpai_form_p tenpai_lst =
   let tasks = Array.init n (fun i -> i) in
   create_work tasks;
   let rec kitaiti_find (tmp_a, tmp_b, tmp_c) (tmp_lst, most_a, most_b, most_c) tenpai_lst = match tenpai_lst with
-    | [] -> flush stdout; (tmp_lst, tmp_a, tmp_b, tmp_c)
+    | [] -> (tmp_lst, tmp_a, tmp_b, tmp_c)
     | (k_lst,t_ritu,agariritu,kitaiti)::t ->
       let (tmp_a, tmp_b, tmp_c) = (tmp_a+.t_ritu, tmp_b+.agariritu, tmp_c+.kitaiti) in
       let (tmp_lst, most_a, most_b, most_c) =  
