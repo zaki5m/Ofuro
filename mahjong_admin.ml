@@ -157,25 +157,6 @@ let rec s_to_hai (x,y) = match y with
           zi_to_hai (x,y)  
 
 
-let ripai2 (list:(int*hai)list) hai = 
-  let list = List.filter (fun ((_,y)) -> y = hai ) list in 
-  let list = List.sort (fun (x1,_) (x2,_) -> if x1 < x2 then -1 else 1) list  in
-  list
-
-let ripai list = 
-  let listm = ripai2 list Manzu in
-  let listp = ripai2 list Pinzu in
-  let lists = ripai2 list Souzu in
-  let listt = ripai2 list Ton in
-  let listn = ripai2 list Nan in
-  let listsy = ripai2 list Sya in
-  let listpe = ripai2 list Pei in
-  let listh = ripai2 list Haku in
-  let listr = ripai2 list Hatsu in
-  let listty = ripai2 list Tyun in
-  let list = listm @ listp @ lists @ listt @ listn @ listsy @ listpe @ listh @ listr @ listty in
-  list
-
 let hai_to_ary (x,y) = 
   if x = 0 then
     if y = Ton then

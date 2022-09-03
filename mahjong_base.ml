@@ -215,10 +215,41 @@ let furo_to_hai (_,(b,(c,d,e))) =
   let x3 = ary_to_hai (b,e) in
   [x1;x2;x3]
 
-let ripai2 (list:(int*hai)list) hai = 
+let hai_match hai tmp = match hai with 
+  | Manzu -> true
+  | Pinzu -> if tmp = Manzu then false else true 
+  | Souzu -> if tmp = Manzu || tmp = Pinzu then false else true
+  | Ton -> if tmp = Manzu || tmp = Pinzu || tmp = Souzu then false else true
+  | Nan -> if tmp = Manzu || tmp = Pinzu || tmp = Souzu || tmp = Ton then false else true
+  | Sya -> if tmp = Pei || tmp = Haku || tmp = Hatsu || tmp = Tyun then true else false
+  | Pei -> if tmp = Haku || tmp = Hatsu || tmp = Tyun then true else false
+  | Haku -> if tmp = Hatsu || tmp = Tyun then true else false
+  | Hatsu -> if tmp = Tyun then true else false
+  | Tyun -> false
+  | _ -> true
+
+
+
+let rec ripai (xs:(int*hai)list) =
+  let rec insert_element (c,d) = function
+    [] -> [(c,d)]
+  | ((a',b')::ys) as a -> if b' = d then 
+                            if c < a' then (c,d)::a else (a',b')::insert_element (c,d) ys
+                          else
+                            if hai_match d b' then 
+                              (c,d)::a 
+                            else 
+                              (a',b')::insert_element (c,d) ys
+  in
+    match xs with
+      [] -> []
+    | (a,b)::ys -> insert_element (a,b) (ripai ys)
+(*
+let ripai2 (list:(int*hai)list) hai  = 
   let list = List.filter (fun ((_,y)) -> y = hai ) list in 
   let list = List.sort (fun (x1,_) (x2,_) -> if x1 < x2 then -1 else 1) list  in
   list
+
 
 let ripai list = 
   let listm = ripai2 list Manzu in
@@ -233,7 +264,7 @@ let ripai list =
   let listty = ripai2 list Tyun in
   let list = listm @ listp @ lists @ listt @ listn @ listsy @ listpe @ listh @ listr @ listty in
   list
-
+*)
 let hai_to_int (tehai:(int*hai)list) (x,y) =
   let m = List.length tehai in
   let rec loop i = 
