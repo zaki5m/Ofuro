@@ -1270,31 +1270,31 @@ let combination n r =
 let tenpai_ritu (rest_tumo_lst:int list) tumo_l rm_wan = 
   let m = List.length rest_tumo_lst in 
   let len = 69 - (int_of_float rm_wan) in 
-  let t_ritu = 
-    if m = 1 then 
-      let n1 = List.hd rest_tumo_lst in 
-      syanten_1_ary.(len).(4-n1)
-    else if m = 2 then 
-      let n1 = List.hd rest_tumo_lst in 
-      let n2 = List.nth rest_tumo_lst 1 in 
-      syanten_2_ary.(len).(4-n2).(4-n1)
-    else if m = 3 then 
-      let n1 = List.hd rest_tumo_lst in 
-      let n2 = List.nth rest_tumo_lst 1 in 
-      let n3 = List.nth rest_tumo_lst 2 in
-      syanten_3_ary.(len).(4-n3).(4-n2).(4-n1)
-    else if m = 4 then 
-      let n1 = List.hd rest_tumo_lst in 
-      let n2 = List.nth rest_tumo_lst 1 in 
-      let n3 = List.nth rest_tumo_lst 2 in
-      let n4 = List.nth rest_tumo_lst 3 in
-      syanten_4_ary.(len).(4-n4).(4-n3).(4-n2).(4-n1)
-    else
-      0.0
-  in
   if m > tumo_l then
     0.0
   else
+    let t_ritu = 
+      if m = 1 then 
+        let n1 = List.hd rest_tumo_lst in 
+        syanten_1_ary.(len).(4-n1)
+      else if m = 2 then 
+        let n1 = List.hd rest_tumo_lst in 
+        let n2 = List.nth rest_tumo_lst 1 in 
+        syanten_2_ary.(len).(4-n2).(4-n1)
+      else if m = 3 then 
+        let n1 = List.hd rest_tumo_lst in 
+        let n2 = List.nth rest_tumo_lst 1 in 
+        let n3 = List.nth rest_tumo_lst 2 in
+        syanten_3_ary.(len).(4-n3).(4-n2).(4-n1)
+      else if m = 4 then 
+        let n1 = List.hd rest_tumo_lst in 
+        let n2 = List.nth rest_tumo_lst 1 in 
+        let n3 = List.nth rest_tumo_lst 2 in
+        let n4 = List.nth rest_tumo_lst 3 in
+        syanten_4_ary.(len).(4-n4).(4-n3).(4-n2).(4-n1)
+      else
+        0.0
+    in
     t_ritu
 
 
