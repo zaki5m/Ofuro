@@ -1309,7 +1309,7 @@ let ikki_tukan lst tmp =
 let yakuhai lst zi_kaze ba_kaze tmp =
   let m = List.length lst in
   let rec loop' lst n y_lst =
-    let (a,(b,_,_)) = List.nth lst n in
+    let (a,(b,_,_)) = List.nth lst n in 
     let y_lst =
       if a = 3 then
         if b = zi_kaze then
@@ -1395,7 +1395,7 @@ let tyuren ary y_lst =
     let ary2 = Array.copy ary.(i) in
     let tmp2 = 
       if (loop ary2 0 false) = true then
-        Tyurenpoutou::y_lst
+        Tyurenpoutou::tmp2
       else
         tmp2
     in
@@ -1404,7 +1404,7 @@ let tyuren ary y_lst =
     else
       loop' (i+1) tmp2
     in
-  loop' 0 []
+  loop' 0 y_lst
 
 let ryuiso ary zi_ary y_lst = 
   let rec loop' j tmp = 
@@ -2013,7 +2013,6 @@ let opt_yaku ary zi_ary lst lst2 head mati zi_kaze ba_kaze naki zi_lst oya min_l
       else
         tmp
     in
-
     if n = 0 then
       tmp::y_lst
     else
@@ -2273,6 +2272,7 @@ let kokushi_ten ary zi_ary (a,b) oya =
     ((a,b),(0,0))
 
 (*ary,zi_aryはf_lstの物は加えない*)
+(*return ((int*int)和了牌*(int*int)(ツモ，ロン))list *)
 let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int*(int*int*int)))list) (yaku_lst:Mahjong_base.yaku list) dora_lst =
   let oya = if zi_kaze = 0 then true else false in 
   let ary2 = Array.map (fun x -> Array.copy x) ary in
@@ -2300,8 +2300,8 @@ let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int
 
 (*let _ = 
   let a = [|[|0;0;2;0;0;0;0;0;0|];
-            [|3;0;0;0;0;0;0;0;0|];
+            [|3;0;0;0;0;2;0;0;0|];
             [|0;1;1;1;0;0;0;0;0|]|] in 
-  let zi = [|1;1;0;0;0;0;0|] in
+  let zi = [|0;0;0;0;0;3;0|] in
   let zi_lst = hantei_zi zi in  
-  tehai_to_ten a zi 2 1 true [(Minko,(3,(1,1,1)))] [] [(3,5)]*)
+  tehai_to_ten a zi 2 1 false [] [] [(3,5)]*)

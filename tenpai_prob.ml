@@ -179,6 +179,27 @@ let tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary t
     else
       [(loop 0.0 0.0 ten_lst)]
 
+let tenpai_kitaiti_pp lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst =
+  let (t_ary,t_zi_ary) = list_to_ary lst in
+  let ten_lst = tehai_to_ten t_ary t_zi_ary zi_kaze ba_kaze naki f_lst yaku_lst dora_lst in
+  let m = List.length ten_lst in
+  let rec loop tmp_kitaiti t_lst = match t_lst with
+    | [] -> tmp_kitaiti
+    | ((a,b),(c,_))::t -> let c = Int.to_float c in
+                          loop (((a,b),c)::tmp_kitaiti) t
+  in
+  if naki = false then
+    let ten_lst2 = tehai_to_ten t_ary t_zi_ary zi_kaze ba_kaze naki f_lst (Reach::yaku_lst) dora_lst in
+    if m = 0 then
+      []
+    else
+      loop [] ten_lst2
+  else
+    if m = 0 then
+      []
+    else
+      loop [] ten_lst
+
 let tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary = 
   let rec loop tmp double_lst i t_lst = match t_lst with 
     | [] -> tmp
@@ -217,6 +238,65 @@ let tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_l
   in
   let t_lst = loop [] [] 0 tehai in
   loop2 (13,(0.0,0.0)) t_lst 
+
+let tenpai_tumo_lst current_tehai =
+  let rec loop i j tmp = 
+    let tmp = 
+        let (x,y) = ary_to_hai (i,j) in
+        let tmp_tehai = add_tehai current_tehai (x,y) in
+        let (_,new_n) = syanten tmp_tehai in 
+        if new_n = -1 then
+          (x,y)::tmp
+        else
+          tmp
+    in
+    if i = 2 then
+      if j = 8 then
+        tmp
+      else
+        loop i (j+1) tmp
+    else
+      if j = 8 then
+        loop (i+1) 0 tmp
+      else
+        loop i (j+1) tmp
+  in
+  let rec loop2 i tmp = 
+    let tmp = 
+        let (x,y) = ary_to_hai (3,i) in
+        let tmp_tehai = add_tehai current_tehai (x,y) in
+        let (_,new_n) = syanten tmp_tehai in 
+        if new_n = -1 then
+          (x,y)::tmp
+        else
+          tmp
+    in
+    if i = 6 then
+      tmp
+    else
+      loop2 (i+1) tmp
+  in
+  let t_lst = loop 0 0 [] in
+  loop2 0 t_lst
+
+
+let tenpai_to_opt_p tehai f_lst zi_kaze ba_kaze naki yaku_lst dora_lst = 
+  let rec loop tmp double_lst t_lst = match t_lst with 
+    | [] -> tmp
+    | h::t -> if List.exists (fun a -> a = h) double_lst then 
+                loop tmp double_lst t
+              else
+                let lst = d_tehai tehai h in
+                let (_,n) = syanten lst in
+                let tmp = 
+                  if n = 0 then
+                    (tenpai_kitaiti_pp lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst)::tmp
+                  else
+                    tmp
+                in
+                loop tmp (h::double_lst) t
+  in
+  loop [] [] tehai 
 
 
 let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary kuikae_lst = 
@@ -1322,6 +1402,78 @@ let tenpai_ritu (rest_tumo_lst:int list) tumo_l rm_wan =
   else
     loop 0.0 0
 *)
+(*new_tumo_lstは最後のツモ牌の残り枚数とその牌で和了した時の点数の組のリスト
+   return (和了率＊期待値)*)
+let make_agariritu_kitaiti rest_tumo_lst (new_tumo_lst:(int*float)list) tumo_len rm_wan = 
+  let m = List.length rest_tumo_lst in 
+  let len = 69 - (int_of_float rm_wan) in
+  let rec loop (tmp,tmp2) t_lst = match t_lst with 
+    | [] -> (tmp,tmp2) 
+    | (h1,h2)::t -> let t_ritu = 
+                if m = 0 then 
+                  syanten_1_ary.(len).(h1)
+                else if m = 1 then 
+                  let n1 = List.hd rest_tumo_lst in 
+                  syanten_2_ary.(len).(4-n1).(h1)
+                else if m = 2 then 
+                  let n1 = List.hd rest_tumo_lst in 
+                  let n2 = List.nth rest_tumo_lst 1 in 
+                  syanten_3_ary.(len).(4-n2).(4-n1).(h1)
+                else if m = 3 then 
+                  let n1 = List.hd rest_tumo_lst in 
+                  let n2 = List.nth rest_tumo_lst 1 in 
+                  let n3 = List.nth rest_tumo_lst 2 in
+                  syanten_4_ary.(len).(4-n3).(4-n2).(4-n1).(h1)
+                else if m = 4 then 
+                  let n1 = List.hd rest_tumo_lst in 
+                  let n2 = List.nth rest_tumo_lst 1 in 
+                  let n3 = List.nth rest_tumo_lst 2 in
+                  let n4 = List.nth rest_tumo_lst 3 in
+                  syanten_5_ary.(len).(4-n4).(4-n3).(4-n2).(4-n1).(h1)
+                else
+                  0.0
+              in
+              let kitaiti = t_ritu *. h2 in 
+              loop ((t_ritu+.tmp),(kitaiti+.tmp2)) t 
+  in
+  if m > tumo_len then 
+    (0.0,0.0)
+  else
+    loop (0.0,0.0) new_tumo_lst
+
+
+let tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan = 
+  let rec loop2 new_rest_tumo_lst ary2 zi_ary2 a_k_lst = match a_k_lst with 
+    | [] -> new_rest_tumo_lst
+    | h::t -> 
+      let rec lp1 tmp2 t_lst2 = match t_lst2 with 
+                | [] -> tmp2
+                | h1::t1 -> 
+                            let ((x,y),z) = h1 in 
+                            let n = 
+                              if x = 3 then 
+                                zi_ary2.(y)
+                              else
+                                ary2.(x).(y)
+                            in
+                            if n <= 0 then 
+                              lp1 tmp2 t1
+                            else 
+                              lp1 ((n,z)::tmp2) t1
+              in
+              loop2 ((lp1 [] h)@new_rest_tumo_lst) ary2 zi_ary2 t
+  in
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu)::t -> let (ary2,zi_ary2) = ary_opt ary zi_ary tumo_lst in
+                                                                let current_tehai = ripai current_tehai in
+                                                                let a_k_lst = tenpai_to_opt_p current_tehai f_lst zi_kaze ba_kaze naki [] dora_lst in
+                                                                let lst = loop2 [] ary2 zi_ary2 a_k_lst in
+                                                                let (agariritu,kitaiti) = make_agariritu_kitaiti rest_tumo_lst lst tumo_l rm_wan in
+                                                                loop ((k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti)::tmp) t 
+  in
+  loop [] tenpai_lst
+(*
 let tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan = 
   let rec loop tmp t_lst = match t_lst with 
     | [] -> tmp 
@@ -1335,7 +1487,50 @@ let tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst 
                                                                 loop ((k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu,agariritu,kitaiti)::tmp) t 
   in
   loop [] tenpai_lst
+*)
 
+let tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan = 
+  let m = Array.length tenpai_lst in
+  let tasks = Array.init m (fun i -> i) in 
+  create_work tasks;
+  let rec loop2 new_rest_tumo_lst ary2 zi_ary2 a_k_lst = match a_k_lst with 
+    | [] -> new_rest_tumo_lst
+    | h::t -> 
+      let rec lp1 tmp2 t_lst2 = match t_lst2 with 
+                | [] -> tmp2
+                | h1::t1 -> 
+                            let ((x,y),z) = h1 in 
+                            let n = 
+                              if x = 3 then 
+                                zi_ary2.(y)
+                              else
+                                ary2.(x).(y)
+                            in
+                            if n <= 0 then 
+                              lp1 tmp2 t1
+                            else 
+                              lp1 ((n,z)::tmp2) t1
+              in
+              loop2 ((lp1 [] h)@new_rest_tumo_lst) ary2 zi_ary2 t
+  in
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (k_lst,tumo_lst,rest_tumo_lst,current_tehai,t_ritu)::t -> let (ary2,zi_ary2) = ary_opt ary zi_ary tumo_lst in
+                                                                let current_tehai = ripai current_tehai in
+                                                                let a_k_lst = tenpai_to_opt_p current_tehai f_lst zi_kaze ba_kaze naki [] dora_lst in
+                                                                let lst = loop2 [] ary2 zi_ary2 a_k_lst in
+                                                                let (agariritu,kitaiti) = make_agariritu_kitaiti rest_tumo_lst lst tumo_l rm_wan in
+                                                                loop ((k_lst,t_ritu,agariritu,kitaiti)::tmp) t 
+  in
+  let update p r i = p.(i) <- loop [] r.(i) in 
+  let pre =  Array.make m [] in 
+  let domains = Array.init (num_domains - 1)
+              (fun _ -> Domain.spawn(worker (update pre tenpai_lst))) in
+  worker (update pre tenpai_lst) ();
+  Array.iter Domain.join domains;
+  pre
+
+(*
 let tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan = 
   let m = Array.length tenpai_lst in
   let tasks = Array.init m (fun i -> i) in 
@@ -1360,6 +1555,7 @@ let tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_ls
   Array.iter Domain.join domains;
   pre
   
+*)
 (*
 let compile_kitaiti p_lst current_tehai = 
   let rec loop tmp t_lst = match t_lst with 
