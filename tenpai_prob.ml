@@ -1411,32 +1411,34 @@ let make_agariritu_kitaiti rest_tumo_lst (new_tumo_lst:(int*float)list) tumo_len
     | [] -> (tmp,tmp2) 
     | (h1,h2)::t -> let t_ritu = 
                 if m = 0 then 
-                  syanten_1_ary.(len).(h1)
+                  syanten_1_ary.(len).(4-h1)
                 else if m = 1 then 
                   let n1 = List.hd rest_tumo_lst in 
-                  syanten_2_ary.(len).(4-n1).(h1)
+                  syanten_2_ary.(len).(4-n1).(4-h1)
                 else if m = 2 then 
                   let n1 = List.hd rest_tumo_lst in 
                   let n2 = List.nth rest_tumo_lst 1 in 
-                  syanten_3_ary.(len).(4-n2).(4-n1).(h1)
+                  syanten_3_ary.(len).(4-n2).(4-n1).(4-h1)
                 else if m = 3 then 
                   let n1 = List.hd rest_tumo_lst in 
                   let n2 = List.nth rest_tumo_lst 1 in 
                   let n3 = List.nth rest_tumo_lst 2 in
-                  syanten_4_ary.(len).(4-n3).(4-n2).(4-n1).(h1)
+                  syanten_4_ary.(len).(4-n3).(4-n2).(4-n1).(4-h1)
                 else if m = 4 then 
                   let n1 = List.hd rest_tumo_lst in 
                   let n2 = List.nth rest_tumo_lst 1 in 
                   let n3 = List.nth rest_tumo_lst 2 in
                   let n4 = List.nth rest_tumo_lst 3 in
-                  syanten_5_ary.(len).(4-n4).(4-n3).(4-n2).(4-n1).(h1)
+                  syanten_5_ary.(len).(4-n4).(4-n3).(4-n2).(4-n1).(4-h1)
                 else
                   0.0
               in
               let kitaiti = t_ritu *. h2 in 
               loop ((t_ritu+.tmp),(kitaiti+.tmp2)) t 
   in
-  if m > tumo_len then 
+  if m = 0 then 
+    loop (0.0,0.0) new_tumo_lst
+  else if (m+1) > tumo_len then 
     (0.0,0.0)
   else
     loop (0.0,0.0) new_tumo_lst
