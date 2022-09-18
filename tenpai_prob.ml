@@ -1700,6 +1700,7 @@ let first_sutehai_to_one_index tenpai_array =
   let n = Array.length tenpai_array in 
   let rec loop i (a_lst, b_tmp, c_tmp, d_tmp) tmp_lst (most_lst, most_a, most_b, most_c) = 
     let (k_lst,t_ritu,agariritu,kitaiti) = tenpai_array.(i) in 
+    let _ = if i = 0 then (Printf.printf "t_ritu:%f a_ritu:%f kitaiti:%f\n" b_tmp c_tmp d_tmp;) else () in 
     if k_lst = [] then 
       if i = 0 then
         (most_lst, b_tmp, c_tmp, d_tmp)::tmp_lst
@@ -1806,6 +1807,7 @@ let minus_kitaiti_p lst =
   let rec loop2 tmp t_lst = match t_lst with 
     | [] -> tmp 
     | (k_lst,t_ritu,agariritu,kitaiti,anzendo)::t -> let minus_kitaiti = sum -. kitaiti in 
+                                                     Printf.printf "sum :%f anzendo: %d" sum anzendo; 
                                                      let anzendo_f = float_of_int anzendo in 
                                                      let total_kitaiti = kitaiti -. 0.1 *.(minus_kitaiti -.anzendo_f*.10000.0) in
                                                      loop2 ((k_lst,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti)::tmp) t 
