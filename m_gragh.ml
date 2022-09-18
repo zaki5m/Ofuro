@@ -391,11 +391,17 @@ let print_info ba kyoku honba kyotaku player_score yaku_lst dora_lst =
   loop3 0;
   loop 0
 
+let tapl_to_list tapl = 
+  let (a,b,c,d) = tapl in 
+  [a;b;c;d]
 
 
 
-let t_format tehai_lst furo_lst (sutehai_lst:(int*hai*bool)list list) ba kyoku honba kyotaku player_score yaku_lst dora_lst =
+let t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst =
   print_info ba kyoku honba kyotaku player_score yaku_lst dora_lst;
+  let tehai_lst = tapl_to_list tehai_lst in 
+  let sutehai_lst = tapl_to_list sutehai_lst in 
+  let furo_lst = tapl_to_list furo_lst in 
   let tehai_lst = List.map (fun a -> (List.map change_gragh a))tehai_lst in
   let sutehai_lst = List.map (fun a -> (List.map (fun (x,y,_) -> change_gragh (x,y))) a) sutehai_lst in
   let furo_lst = List.map (fun a -> (List.map (fun b -> furo_to_hai b) a))furo_lst in
