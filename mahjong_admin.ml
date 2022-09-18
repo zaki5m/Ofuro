@@ -41,6 +41,8 @@ let hai_lst = [(1,Manzu);
               (0,Hatsu);
               (0,Tyun)]
 
+let big_hai_lst = hai_lst @ hai_lst @ hai_lst @ hai_lst 
+
 let rec add_tehai (list:(int*hai) list) (x,y) = match list with
   | [] -> [(x,y)]
   | [(x1,y1)] -> [(x1,y1);(x,y)]
@@ -1633,7 +1635,7 @@ let kyoku_s ba kyoku honba kyotaku player_score  =
 
 (*automatic*)
 let kyoku_s ba kyoku honba kyotaku player_score furoritu_lst count = 
-  let lst2 = hai_lst @ hai_lst @ hai_lst @ hai_lst in
+  let lst2 = big_hai_lst in
   (*let lst3 = r_hai lst2 in*)
   let lst3 = r_hai2 lst2 count in 
   let lst4 = List.sort (fun (_ ,_ ,z1) (_ ,_ ,z2) -> if z1 < z2 then -1 else 1) lst3 in
