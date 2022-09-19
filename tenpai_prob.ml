@@ -243,8 +243,9 @@ let tenpai_to_opt_agariritu_kitaiti lst tumo_l rm_wan =
   let n_lst = loop [] lst in 
   max_kitaiti_p n_lst
 
-let tenpai_to_opt_agariritu_kitaiti_f lst tumo_l rm_wan = 
+let tenpai_to_opt_agariritu_kitaiti_f lst patern tumo_l rm_wan = 
   let len = 69 - (int_of_float rm_wan) in 
+  let patern = float_of_int patern in 
   let rec loop tmp t_lst = match t_lst with 
     | [] -> tmp
     | (i,t_lst2)::t -> let rec loop2 (agariritu,kitaiti) t_lst22 = match t_lst22 with 
@@ -256,6 +257,7 @@ let tenpai_to_opt_agariritu_kitaiti_f lst tumo_l rm_wan =
                                                     else
                                                       syanten_1_ary.(len).(4-n) 
                                                     in
+                                       let a_ritu = (1. /. patern) *. a_ritu in 
                                        let k_ritu = a_ritu *. z in
                                        loop2 ((agariritu+.a_ritu),(k_ritu+.kitaiti)) t2 
                         in
@@ -423,9 +425,9 @@ let tenpai_to_opt_p tehai f_lst zi_kaze ba_kaze naki yaku_lst dora_lst =
 
 let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary kuikae_lst = 
   let rec loop tmp double_lst i t_lst = match t_lst with 
-    | [] -> tmp
+    | [] -> (i,tmp)
     | h::t -> if List.exists (fun a -> a = h) double_lst then 
-                loop tmp double_lst (i+1) t
+                loop tmp double_lst i t
               else
                 let lst = d_tehai tehai h in
                 let (_,n) = syanten lst in
@@ -437,7 +439,15 @@ let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora
                   else
                     tmp
                 in
-                loop tmp (h::double_lst) (i+1) t
+                let i = 
+                  if List.exists (fun a -> a = h) kuikae_lst then 
+                    i
+                  else if n = 0 then
+                    i+1
+                  else
+                    i
+                in
+                loop tmp (h::double_lst) i t
   in
   let rec loop2 tmp t_lst = match t_lst with
     | [] -> tmp
@@ -455,8 +465,8 @@ let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora
                       let tmp2 = loop3 [] t_lst in 
                       loop2 ((i,tmp2)::tmp) t
   in 
-  let tmp = loop [] [] 0 tehai in
-  tenpai_to_opt_agariritu_kitaiti_f (loop2 [] tmp) tumo_l rm_wan  
+  let (i,tmp) = loop [] [] 0 tehai in
+  tenpai_to_opt_agariritu_kitaiti_f (loop2 [] tmp) i tumo_l rm_wan  
 
 (*
 let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary kuikae_lst = 
