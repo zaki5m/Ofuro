@@ -1793,7 +1793,7 @@ let opt_tenpai_form_p tenpai_lst =
   let tasks = Array.init n (fun i -> i) in
   create_work tasks;
   let rec kitaiti_find (tmp_a, tmp_b, tmp_c) (tmp_lst, most_a, most_b, most_c) tenpai_lst = match tenpai_lst with
-    | [] -> (tmp_lst, tmp_a, tmp_b, tmp_c)
+    | [] -> let _ = if tmp_a > 1. then (Printf.printf "t_ritu:%f agariritu:%f kitaiti:%f\n" tmp_a tmp_b tmp_c;)else () in (tmp_lst, tmp_a, tmp_b, tmp_c)
     | (k_lst,t_ritu,agariritu,kitaiti)::t ->
       let (tmp_a, tmp_b, tmp_c) = (tmp_a+.t_ritu, tmp_b+.agariritu, tmp_c+.kitaiti) in
       let (tmp_lst, most_a, most_b, most_c) =  
