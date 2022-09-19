@@ -2016,6 +2016,30 @@ let col_tenpai_parallel tenpai_lst_ary tumo_l rm_wan =
   Array.iter Domain.join domains;
   pre
 
+let col_tenpai_parallel_f tenpai_lst_ary tumo_l rm_wan = 
+  let n = Array.length tenpai_lst_ary in 
+  let tasks = Array.init n (fun i -> i) in
+  create_work tasks;
+  let rec loop tmp lst = match lst with
+    | [] -> tmp
+    | (k_lst,tumo_lst,rest_tumo_lst,k_count,current_tehai)::t -> 
+            let t_ritu = tenpai_ritu rest_tumo_lst tumo_l rm_wan in 
+            let k_ritu = calc_k_ritu_naki k_count in 
+            let t_ritu = t_ritu *. k_ritu in 
+            (*let _ =  if true then (Printf.printf "%d, " tumo_l; Printf.printf "%f, " t_ritu; List.iter (fun a -> Printf.printf "%d "a) rest_tumo_lst; Printf.printf "\n") else () in*)
+            if t_ritu <= 0.0 then
+              loop tmp t
+            else
+              loop ((k_lst,tumo_lst,rest_tumo_lst,k_ritu,current_tehai,t_ritu)::tmp) t
+    in 
+  let update p r i = p.(i) <- loop [] r.(i) in 
+  let pre =  Array.make n [] in 
+  let domains = Array.init (num_domains - 1)
+              (fun _ -> Domain.spawn(worker (update pre tenpai_lst_ary))) in
+  worker (update pre tenpai_lst_ary) ();
+  Array.iter Domain.join domains;
+  pre
+
 (*
 let col_tenpai_parallel tenpai_lst_ary tumo_l rm_wan = 
   let n = Array.length tenpai_lst_ary in 
@@ -2673,7 +2697,7 @@ let col_tenpai_f ary zi_ary yama_len f_lst zi_kaze ba_kaze naki dora_lst tenpai_
   if a_len = 1 && List.length tenpai_lst.(0) = 0 || a_len = 0 then
     ([],0.0,0.0,0.0,0,0.0,0.0)
   else
-    let tenpai_lst = col_tenpai_parallel tenpai_lst tumo_l rm_wan in
+    let tenpai_lst = col_tenpai_parallel_f tenpai_lst tumo_l rm_wan in
     let tenpai_lst = tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
     let last_form_tenpai_lst = opt_tenpai_form_p tenpai_lst in
     if last_form_tenpai_lst = [] then 
