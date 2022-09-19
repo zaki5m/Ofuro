@@ -357,6 +357,15 @@ let calc_k_ritu_not_naki lst =
   in
   loop 1. lst 
 
+let calc_k_ritu_naki lst = 
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp
+    | h::t -> let n = float_of_int h in 
+              let tmp = tmp *. (1./.n) in 
+              loop tmp t
+  in
+  loop 1. lst 
+
 let tenpai_tumo_lst current_tehai =
   let rec loop i j tmp = 
     let tmp = 
@@ -2145,7 +2154,7 @@ let kuikae_check kuikae_lst n rm_wan tumo_l tenpai_lst_ary =
                                                               tmp
                                                             else
                                                               let t_ritu = tenpai_ritu rest_tumo_lst tumo_l rm_wan in 
-                                                              let k_ritu = calc_k_ritu_not_naki k_count in 
+                                                              let k_ritu = calc_k_ritu_naki k_count in 
                                                               let t_ritu = t_ritu *. k_ritu in 
                                                               if t_ritu <= 0.0 then 
                                                                 tmp
@@ -3161,9 +3170,9 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
             [(k_hai,f_hai)]
             *)
             []
-    else
-            []
-     (* 
+    else 
+      []
+      (*
       let haitei_s = haitei_slide (yama_len - 14) yaku_lst player in
       if haitei_s = true && (yama_len-14) < 4 then
         []
@@ -3174,7 +3183,6 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         else
           [(k_hai,f_hai)]
         *)
-
 
 
 
