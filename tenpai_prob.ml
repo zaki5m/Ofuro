@@ -2000,7 +2000,7 @@ let col_tenpai_parallel tenpai_lst_ary tumo_l rm_wan =
     | [] -> tmp
     | (k_lst,tumo_lst,rest_tumo_lst,k_count,current_tehai)::t -> 
             let t_ritu = tenpai_ritu rest_tumo_lst tumo_l rm_wan in 
-            let k_ritu = calc_k_ritu_not_naki k_count in 
+            let k_ritu = calc_k_ritu_naki k_count in 
             let t_ritu = t_ritu *. k_ritu in 
             (*let _ =  if true then (Printf.printf "%d, " tumo_l; Printf.printf "%f, " t_ritu; List.iter (fun a -> Printf.printf "%d "a) rest_tumo_lst; Printf.printf "\n") else () in*)
             if t_ritu <= 0.0 then
@@ -2472,7 +2472,9 @@ let judge_reach ary zi_ary tehai sutehai_lst yaku_lst yama_len f_lst zi_kaze ba_
 
 
   
-let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst furo_double_lst = 
+let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst furo_double_lst =
+
+        Printf.printf "ps\n";
   let yaku = tapl_player yaku_lst player in
   let reach_q_1 =  List.exists (fun b -> b = Reach || b = Doublereach) (tapl_player_1 yaku_lst) in
   let reach_q_2 =  List.exists (fun b -> b = Reach || b = Doublereach) (tapl_player_2 yaku_lst) in
@@ -3133,6 +3135,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
 
 (*data scan*)
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst furoritu_lst =
+        Printf.printf "pf\n";
   let (_,n) = syanten tehai in
   let reach_q_1 =  List.exists (fun b -> b = Reach || b = Doublereach) (tapl_player_1 yaku_lst) in
   let reach_q_2 =  List.exists (fun b -> b = Reach || b = Doublereach) (tapl_player_2 yaku_lst) in
