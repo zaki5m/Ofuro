@@ -719,10 +719,8 @@ let target4 yama_len tumo_len a b c d ai bi ci di =
     let tmp2 = 
         let tmp_ac = float_of_int (pure_combination (k1*3) ((a-ai)+l+m1+n1)) in
         let tmp_ac = tmp_ac *. (float_of_int (factorial ((a-ai)+l+m1+n1)) /. float_of_int ((factorial l) * (factorial (a-ai)) * (factorial m1) * (factorial n1))) in
-        let _ = if float_of_int ((factorial l) * (factorial (a-ai)) * (factorial m1) * (factorial n1)) = 0.0 then (Printf.printf "%d %d %d\n" l m1 n1;flush stdout;) else () in 
         let tmp_bc = float_of_int (pure_combination ((k2-k1)*3) (((b-bi)-l)+m2+n2)) in
         let tmp_bc = tmp_bc *.  (float_of_int (factorial ((b-bi-l)+m2+n2)) /. float_of_int ((factorial m2) * (factorial (b-bi-l)) * (factorial n2))) in
-        let _ = if float_of_int ((factorial m2) * (factorial (b-bi-l)) * (factorial n2)) = 0.0 then (Printf.printf "%d %d\n" m2 n2;flush stdout;) else () in
         let tmp_cc = float_of_int (pure_combination ((k3-k2)*3) ((c-ci-m1-m2)+n3)) in
         let tmp_cc = tmp_cc *. (float_of_int (factorial ((c-ci-m1-m2)+n3)) /. float_of_int ((factorial n3) * (factorial ((c-ci-m1-m2))))) in
         let _ = if float_of_int ((factorial n3) * (factorial ((c-ci-m1-m2)))) = 0.0 then (Printf.printf "%d\n" n3;flush stdout;) else () in
@@ -1111,27 +1109,48 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
   let under = under_loop (a+b+c+d+e-1) 1. in
   let loop j k1 k2 k3 k4 l m1 m2 n1 n2 n3 o1 o2 o3 o4 = 
     let tmp2 = 
+      let _ = if ((a-ai)+l+m1+n1+o1) < 0  then (Printf.printf "a%d %d %d\n" l m1 n1;flush stdout;) else () in
+      let _ = if (((b-bi)-l)+m2+n2+o2) < 0  then (Printf.printf "b%d %d %d %d %d %d\n" b bi l m2 n2 o2;flush stdout;) else () in 
+      let _ = if  ((c-ci-m1-m2)+n3+o3) < 0  then (Printf.printf "c%d %d %d\n" m1 m2 n3;flush stdout;) else () in 
+      let _ = if (d-di-n1-n2-n3+o4) < 0  then (Printf.printf "d%d %d %d\n" l m2 n2;flush stdout;) else () in 
+      let _ = if (e-ei-o1-o2-o3-o4)< 0  then (Printf.printf "e%d %d %d\n" l m2 n2;flush stdout;) else () in  
         let tmp_ac = float_of_int (pure_combination (k1*3) ((a-ai)+l+m1+n1+o1)) in
+        let _ = if e = 1 && tmp_ac = 0. then (Printf.printf "a %f\n"tmp_ac; flush stdout;) else () in 
         let tmp_ac = tmp_ac *. (float_of_int (factorial ((a-ai)+l+m1+n1+o1)) /. float_of_int ((factorial l) * (factorial (a-ai)) * (factorial m1) * (factorial n1) * (factorial o1))) in
         let tmp_bc = float_of_int (pure_combination ((k2-k1)*3) (((b-bi)-l)+m2+n2+o2)) in
+        let _ = if e = 1 && tmp_bc = 0. then (Printf.printf "b %f\n"tmp_bc; flush stdout;) else () in 
         let tmp_bc = tmp_bc *.  (float_of_int (factorial ((b-bi-l)+m2+n2+o2)) /. float_of_int ((factorial m2) * (factorial (b-bi-l)) * (factorial n2) * (factorial o2))) in
         let tmp_cc = float_of_int (pure_combination ((k3-k2)*3) ((c-ci-m1-m2)+n3+o3)) in
+        let _ = if e = 1 && tmp_cc = 0. then (Printf.printf "c %f\n"tmp_cc; flush stdout;) else () in 
         let tmp_cc = tmp_cc *. (float_of_int (factorial ((c-ci-m1-m2)+n3+o3)) /. float_of_int ((factorial n3) * (factorial ((c-ci-m1-m2))) * (factorial o3))) in
         let tmp_dc = float_of_int (pure_combination ((k4-k3)*3) ((d-di-n1-n2-n3)+o4)) in
+        let _ = if e = 1 && tmp_dc = 0. then (Printf.printf "d %f\n"tmp_dc; flush stdout;) else () in 
         let tmp_dc = tmp_dc *. (float_of_int (factorial ((d-di-n1-n2-n3)+o4)) /. float_of_int ((factorial (d-di-n1-n2-n3)) * (factorial o4))) in
         let tmp_ec = float_of_int (pure_combination ((j-k4)*3) ((e-ei-o1-o2-o3-o4))) in
+        let _ = if e = 1 && tmp_ec = 0. then (Printf.printf "e %f\n"tmp_ec; flush stdout;) else () in 
         let tmp_oa = over (ai-1) k1 (bi+ci+di+ei) 1. in
+        let _ = if e = 1 && tmp_oa = 0. then (Printf.printf "ao %f\n"tmp_oa; flush stdout;) else () in 
         let tmp_ob = over (bi-1) k2 (ci+di+ei) 1. in
+        let _ = if e = 1 && tmp_ob = 0. then (Printf.printf "bo %f\n"tmp_ob; flush stdout;) else () in 
         let tmp_oc = over (ci-1) k3 (di+ei) 1. in
+        let _ = if e = 1 && tmp_oc = 0. then (Printf.printf "co %f\n"tmp_oc; flush stdout;) else () in 
         let tmp_od = over (di-1) k4 ei 1. in
+        let _ = if e = 1 && tmp_od = 0. then (Printf.printf "do %f\n"tmp_od; flush stdout;) else () in 
         let tmp_oe = over (ei-1) j 0 1. in 
+        let _ = if e = 1 && tmp_oe = 0. then (Printf.printf "eo %f\n"tmp_oe; flush stdout;) else () in 
         let tmp_o2a = float_of_int (over2 a ai 1) in 
         let tmp_o2b = float_of_int (over2 b bi 1) in 
         let tmp_o2c = float_of_int (over2 c ci 1) in 
         let tmp_o2d = float_of_int (over2 d di 1) in 
         let tmp_o2e = float_of_int (over2 e ei 1) in 
+        let _ = if e = 1 && tmp_ac = 0. then (Printf.printf "a %f\n"tmp_ac; flush stdout;) else () in 
+        let _ = if e = 1 && tmp_bc = 0. then (Printf.printf "b %f\n"tmp_bc; flush stdout;) else () in 
+        let _ = if e = 1 && tmp_cc = 0. then (Printf.printf "c %f\n"tmp_cc; flush stdout;) else () in 
+        let _ = if e = 1 && tmp_dc = 0. then (Printf.printf "d %f\n"tmp_dc; flush stdout;) else () in 
+        let _ = if e = 1 && tmp_ec = 0. then (Printf.printf "e %f\n"tmp_ec; flush stdout;) else () in 
         ((tmp_oa *. tmp_ob *. tmp_oc *. tmp_od *. tmp_oe *. tmp_o2a *. tmp_ac *. tmp_o2b *. tmp_bc *. tmp_o2c *. tmp_cc *. tmp_o2d *. tmp_dc *. tmp_o2e *. tmp_ec) /. under) 
     in
+    let _ = if e = 1 && tmp2 = 0. then (Printf.printf "tmp2 %f\n"tmp2; flush stdout;) else () in 
     tmp2
   in 
   let rec loop10 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 o3 o4 tmp = 
@@ -1162,9 +1181,9 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
       if o3 < (e-ei) - (o1+o2)  then
         loop9 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 (o3+1) tmp2
       else
-        tmp 
+        tmp2 
     else
-      tmp
+      tmp2
   in
   let rec loop9_2 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 o3 tmp = 
     let tmp2 = 
@@ -1177,9 +1196,9 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
       if o3 < (e-ei) - (o1+o2)  then
         loop9_2 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 (o3+1) tmp2
       else
-        tmp 
+        tmp2
     else
-      tmp
+      tmp2
   in
   let rec loop9_normal j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 o3 tmp = 
     let tmp2 = 
@@ -1191,7 +1210,7 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
     if o3 < (e-ei) - (o1+o2)  then
       loop9_normal j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 (o3+1) tmp2
     else
-      tmp 
+      tmp2 
   in
   let rec loop8 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 tmp = 
     let tmp2 = loop9 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 0 tmp in
@@ -1199,9 +1218,9 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
       if n3 < (d-di) - (n1+n2)  then
         loop8 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 (n3+1) tmp2
       else
-        tmp 
+        tmp2
     else
-      tmp
+      tmp2
   in
   let rec loop8_2 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 tmp = 
     let tmp2 = loop9_2 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 0 tmp in
@@ -1209,16 +1228,16 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
       if n3 < (d-di) - (n1+n2)  then
         loop8_2 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 (n3+1) tmp2
       else
-        tmp 
+        tmp2 
     else
-      tmp
+      tmp2
   in
   let rec loop8_normal j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 tmp = 
     let tmp2 = loop9_normal j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 n3 0 tmp in
     if n3 < (d-di) - (n1+n2)  then
       loop8_normal j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 (n3+1) tmp2
     else
-      tmp 
+      tmp2 
   in
   let rec loop7 j k1 k2 k3 k4 l m1 n1 o1 m2 n2 o2 tmp = 
     let tmp2 = 
@@ -1290,7 +1309,7 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
     in
     if (m2+n2) < (3-((b-bi)-l)) then 
       if n2 < (d-di) - n1  then
-        loop6 j k1 k2 k3 k4 l m1 n1 m2 o1 (n2+1) tmp2
+        loop6 j k1 k2 k3 k4 l m1 n1 o1 m2 (n2+1) tmp2
       else
         tmp2
     else
@@ -1301,7 +1320,7 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
     in
     if (m2+n2) < (6-((b-bi)-l)) then 
       if n2 < (d-di) - n1  then
-        loop6_2 j k1 k2 k3 k4 l m1 n1 m2 o1 (n2+1) tmp2
+        loop6_2 j k1 k2 k3 k4 l m1 n1 o1 m2 (n2+1) tmp2
       else
         tmp2
     else
@@ -1312,7 +1331,7 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
     in
     if (m2+n2) < (9-((b-bi)-l)) then 
       if n2 < (d-di) - n1  then
-        loop6_3 j k1 k2 k3 k4 l m1 n1 m2 o1 (n2+1) tmp2
+        loop6_3 j k1 k2 k3 k4 l m1 n1 o1 m2 (n2+1) tmp2
       else
         tmp2
     else
@@ -1322,7 +1341,7 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
     let tmp2 = loop7_normal j k1 k2 k3 k4 l m1 n1 o1 m2 n2 0 tmp 
     in
     if n2 < (d-di) - n1  then
-      loop6_normal j k1 k2 k3 k4 l m1 n1 m2 o1 (n2+1) tmp2
+      loop6_normal j k1 k2 k3 k4 l m1 n1 o1 m2 (n2+1) tmp2
     else
       tmp2
   in
@@ -1715,6 +1734,7 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
     create_work tasks;
     let loop_p x = 
       let (j,k1,k2,k3,k4) = x in 
+      let tmp_ex = 
       if k1 = 1 then
         loop1 j k1 k2 k3 k4 0 0.0
       else if k1 = 2 then 
@@ -1725,6 +1745,8 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
         loop1_4 j k1 k2 k3 k4 0 0.0
       else
         loop1_normal j k1 k2 k3 k4 0 0.0
+      in
+      tmp_ex
     in
     let update p r i = p.(i) <- loop_p r.(i) in 
     let pre =  Array.make n 0.0 in 
@@ -1736,7 +1758,7 @@ let target5 yama_len tumo_len a b c d e ai bi ci di ei =
     x
   in
   out_loop_p ()
-    (*out_loop 5 1 2 3 4 0.0*)
+  (*out_loop 5 1 2 3 4 0.0*)
 
 let tenpai_ritu_5 yama_len tumo_len a b c d e =
   let yama_len = yama_len + 14 in
@@ -1795,7 +1817,7 @@ let tenpai_ritu_5 yama_len tumo_len a b c d e =
         if k = 1 then 
           if l = 1 then 
             if m = 1 then 
-              loop2 (i-1) d c d e tmp
+              loop2 (i-1) b c d e tmp
             else
               loop2 i j k l (m-1) tmp  
           else
@@ -2011,7 +2033,7 @@ let syanten5_write_a () =
   let rec loop yama_len = 
     let tumo_len = yama_len / 4 in
     let _ = 
-      if tumo_len < 4 then 
+      if tumo_len < 5 then 
         ()
       else
         (syanten_5_write tumo_len yama_len;
@@ -2284,5 +2306,28 @@ let syanten1_write_a () =
   in
   loop yama_len
 
+
+let self_t_ritu yama_len tumo_len yukou_lst tumo_lst = 
+  let yama_len = float_of_int (yama_len + 14) in 
+  let n = List.length yukou_lst in 
+  let rec loop2 len max_len under top tmp =
+    let tmp = tmp *. top /. under in
+    if len > max_len then 
+      loop2 (len-1) max_len (under-.1.) (top-.1.) tmp
+    else
+      tmp /. (under-.1.)
+  in
+  let rec loop len end_len i yama tmp sum t_lst = match t_lst with
+    | [] -> sum
+    | h::t -> let tumo = List.nth tumo_lst i in 
+              let tmp2 = loop2 len end_len yama (yama -. float_of_int h) 1. in 
+              let tmp2 = tmp *. tmp2 *. (float_of_int tumo) in
+              let tmp3 = if i = n-1 then tmp2 else loop (end_len-1) end_len (i+1) (yama-.(float_of_int (len - end_len))) tmp2 0. t in
+              if end_len > (n-i) then 
+                loop len (end_len-1) i yama tmp (sum +. tmp3) (h::t)
+              else
+                sum +. tmp3
+  in
+  loop tumo_len tumo_len 0 yama_len 1. 0. yukou_lst
 
 let _ = syanten5_write_a ()
