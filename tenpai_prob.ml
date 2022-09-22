@@ -206,7 +206,7 @@ let yukou_to_ritu yama_len tumo_len yukou_lst tumo_lst =
     loop tumo_len (float_of_int (tumo_len - tumo_len_len + 1)) 1. 0. (float_of_int (List.nth yukou_lst 0)) (float_of_int (tumo_len - tumo_len_len + 1)) 0 
 
 let self_t_ritu yama_len tumo_len yukou_lst tumo_lst = 
-  let yama_len = float_of_int (yama_len + 14) in 
+  let yama_len = yama_len +. 14. in 
   let n = List.length yukou_lst in 
   let rec loop2 len max_len under top tmp =
     let tmp = tmp *. top /. under in
@@ -1670,6 +1670,7 @@ let tenpai_ritu (rest_tumo_lst:int list) tumo_l rm_wan =
 *)
 (*new_tumo_lstは最後のツモ牌の残り枚数とその牌で和了した時の点数の組のリスト
    return (和了率＊期待値)*)
+   (*
 let make_agariritu_kitaiti rest_tumo_lst (new_tumo_lst:(int*float)list) tumo_len rm_wan = 
   let m = List.length rest_tumo_lst in 
   let len = 69 - (int_of_float rm_wan) in
@@ -1708,7 +1709,30 @@ let make_agariritu_kitaiti rest_tumo_lst (new_tumo_lst:(int*float)list) tumo_len
     (0.0,0.0)
   else
     loop (0.0,0.0) new_tumo_lst
-
+*)
+let make_agariritu_kitaiti rest_tumo_lst (new_tumo_lst:(int*float)list list) tumo_len rm_wan yukou_lst sum_lst = 
+  let m = List.length rest_tumo_lst in 
+  let rec loop2 (tmp,tmp2) y_lst t_lst = match t_lst with 
+    | [] -> (tmp,tmp2) 
+    | (h1,h2)::t -> 
+      let t_ritu = 
+                self_t_ritu rm_wan tumo_len (rest_tumo_lst@[h1]) y_lst 
+              in
+              let kitaiti = t_ritu *. h2 in 
+              loop2 ((t_ritu+.tmp),(kitaiti+.tmp2)) y_lst t 
+  in
+  let rec loop (tmp,tmp2) i t_lst = match t_lst with 
+    | [] -> (tmp,tmp2) 
+    | h::t -> let sum = List.nth sum_lst i in  
+              let (agariritu,kitaiti) = loop2 (0.,0.) (yukou_lst@[sum]) h in 
+              loop ((agariritu+.tmp),(kitaiti+.tmp2)) (i+1) t 
+  in
+  if m = 0 then 
+    loop (0.0,0.0) 0 new_tumo_lst
+  else if (m+1) > tumo_len then 
+    (0.0,0.0)
+  else
+    loop (0.0,0.0) 0 new_tumo_lst
 (*
 let tenpai_to_kitaiti ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan = 
   let rec loop2 new_rest_tumo_lst ary2 zi_ary2 a_k_lst = match a_k_lst with 
@@ -1762,11 +1786,11 @@ let tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_ls
   let m = Array.length tenpai_lst in
   let tasks = Array.init m (fun i -> i) in 
   create_work tasks;
-  let rec loop2 new_rest_tumo_lst ary2 zi_ary2 a_k_lst = match a_k_lst with 
-    | [] -> new_rest_tumo_lst
+  let rec loop2 new_rest_tumo_lst sum_lst ary2 zi_ary2 a_k_lst = match a_k_lst with 
+    | [] -> (sum_lst,new_rest_tumo_lst)
     | h::t -> 
-      let rec lp1 tmp2 t_lst2 = match t_lst2 with 
-                | [] -> tmp2
+      let rec lp1 tmp2 sum t_lst2 = match t_lst2 with 
+                | [] -> (sum,tmp2)
                 | h1::t1 -> 
                             let ((x,y),z) = h1 in 
                             let n = 
@@ -1776,21 +1800,22 @@ let tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_ls
                                 ary2.(x).(y)
                             in
                             if n <= 0 then 
-                              lp1 tmp2 t1
+                              lp1 tmp2 sum t1
                             else 
-                              lp1 ((n,z)::tmp2) t1
+                              lp1 ((n,z)::tmp2) (sum+n) t1
               in
-              loop2 ((lp1 [] h)@new_rest_tumo_lst) ary2 zi_ary2 t
+              let (sum,tmp2) = lp1 [] 0 h in 
+              loop2 (tmp2::new_rest_tumo_lst) (sum::sum_lst) ary2 zi_ary2 t
   in
   let rec loop tmp t_lst = match t_lst with 
     | [] -> tmp 
     | (k_lst,tumo_lst,rest_tumo_lst,k_ritu,yukou_lst,current_tehai,t_ritu)::t -> let (ary2,zi_ary2) = ary_opt ary zi_ary tumo_lst in
                                                                 let current_tehai = ripai current_tehai in
                                                                 let (i,a_k_lst) = tenpai_to_opt_p current_tehai f_lst zi_kaze ba_kaze naki [] dora_lst in
-                                                                let lst = loop2 [] ary2 zi_ary2 a_k_lst in
+                                                                let (sum_lst,lst) = loop2 [] [] ary2 zi_ary2 a_k_lst in
                                                                 let k_ritu = k_ritu *. (1. /. (float_of_int i)) in 
                                                                 (*let (agariritu,kitaiti) = make_agariritu_kitaiti rest_tumo_lst lst tumo_l rm_wan in*)
-                                                                let (agariritu,kitaiti) = make_agariritu_kitaiti rest_tumo_lst lst tumo_l rm_wan yukou_lst in
+                                                                let (agariritu,kitaiti) = make_agariritu_kitaiti rest_tumo_lst lst tumo_l rm_wan yukou_lst sum_lst in
                                                                 loop ((k_lst,t_ritu,agariritu*.k_ritu,kitaiti*.k_ritu)::tmp) t 
   in
   let update p r i = p.(i) <- loop [] r.(i) in 
@@ -2284,7 +2309,7 @@ let kuikae_check kuikae_lst n rm_wan tumo_l tenpai_lst_ary =
                                                               if t_ritu <= 0.0 then 
                                                                 tmp
                                                               else
-                                                                (k_lst,tumo_lst,rest_tumo_lst,k_ritu,current_tehai,t_ritu)::tmp 
+                                                                (k_lst,tumo_lst,rest_tumo_lst,k_ritu,yukou_lst,current_tehai,t_ritu)::tmp 
                                                         in
                                                         loop tmp t
   in
