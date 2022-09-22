@@ -1,4 +1,4 @@
-open Domainslib
+(*open Domainslib
 
 module C = Domainslib.Chan
 
@@ -23,7 +23,7 @@ let rec worker f () =
       f a;
       worker f ()
   | Quit -> ()
-
+*)
 let syanten_4 tumo_len yama_len = 
   Printf.printf "%d %d "tumo_len yama_len;
   let rec loop a b c d = 
@@ -300,9 +300,9 @@ let factorial n =
     1
   else
     (loop n 1)
-
+(*
 (*iは最後に積もる時に残っているtargetの牌の枚数*)
-let target1 yama_len tumo_len a i = 
+let target1 yama_len tumo_len a i yukouhai = 
   let rec under_loop j tmp = 
     let tmp = tmp *. (float_of_int (yama_len-j)) in 
     if j = 0 then 
@@ -336,29 +336,166 @@ let target1 yama_len tumo_len a i =
       loop (j+1) tmp
   in
   loop 1 0.0
+*)
 
-let tenpai_ritu_1 yama_len tumo_len a = 
-  let yama_len = yama_len + 14 in 
-  let rec muda_tumo n_yama_len tmp target = 
-    let tmp = tmp *. ((float_of_int (yama_len - a)) /. (float_of_int n_yama_len)) in 
-    if n_yama_len = target then 
+let yukouhai_tumo_lst_diff yukou_lst = 
+  let rec loop2 tmp lst t_lst = match t_lst with 
+    | [] -> tmp
+    | (h,n)::t -> let tmp = 
+                    if List.exists (fun (a,_) -> a = h) lst then 
+                      n::tmp
+                    else
+                      tmp
+                  in
+                  loop2 tmp lst t
+  in
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | h::[] -> tmp
+    | h::x::t -> let tmp = (loop2 [] h x)::tmp in
+                 loop tmp t
+  in
+  loop [] yukou_lst
+let target1 yama_len tumo_len a i = 
+  let rec under_loop j tmp = 
+    let tmp = tmp *. (float_of_int (yama_len-j)) in 
+    if j = 0 then 
       tmp
     else
-      muda_tumo (n_yama_len - 1) tmp target
+      under_loop (j-1) tmp
+  in 
+  let rec over j target tmp = 
+    if j = 0 then 
+      tmp
+    else
+      over (j-1) target (tmp*((yama_len+1)-(target*4)-j))
   in
+  (*x:a,y:i*)
+  let rec over2 x y tmp = 
+    let tmp = y * tmp in 
+    if x = y then 
+      tmp
+    else
+      over2 x (y+1) tmp
+  in
+  let under = under_loop (a-1) 1. in
+  let loop j k tmp = 
+    let tmp_c = float_of_int (pure_combination (j*3) (a-k)) in 
+    let tmp_o = float_of_int (over (k-1) j 1) in 
+    let tmp_o2 = float_of_int (over2 a k 1) in 
+    let tmp = ((tmp_o *. tmp_o2 *. tmp_c) /. under) +. tmp in 
+    tmp
+  in
+  if tumo_len * 3 < (a-i) then 
+    loop tumo_len (tumo_len*3) 0.
+  else
+    loop tumo_len i 0.0
+
+let ave_calc ave ai ai2 new_yukou_sum = 
   let rec loop i tmp = match i with 
-   | -1 -> tmp
-   | _ -> let n_yama_len = yama_len - i * 4 in 
-          let tmp2 = muda_tumo yama_len 1.0 n_yama_len in 
-          let tmp = tmp +. (tmp2 *. (float_of_int a) /. (float_of_int n_yama_len)) in 
-          loop (i-1) tmp
+    | 0 -> tmp
+    | _ -> let x = Float.pow (float_of_int new_yukou_sum /. float_of_int ai) (float_of_int i) in
+           let x = x *. (combination ave i) in
+           let tmp = if x > 1.0 then tmp +. 1. else tmp +. x in 
+           loop (i-1) tmp
   in
-  let rec loop2 i tmp = match i with 
+  ai2 - (int_of_float (loop ave 0.))
+
+let tenpai_ritu_1 yama_len tumo_len tumo_lst yukou_lst = 
+  let yama_len = yama_len + 14 in 
+  let n = List.length tumo_lst in
+  let new_yukou_lst = yukouhai_tumo_lst_diff yukou_lst in 
+  let first_ai = List.fold_right (fun (_,a) b -> a+b) (List.nth yukou_lst 0) 0 in
+  let rec loop2 len a ai tumo_hai th (ave,tmp) = match ai with 
+    | 0 -> (ave,tmp) 
+    | _ ->  if th > ai then 
+              loop2 len a (ai-1) tumo_hai th (ave,tmp)
+            else
+              let tmp2 = target1 yama_len tumo_len a ai in 
+              let tmp2 = (float_of_int ai *.  (float_of_int tumo_hai /. float_of_int a)) *. tmp2 in 
+              let ave2 = if len * 3 < (a-ai) then len*3 else (a-ai) in 
+              loop2 len a (ai-1) tumo_hai th ((ave+ave2),(tmp+.tmp2))
+  in
+  let rec loop len i next n_tmp tmp = match len with 
     | 0 -> tmp 
-    | _ ->  let tmp2 = target1 yama_len tumo_len a i in 
-            loop2 (i-1) (tmp+.tmp2)
+    | _ ->  if n - i > len then 
+              loop (len-1) i next n_tmp 1.
+            else
+              let tumo_hai = List.nth tumo_lst i in 
+              let ai2 = if (i+1) = List.length yukou_lst then 0 else List.fold_right (fun (_,a) b -> a+b) (List.nth yukou_lst (i+1)) 0 in
+              let new_yukou_sum = if (i+1) >= List.length new_yukou_lst then 0 else List.fold_right (fun a b -> a+b) (List.nth new_yukou_lst i) 0 in  
+              let (ave,x) = loop2 len next next tumo_hai (n-i) (0,0.) in
+              let ave = ave / (next-(n-i-1)) in 
+              let ave = ave_calc ave next ai2 new_yukou_sum in (*次の有効牌の枚数*)
+              let tmp2 = if i = (n-1) then 
+                            (tmp*.x)
+                        else
+                          loop (len-1) (i+1) ave 0. (tmp*.x) 
+              in
+              loop (len-1) i next (n_tmp +. tmp2) 1.
+          in
+  loop tumo_len 0 first_ai 0. 1.
+
+
+
+
+
+
+let yukou_to_ritu yama_len tumo_len yukou_lst tumo_lst = 
+  let yama_len = yama_len + 14 in 
+  let tumo_len_len = List.length tumo_lst in
+  let rec make_lst tmp i =
+    if i <= 14 then 
+      tmp
+    else
+      make_lst (i::tmp) (i-4)
   in
-  loop2 a 0.0
+  let lst = make_lst [] (yama_len+1) in
+  let lst_len =  List.length lst in 
+  let rec make_x n tmp yama i = match i with 
+    | 0 -> tmp
+    | _ ->  let tmp = tmp +. (n /. float_of_int (yama-i)) in
+            make_x n tmp yama (i-1)
+  in
+  let rec loop len max_i tmp tmp2 x i j = match len with 
+    | 0 ->  tmp
+    | _ ->  let n = List.nth yukou_lst j in 
+            let yama = List.nth lst (lst_len-len) in 
+            let yama2 = List.nth lst (lst_len-len-1) in 
+            let x = x -. ((i /. max_i) *. (make_x (float_of_int n) 0. yama (int_of_float max_i))) in 
+            let tmp = ((i-.1.)/.max_i)*.(x /. (float_of_int yama2)) *.tmp in
+            let tmp2 = 
+              if  (lst_len-len-1) < 0 then 
+                tmp+.tmp2
+              else if j = (List.length yukou_lst) - 1 then 
+                tmp+.tmp2
+              else
+                let y = (List.nth yukou_lst (j+1)) in 
+                let y = (float_of_int y) -. (((float_of_int n) -. x) *. (float_of_int y) /.(float_of_int n)) in
+                tmp2 +. (loop (len-1) i tmp 0. y i (j+1))
+            in
+            if (i-.2.) <= 0. then 
+              loop 0 max_i tmp tmp2 x (i-.1.) j
+            else
+              loop (len-1) max_i tmp tmp2 x (i-.1.) j
+  in
+  loop tumo_len (float_of_int (tumo_len - tumo_len_len + 1)) 1. 0. (float_of_int (List.nth yukou_lst 0)) (float_of_int (tumo_len - tumo_len_len + 1)) 0
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
 
 
 
@@ -1084,7 +1221,7 @@ let tenpai_ritu_4 yama_len tumo_len a b c d =
   in
   loop2 a b c d 0.0
 
-
+(*
 let target5 yama_len tumo_len a b c d e ai bi ci di ei = 
   let rec under_loop j tmp = 
     let tmp = tmp *. (float_of_int (yama_len-j)) in 
@@ -2027,7 +2164,7 @@ let syanten5_write_a () =
         loop (yama_len - 1)
   in
   loop yama_len
-
+*)
 let syanten_4_write tumo_len yama_len = 
   Printf.printf "[|[|[|[|"; 
   let rec loop a b c d = 
@@ -2252,7 +2389,7 @@ let syanten2_write_a () =
   in
   loop yama_len
 
-
+(*
 let syanten_1_write tumo_len yama_len = 
   Printf.printf "[|";
   let rec loop d= 
@@ -2264,7 +2401,8 @@ let syanten_1_write tumo_len yama_len =
       loop (d-1))     
   in
   loop 4 
-
+*)
+(*
 let syanten1_write_a () = 
   let yama_len = 69 in 
   Printf.printf "[|"; flush stdout;
@@ -2283,6 +2421,6 @@ let syanten1_write_a () =
       loop (yama_len - 1)
   in
   loop yama_len
+*)
 
-
-let _ = syanten5_write_a ()
+let _ =  tenpai_ritu_1 16 4 [1] [[((2,1),4)]]
