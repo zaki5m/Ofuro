@@ -34,6 +34,9 @@ let rec worker f () =
 
 let myhash = Hashtbl.create 12345
 
+
+
+
 let hash_number_manzu x = match x with 
   | 1 -> 1
   | 2 -> 4
@@ -308,9 +311,9 @@ let max_kitaiti_p_f lst =
   in
   loop ((1,Not_hai),(0.0,0.0)) lst
 
-let tenpai_to_opt_agariritu_kitaiti lst tumo_l rm_wan = 
+let tenpai_to_opt_agariritu_kitaiti lst sum_lst tumo_l rm_wan = 
   let len = 69 - (int_of_float rm_wan) in 
-  let rec loop tmp t_lst = match t_lst with 
+  let rec loop tmp j t_lst = match t_lst with 
     | [] -> tmp
     | (i,t_lst2)::t -> let rec loop2 (agariritu,kitaiti) t_lst22 = match t_lst22 with 
                         | [] -> (agariritu,kitaiti)
@@ -319,20 +322,21 @@ let tenpai_to_opt_agariritu_kitaiti lst tumo_l rm_wan =
                                                     else if tumo_l = 0 then 
                                                       0.0
                                                     else
-                                                      syanten_1_ary.(len).(4-n) 
+                                                      (*syanten_1_ary.(len).(4-n) *)
+                                                      self_t_ritu rm_wan tumo_l [(List.nth sum_lst j)] [n]
                                                     in
                                        let k_ritu = a_ritu *. z in
                                        loop2 ((agariritu+.a_ritu),(k_ritu+.kitaiti)) t2 
                         in
-                        loop ((i,(loop2 (0.0,0.0) t_lst2))::tmp) t
+                        loop ((i,(loop2 (0.0,0.0) t_lst2))::tmp) (j+1) t
   in
-  let n_lst = loop [] lst in 
+  let n_lst = loop [] 0 lst in 
   max_kitaiti_p n_lst
 
-let tenpai_to_opt_agariritu_kitaiti_f lst patern tumo_l rm_wan = 
+let tenpai_to_opt_agariritu_kitaiti_f lst sum_lst patern tumo_l rm_wan = 
   let len = 69 - (int_of_float rm_wan) in 
   let patern = float_of_int patern in 
-  let rec loop tmp t_lst = match t_lst with 
+  let rec loop tmp j t_lst = match t_lst with 
     | [] -> tmp
     | (i,t_lst2)::t -> let rec loop2 (agariritu,kitaiti) t_lst22 = match t_lst22 with 
                         | [] -> (agariritu,kitaiti)
@@ -341,15 +345,16 @@ let tenpai_to_opt_agariritu_kitaiti_f lst patern tumo_l rm_wan =
                                                     else if tumo_l = 0 then 
                                                       0.0
                                                     else
-                                                      syanten_1_ary.(len).(4-n) 
+                                                      (*syanten_1_ary.(len).(4-n)*)
+                                                      self_t_ritu rm_wan tumo_l [(List.nth sum_lst j)] [n]
                                                     in
                                        let a_ritu = (1. /. patern) *. a_ritu in 
                                        let k_ritu = a_ritu *. z in
                                        loop2 ((agariritu+.a_ritu),(k_ritu+.kitaiti)) t2 
                         in
-                        loop ((i,(loop2 (0.0,0.0) t_lst2))::tmp) t
+                        loop ((i,(loop2 (0.0,0.0) t_lst2))::tmp) (j+1) t
   in
-  let n_lst = loop [] lst in 
+  let n_lst = loop [] 0 lst in 
   max_kitaiti_p_f n_lst
 
 
@@ -372,10 +377,10 @@ let tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_l
                 in
                 loop tmp (h::double_lst) (i+1) t
   in
-  let rec loop2 tmp t_lst = match t_lst with
-    | [] -> tmp
-    | (i,t_lst)::t -> let rec loop3 tmp2 t_lst = match t_lst with
-                      | [] -> tmp2
+  let rec loop2 tmp sum_lst t_lst = match t_lst with
+    | [] -> (sum_lst,tmp)
+    | (i,t_lst)::t -> let rec loop3 tmp2 sum t_lst = match t_lst with
+                      | [] -> (sum,tmp2)
                       | ((x,y),z)::t2 -> 
                                         let n = 
                                           if x = 3 then
@@ -383,13 +388,14 @@ let tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_l
                                           else 
                                             ary.(x).(y)
                                         in
-                                        loop3 ((n,z)::tmp2) t2
+                                        loop3 ((n,z)::tmp2) (sum+n) t2
                       in
-                      let tmp2 = loop3 [] t_lst in 
-                      loop2 ((i,tmp2)::tmp) t
+                      let (sum,tmp2) = loop3 [] 0 t_lst in 
+                      loop2 ((i,tmp2)::tmp) (sum::sum_lst) t
   in 
   let tmp = loop [] [] 0 tehai in
-  tenpai_to_opt_agariritu_kitaiti (loop2 [] tmp) tumo_l rm_wan
+  let (sum,tmp) = loop2 [] [] tmp in 
+  tenpai_to_opt_agariritu_kitaiti tmp sum tumo_l rm_wan
   
   
 (*
@@ -544,6 +550,52 @@ let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora
                 in
                 loop tmp (h::double_lst) i t
   in
+  let rec loop2 tmp sum_lst t_lst = match t_lst with
+    | [] -> (sum_lst,tmp)
+    | (i,t_lst)::t -> let rec loop3 tmp2 sum t_lst = match t_lst with
+                      | [] -> (sum,tmp2)
+                      | ((x,y),z)::t2 -> 
+                                        let n = 
+                                          if x = 3 then
+                                            zi_ary.(y)
+                                          else 
+                                            ary.(x).(y)
+                                        in
+                                        loop3 ((n,z)::tmp2) (sum+n) t2
+                      in
+                      let (sum,tmp2) = loop3 [] 0 t_lst in 
+                      loop2 ((i,tmp2)::tmp) (sum::sum_lst) t
+  in 
+  let (i,tmp) = loop [] [] 0 tehai in
+  let (sum,tmp) = loop2 [] [] tmp in
+  tenpai_to_opt_agariritu_kitaiti_f tmp sum i tumo_l rm_wan 
+(*
+let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary kuikae_lst = 
+  let rec loop tmp double_lst i t_lst = match t_lst with 
+    | [] -> (i,tmp)
+    | h::t -> if List.exists (fun a -> a = h) double_lst then 
+                loop tmp double_lst i t
+              else
+                let lst = d_tehai tehai h in
+                let (_,n) = syanten lst in
+                let tmp = 
+                  if List.exists (fun a -> a = h) kuikae_lst then 
+                    tmp
+                  else if n = 0 then
+                    (h,(tenpai_kitaiti_pp lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst))::tmp
+                  else
+                    tmp
+                in
+                let i = 
+                  if List.exists (fun a -> a = h) kuikae_lst then 
+                    i
+                  else if n = 0 then
+                    i+1
+                  else
+                    i
+                in
+                loop tmp (h::double_lst) i t
+  in
   let rec loop2 tmp t_lst = match t_lst with
     | [] -> tmp
     | (i,t_lst)::t -> let rec loop3 tmp2 t_lst = match t_lst with
@@ -562,7 +614,7 @@ let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora
   in 
   let (i,tmp) = loop [] [] 0 tehai in
   tenpai_to_opt_agariritu_kitaiti_f (loop2 [] tmp) i tumo_l rm_wan  
-
+*)
 (*
 let tenpai_to_opt_f tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary kuikae_lst = 
   let rec loop tmp double_lst t_lst = match t_lst with 
@@ -973,6 +1025,8 @@ let hash_serch tehai =
   in
   let tmp = loop lst in 
   tmp
+
+
 
 
 let operate_tenpai_ritu_parallel tenpai_lst = 
@@ -1647,8 +1701,8 @@ let tenpai_ritu (rest_tumo_lst:int list) tumo_l rm_wan =
         0.0
     in
     t_ritu
-*)
 
+*)
 (*
 let tenpai_ritu (rest_tumo_lst:int list) tumo_l rm_wan = 
   let rm_wan = rm_wan +. 14. in (*cosion*)
@@ -1721,7 +1775,7 @@ let make_agariritu_kitaiti rest_tumo_lst (new_tumo_lst:(int*float)list list) tum
     | [] -> (tmp,tmp2) 
     | (h1,h2)::t -> 
       let t_ritu = 
-                self_t_ritu rm_wan tumo_len (rest_tumo_lst@[h1]) y_lst 
+                self_t_ritu rm_wan tumo_len y_lst (rest_tumo_lst@[h1]) 
               in
               let kitaiti = t_ritu *. h2 in 
               loop2 ((t_ritu+.tmp),(kitaiti+.tmp2)) y_lst t 
