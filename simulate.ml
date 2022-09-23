@@ -336,10 +336,11 @@ let simulate count (uma1,uma2) furoritu_lst =
   loop (count-1) (0,0,0,0) 0 [(0,0,0,0);(0,0,0,0);(0,0,0,0);(0,0,0,0)]
 
 
-let simulate_kyoku count (uma1,uma2) furoritu_lst =
+let simulate_kyoku count furoritu_lst =
   let player_score = (25000,25000,25000,25000) in
   let rec loop i (tmp1,tmp2,tmp3,tmp4) zyuni_lst = 
     let (_,(a,b,c,d),player_score) = kyoku_s 0 1 0 0 player_score furoritu_lst 0 in
+    flush stdout;
     let a = a - 25000 in
     let b = b - 25000 in
     let c = c - 25000 in
@@ -369,5 +370,6 @@ let simulate_kyoku count (uma1,uma2) furoritu_lst =
   in
   loop (count-1) (0,0,0,0) [(0,0,0,0);(0,0,0,0);(0,0,0,0);(0,0,0,0)]
 
-let _ = simulate 250 (10000,30000) [10.0;35.0;35.0;10.0] 
+(*let _ = simulate 250 (10000,30000) [10.0;35.0;35.0;10.0] *)
+let _ = simulate_kyoku 5 [25.;25.;25.;25.]
 

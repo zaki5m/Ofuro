@@ -703,6 +703,36 @@ let create_table sutehai_lst tehai =
   let _ = loop3 tehai in
   (ary,zi_ary)
 
+let count_yukouhai ary zi_ary (x,y) = 
+  if x = 3 then 
+    zi_ary.(y)
+  else
+    let n1 = ary.(x).(y) in 
+    if y = 0 then 
+      let n2 = ary.(x).(y+1) in 
+      let n3 = ary.(x).(y+2) in 
+      n1+n2+n3
+    else if y = 1 then 
+      let n2 = ary.(x).(y+1) in 
+      let n3 = ary.(x).(y+2) in 
+      let n4 = ary.(x).(y-1) in 
+      n1+n2+n3+n4
+    else if y = 7 then 
+      let n2 = ary.(x).(y-1) in 
+      let n3 = ary.(x).(y-2) in 
+      let n4 = ary.(x).(y+1) in 
+      n1+n2+n3+n4
+    else if y = 8 then 
+      let n2 = ary.(x).(y-1) in 
+      let n3 = ary.(x).(y-2) in 
+      n1+n2+n3
+    else
+      let n2 = ary.(x).(y-1) in 
+      let n3 = ary.(x).(y-2) in 
+      let n4 = ary.(x).(y+1) in 
+      let n5 = ary.(x).(y+2) in 
+      n1+n2+n3+n4+n5
+
 
 (*
 let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst = 

@@ -228,13 +228,16 @@ let self_t_ritu yama_len tumo_len yukou_lst tumo_lst =
                           Option.get result
               in 
               let tmp2 = tmp *. tmp2 *. (float_of_int tumo) in
-              let tmp3 = if i = n-1 then tmp2 else loop (end_len-1) end_len (i+1) (yama-.(float_of_int (len - end_len))) tmp2 0. t in
+              let tmp3 = if i = n-1 then tmp2 else loop (end_len-1) (end_len-1) (i+1) (yama-.(float_of_int (len - end_len+1))*.4.) tmp2 0. t in
               if end_len > (n-i) then 
                 loop len (end_len-1) i yama tmp (sum +. tmp3) (h::t)
               else
                 sum +. tmp3
   in
-  loop tumo_len tumo_len 0 yama_len 1. 0. yukou_lst
+  if tumo_len < n then
+    0. 
+  else
+    loop tumo_len tumo_len 0 yama_len 1. 0. yukou_lst
 
 (*ary,zi_aryは残り枚数のテーブル。　返り値(kitaiti,agariritu) 0th: reach無し 1th:reachあり*)
 let tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary tumo_l rm_wan =
@@ -2041,7 +2044,7 @@ let minus_kitaiti_p lst =
     | (k_lst,t_ritu,agariritu,kitaiti,anzendo)::t -> let minus_kitaiti = sum -. kitaiti in 
                                                      (*Printf.printf "sum :%f anzendo: %d\n" sum anzendo; *)
                                                      let anzendo_f = float_of_int anzendo in 
-                                                     let total_kitaiti = kitaiti -. 0.1 *.(minus_kitaiti -.anzendo_f*.10000.0) in
+                                                     let total_kitaiti = kitaiti -.  anzendo_f*.100.0 in
                                                      loop2 ((k_lst,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti)::tmp) t 
   in
   loop2 [] lst
@@ -2362,7 +2365,7 @@ let kuikae_check kuikae_lst n rm_wan tumo_l tenpai_lst_ary =
                                                             else
                                                               (*let t_ritu = tenpai_ritu rest_tumo_lst tumo_l rm_wan in*)
                                                               let t_ritu = self_t_ritu rm_wan tumo_l yukou_lst rest_tumo_lst in 
-                                                              let k_ritu = calc_k_ritu_naki k_count in 
+                                                              let k_ritu = calc_k_ritu_not_naki k_count in 
                                                               (*let k_ritu = k_ritu *. (yukou_to_ritu (int_of_float rm_wan) tumo_l yukou_lst rest_tumo_lst) in*)
                                                               let t_ritu = t_ritu *. k_ritu in 
                                                               if t_ritu <= 0.0 then 
@@ -2526,6 +2529,28 @@ let mode_common_b ary zi_ary sutehai_lst tehai player =
     let ((x,y),_) = max_anzen n_tehai in
     (x,y)
 
+let mode_attack_common_b ary zi_ary sutehai_lst tehai player = 
+  let (_,n) = syanten tehai in
+  let rec loop (count,tmp) t_lst = match t_lst with 
+    | [] -> tmp
+    | (x,y)::t -> let new_tehai = d_tehai tehai (x,y) in 
+                  let (_,n') = syanten new_tehai in
+                  if n = n' then 
+                    let new_count = count_yukouhai ary zi_ary (hai_to_ary (x,y)) in 
+                    if new_count < count then 
+                      loop (new_count,(x,y)) t
+                    else
+                      loop (count,tmp) t
+                  else
+                    loop (count,tmp) t
+  in
+  let trush = loop (30,(1,Not_hai)) tehai in           
+  if trush <> (1,Not_hai) then
+    trush
+  else
+    mode_common_b ary zi_ary sutehai_lst tehai player
+
+
 
 let common_b ary zi_ary tehai sutehai_lst tumo_len (f_lst:(state*(int*(int*int*int)))list) player = 
   let (_,n) = syanten tehai in
@@ -2534,14 +2559,24 @@ let common_b ary zi_ary tehai sutehai_lst tumo_len (f_lst:(state*(int*(int*int*i
     let (s_hai,s_count) = somete tehai f_lst in
     let (t_lst,t_count) = titoi_allow tehai f_lst in
     let mode = 
-      if kind_k >= 9 then
-        Kokushi
-      else if s_count >= 9 then
-        Some
-      else if t_count >= 3 then
-        Titoi
+      if tumo_len > 15 then 
+          if kind_k >= 9 then
+            Kokushi
+          else if s_count >= 9 then
+            Some
+          else if t_count >= 4 then
+            Titoi
+          else
+            Attack_common_b    
       else
-        CommonB
+          if kind_k >= 9 then
+            Kokushi
+          else if s_count >= 9 then
+            Some
+          else if t_count >= 3 then
+            Titoi
+          else
+            CommonB
     in
     let k_hai = 
       if mode = Kokushi then
@@ -2550,6 +2585,8 @@ let common_b ary zi_ary tehai sutehai_lst tumo_len (f_lst:(state*(int*(int*int*i
         mode_somete ary zi_ary tehai s_hai
       else if mode = Titoi then
         mode_titoi ary zi_ary t_lst tehai
+      else if mode = Attack_common_b then
+        mode_attack_common_b ary zi_ary sutehai_lst tehai player
       else
         mode_common_b ary zi_ary sutehai_lst tehai player
     in
@@ -2701,7 +2738,7 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
 (*(agariritu,kitaiti),furohai*)
 let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst =
   let n = List.length tehai in
-  let rm_wan = (yama_len-14) in
+  let rm_wan = ((yama_len-14)-3) in
   let tumo_l = rm_wan/4 in
   let rm_wan = Int.to_float rm_wan in
   let rec loop tmp t_lst = match t_lst with

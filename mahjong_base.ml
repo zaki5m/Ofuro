@@ -6,7 +6,7 @@ type yaku = Reach | Ippatu | Menzentumo | Yakuhai | Tanyao | Pinhu | Ipeiko | Ha
             | Doublereach | Sansyokudouzyun | Sansyokudoukou | Sanankou | Ikkitukan | Titoitu | Toitoi | Tyanta | Sankantu | Syousangen
             | Honroutou | Ryanpeikou | Zyuntyan | Honitu | Tinitu | Suankou | Daisangen | Kokusimusou | Ryuiso | Tuiso | Tinroutou
             | Sukantu | Syoususi | Daisusi | Tyurenpoutou | Tihou | Tenhou
-type mode_b = Kokushi | Some | Titoi | CommonB
+type mode_b = Kokushi | Some | Titoi | CommonB | Attack_common_b
 
 
 let rename (m, n) = match n with

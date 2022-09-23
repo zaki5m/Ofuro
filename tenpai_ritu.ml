@@ -2483,13 +2483,13 @@ let print_t_ritu () =
     let t_ritu = if under <= top || under <= 15. then 0. else loop2 len end_len under (under -. top) 1. in 
       if end_len < 1 then 
         if under = (float_of_int len*.4.+.17.) -. 30. then
-          if top = 30. then 
+          if top = 70. then 
             Printf.printf "%F|]|]|]" t_ritu
           else 
             (Printf.printf "%F;" t_ritu;
             loop len over end_len under (top+.1.))
         else
-          if top = 30. then 
+          if top = 70. then 
             (Printf.printf "%F|];\n[|" t_ritu;
             loop len over end_len (under-.1.) 1.)
           else 
@@ -2497,14 +2497,14 @@ let print_t_ritu () =
             loop len over end_len under (top+.1.))
       else
         if under = (float_of_int len*.4.+.17.) -. 30. then
-          if top = 30. then 
+          if top = 70. then 
             (Printf.printf "%F|]|];\n[|[|" t_ritu;
             loop len over (end_len-1) (float_of_int len*.4.+.17.) 1.)
           else 
             (Printf.printf "%F;" t_ritu;
             loop len over end_len under (top+.1.))
         else
-          if top = 30. then 
+          if top = 70. then 
             (Printf.printf "%F|];\n[|" t_ritu;
             loop len over end_len (under-.1.) 1.)
           else 
