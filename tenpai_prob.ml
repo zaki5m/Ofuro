@@ -4,7 +4,7 @@ open Domainslib
 open Mahjong_haieff
 open Mahjong_safty
 open M_gragh
-open Syanten_ary
+open Tenpai_ary
 
 module C = Domainslib.Chan
 
@@ -218,7 +218,12 @@ let self_t_ritu yama_len tumo_len yukou_lst tumo_lst =
   let rec loop len end_len i yama tmp sum t_lst = match t_lst with
     | [] -> sum
     | h::t -> let tumo = List.nth tumo_lst i in 
-              let tmp2 = loop2 len end_len yama (yama -. float_of_int h) 1. in 
+              let result = Tenpai_ary.serch len end_len yama h in
+              let tmp2 = if result = None then 
+                          loop2 len end_len yama (yama -. float_of_int h) 1. 
+                        else
+                          Option.get result
+              in 
               let tmp2 = tmp *. tmp2 *. (float_of_int tumo) in
               let tmp3 = if i = n-1 then tmp2 else loop (end_len-1) end_len (i+1) (yama-.(float_of_int (len - end_len))) tmp2 0. t in
               if end_len > (n-i) then 
@@ -1612,7 +1617,7 @@ let tenpai_ritu rest_tumo_lst tumo_l rm_wan =
   loop 0 1.0 rest_tumo_lst
 *)
 
-
+(*
 let tenpai_ritu (rest_tumo_lst:int list) tumo_l rm_wan = 
   let m = List.length rest_tumo_lst in 
   let len = 69 - (int_of_float rm_wan) in 
@@ -1642,7 +1647,7 @@ let tenpai_ritu (rest_tumo_lst:int list) tumo_l rm_wan =
         0.0
     in
     t_ritu
-
+*)
 
 (*
 let tenpai_ritu (rest_tumo_lst:int list) tumo_l rm_wan = 
