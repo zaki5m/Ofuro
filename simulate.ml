@@ -364,7 +364,8 @@ let simulate_kyoku count furoritu_lst =
       let (s1,s2,s3,s4) = List.nth zyuni_lst 2 in  
       Printf.printf "C: %d %d %d %d \n" s1 s2 s3 s4;
       let (s1,s2,s3,s4) = List.nth zyuni_lst 3 in  
-      Printf.printf "D: %d %d %d %d \n" s1 s2 s3 s4;*))
+      Printf.printf "D: %d %d %d %d \n" s1 s2 s3 s4;*)
+      Printf.printf "finish\n";)
     else
       loop (i-1) (tmp1,tmp2,tmp3,tmp4) zyuni_lst
   in
