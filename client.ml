@@ -216,8 +216,7 @@ let client_fun ic oc =
   try
     let rec loop tehai tehai_s sutehai_lst id ba_kaze kyoku honba kyotaku furo_lst yaku_lst dora_lst naki furoritu furo_double_lst = 
       Printf.printf "flush\n"; flush Stdlib.stdout;
-      let rec r () = try input_line ic  with | End_of_file -> r() in 
-      let r = r () in 
+      let r = input_line ic in 
       let json = Yojson.Basic.from_string r in
       let first = json |> member "type" |> to_string in
       let id = if first = "start_game" then json |> member "id" |> to_int else id in 
