@@ -2,7 +2,8 @@
   (name mahjong_admin)
   (libraries domainslib)
 )
+
 (env
- (dev
-   (flags (:standard -warn-error -a)))
+  (dev
+    (flags (:standard -warn-error -a)))
 )

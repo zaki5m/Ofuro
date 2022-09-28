@@ -344,12 +344,12 @@ let print_furo lst x =
 let print_info ba kyoku honba kyotaku player_score yaku_lst dora_lst = 
   let _ = 
     if ba = 0 then
-      (Printf.printf "東%d局 %d本場 供託:%d A:%d B:%d C:%d D:%d\n" kyoku honba kyotaku (List.nth player_score 0) (List.nth player_score 1) (List.nth player_score 2) (List.nth player_score 3);)
+      (Printf.printf "東%d局 %d本場 供託:%d A:%d B:%d C:%d D:%d\n" kyoku honba kyotaku (tapl_player_1 player_score) (tapl_player_2 player_score) (tapl_player_3 player_score) (tapl_player_4 player_score);)
     else
-      Printf.printf "南%d局 %d本場 供託:%d A:%d B:%d C:%d D:%d\n" kyoku honba kyotaku (List.nth player_score 0) (List.nth player_score 1) (List.nth player_score 2) (List.nth player_score 3);
+      Printf.printf "南%d局 %d本場 供託:%d A:%d B:%d C:%d D:%d\n" kyoku honba kyotaku (tapl_player_1 player_score) (tapl_player_2 player_score) (tapl_player_3 player_score) (tapl_player_4 player_score);
   in
   let rec loop i = 
-    let n = List.nth yaku_lst i in
+    let n = tapl_player yaku_lst i in
     let _ = 
       if List.exists (fun a -> a = Reach) n then
         if i = 0 then
@@ -391,11 +391,17 @@ let print_info ba kyoku honba kyotaku player_score yaku_lst dora_lst =
   loop3 0;
   loop 0
 
+let tapl_to_list tapl = 
+  let (a,b,c,d) = tapl in 
+  [a;b;c;d]
 
 
 
-let t_format tehai_lst furo_lst (sutehai_lst:(int*hai*bool)list list) ba kyoku honba kyotaku player_score yaku_lst dora_lst =
+let t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst =
   print_info ba kyoku honba kyotaku player_score yaku_lst dora_lst;
+  let tehai_lst = tapl_to_list tehai_lst in 
+  let sutehai_lst = tapl_to_list sutehai_lst in 
+  let furo_lst = tapl_to_list furo_lst in 
   let tehai_lst = List.map (fun a -> (List.map change_gragh a))tehai_lst in
   let sutehai_lst = List.map (fun a -> (List.map (fun (x,y,_) -> change_gragh (x,y))) a) sutehai_lst in
   let furo_lst = List.map (fun a -> (List.map (fun b -> furo_to_hai b) a))furo_lst in
@@ -419,5 +425,17 @@ let t_format tehai_lst furo_lst (sutehai_lst:(int*hai*bool)list list) ba kyoku h
   in
   loop' 0 0 
 
+let tehai_onry tehai_lst = 
+  let rec loop i = 
+    print_hai tehai_lst i;
+    if i = 4 then 
+      (Printf.printf "\n";)
+    else
+      (Printf.printf "\n";
+      loop (i+1)
+      )
+  in
+  loop 0
+    
 
 

@@ -3,39 +3,27 @@ open Loop
 open Mahjong_safty
 
 let lst_to_ary_type lst = 
-  let m = List.length lst in
-  let rec loop' i ary = 
-    let (x,_) = List.nth lst i in
-    let n = ary.(x-1) in
-    ary.(x-1) <- n + 1;
-    if i = 0 then
-      ary
-    else
-      loop' (i-1) ary
+  let ary = Array.make 9 0 in
+  let rec loop lst = match lst with 
+    | [] -> ()
+    | (x,_)::t -> let n = ary.(x-1) in
+                  ary.(x-1) <- n + 1;
+                  loop t
   in
-  if m = 0 then
-    Array.make 9 0
-  else
-    loop' (m-1) (Array.make 9 0)
+  let _ = loop lst in 
+  ary
 
 let lst_to_ary_type_zi lst = 
-  let m = List.length lst in
-  let rec loop' i ary = 
-    let (x,y) = List.nth lst i in
-    let (x,y) = hai_to_ary (x,y) in
-    let n = ary.(y) in
-    ary.(y) <- n + 1;
-    if i = 0 then
-      ary
-    else
-      loop' (i-1) ary
+  let ary = Array.make 7 0 in
+  let rec loop lst = match lst with 
+    | [] -> ()
+    | (x,y)::t -> let (x,y) = hai_to_ary (x,y) in
+                  let n = ary.(y) in
+                  ary.(y) <- n + 1;
+                  loop t
   in
-  if m = 0 then
-    Array.make 7 0
-  else
-    loop' (m-1) (Array.make 7 0)
-
-
+  let _ = loop lst in 
+  ary
 
 let yukouhai (x,y) = match y with
   | Manzu -> if x = 1 then
@@ -95,6 +83,30 @@ let yukouhai (x,y) = match y with
   | _ -> [(0,y)]
 
 let kokushi_syanten lst = 
+  let ary = Array.make 14 0 in 
+  let rec loop lst = match lst with 
+    | [] -> ()
+    | (1,Manzu)::t -> if ary.(0) = 0 then ary.(0) <- 1 else ary.(13) <- 1; loop t 
+    | (9,Manzu)::t -> if ary.(1) = 0 then ary.(1) <- 1 else ary.(13) <- 1; loop t 
+    | (1,Pinzu)::t -> if ary.(2) = 0 then ary.(2) <- 1 else ary.(13) <- 1; loop t 
+    | (9,Pinzu)::t -> if ary.(3) = 0 then ary.(3) <- 1 else ary.(13) <- 1; loop t 
+    | (1,Souzu)::t -> if ary.(4) = 0 then ary.(4) <- 1 else ary.(13) <- 1; loop t 
+    | (9,Souzu)::t -> if ary.(5) = 0 then ary.(5) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Ton)::t -> if ary.(6) = 0 then ary.(6) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Nan)::t -> if ary.(7) = 0 then ary.(7) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Sya)::t -> if ary.(8) = 0 then ary.(8) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Pei)::t -> if ary.(9) = 0 then ary.(9) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Haku)::t -> if ary.(10) = 0 then ary.(10) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Hatsu)::t -> if ary.(11) = 0 then ary.(11) <- 1 else ary.(13) <- 1; loop t 
+    | (0,Tyun)::t -> if ary.(12) = 0 then ary.(12) <- 1 else ary.(13) <- 1; loop t 
+    | (_,_)::t -> loop t 
+  in
+  let _ = loop lst in
+  let n = Array.fold_left (fun a b -> a + b) 0 ary in 
+  13 - n 
+      
+
+(*let kokushi_syanten lst = 
   let a1 = if (List.exists (fun x -> x = (1,Manzu)) lst) = true then 1 else 0 in
   let tmp = List.filter (fun x -> x <> (1,Manzu)) lst in
   let a2 = if (List.exists (fun x -> x = (9,Manzu)) lst) = true then 1 else 0 in
@@ -127,9 +139,10 @@ let kokushi_syanten lst =
     13 - b
   else
     12 - b
+*)
 
-let titoi_syanten lst = 
-  let rec loop' lst tmp i = 
+let titoi_syanten (lst:(int*hai)list) = 
+  let rec loop' (lst:(int*hai)list) tmp i = 
     let x = List.hd lst in 
     let tmp = 
       if List.exists (fun a -> a = x) (List.tl lst) then
@@ -151,45 +164,38 @@ let titoi_syanten lst =
 
 (*man,pin,sou,zi*)
 let sprit_lst lst = 
-  let n = List.length lst in
-  let rec loop' i m_lst p_lst s_lst zi_lst = 
-    let (x,y) = List.nth lst i in
-    let m_lst = 
-      if y = Manzu then
-        (x,y)::m_lst
-      else
-        m_lst
-    in
-    let p_lst = 
-      if y = Pinzu then
-        (x,y)::p_lst
-      else
-        p_lst
-    in
-    let s_lst = 
-      if y = Souzu then
-        (x,y)::s_lst
-      else
-        s_lst
-    in
-    let zi_lst = 
-      if x = 0 then
-        (x,y)::zi_lst
-      else
-        zi_lst
-    in
-    if i = 0 then
-      (m_lst,p_lst,s_lst,zi_lst)
-    else
-      loop' (i-1) m_lst p_lst s_lst zi_lst
+  let rec loop m_lst p_lst s_lst zi_lst lst = match lst with
+    | [] -> (m_lst,p_lst,s_lst,zi_lst)
+    | (x,y)::t -> let m_lst = 
+                    if y = Manzu then
+                      (x,y)::m_lst
+                    else
+                      m_lst
+                  in
+                  let p_lst = 
+                    if y = Pinzu then
+                      (x,y)::p_lst
+                    else
+                      p_lst
+                  in
+                  let s_lst = 
+                    if y = Souzu then
+                      (x,y)::s_lst
+                    else
+                      s_lst
+                  in
+                  let zi_lst = 
+                    if x = 0 then
+                      (x,y)::zi_lst
+                    else
+                      zi_lst
+                  in
+                  loop m_lst p_lst s_lst zi_lst t
   in
-  if n = 0 then
-    ([],[],[],[])
-  else
-    loop' (n-1) [] [] [] []
+  loop [] [] [] [] lst
 
 let opt_kouho lst f_lst_len = 
-  let m = List.length lst in
+  let m = List.length lst in 
   let rec loop' i tmp = 
     let (x,y) = List.nth lst i in
     let (x,y) = 
@@ -246,7 +252,7 @@ let reverse_mentsu ary =
   loop 8 0
 
 let forward_mentsu ary = 
-  let rec loop' ary i mentsu = 
+  let rec loop' i mentsu = 
     let mentsu' = 
       if ary.(i) > 0 && ary.(i+1) > 0 && ary.(i+2) > 0 then
         (let n1 = ary.(i) in
@@ -264,14 +270,14 @@ let forward_mentsu ary =
       if i = 6 then
         (ary,mentsu')
       else
-        loop' ary (i+1) mentsu'
+        loop' (i+1) mentsu'
     else
-      loop' ary i mentsu' 
+      loop' i mentsu' 
   in
-  loop' ary 0 0
+  loop' 0 0
 
 let midium_mentsu ary = 
-  let rec loop' ary i mentsu = 
+  let rec loop' i mentsu = 
     let mentsu' = 
       if ary.(i) > 0 && ary.(i+1) > 0 && ary.(i+2) > 0 then
         (let n1 = ary.(i) in
@@ -287,11 +293,11 @@ let midium_mentsu ary =
     in
     if mentsu = mentsu' then
       if i = 3 then
-        (ary,mentsu')
+        mentsu'
       else
-        loop' ary (i+1) mentsu'
+        loop' (i+1) mentsu'
     else
-      loop' ary i mentsu' 
+      loop' i mentsu' 
   in
   let rec loop i mentsu =
     let mentsu' = 
@@ -315,7 +321,7 @@ let midium_mentsu ary =
     else
       loop i mentsu'
   in
-  let (ary,n) = loop' ary 0 0 in
+  let n = loop' 0 0 in
   loop 8 n
 
 
@@ -328,48 +334,40 @@ let mentsu_kouho_syuntsu ary f_lst_len =
   let (arym,m) = midium_mentsu arym in
   let rec loop2' ary i kouho = 
     let kouho' = 
-      if i < 7  then
-        if ary.(i) > 0 && ary.(i+1) > 0 then
-          (let n1 = ary.(i) in
-          let n2 = ary.(i+1) in
-          ary.(i) <- n1 - 1;
-          ary.(i+1) <- n2 - 1;
-          kouho+1
-          )
-        else if ary.(i) > 0 && ary.(i+2) > 0 then
-          (let n1 = ary.(i) in
-          let n2 = ary.(i+2) in
-          ary.(i) <- n1 - 1;
-          ary.(i+2) <- n2 - 1;
-          kouho+1
-          )
-        else if ary.(i) = 2 then
-          (let n = ary.(i) in
-          ary.(i) <- n - 2;
-          kouho + 1)
-        else
-          kouho
-      else if i < 8 then
-        if ary.(i) > 0 && ary.(i+1) > 0 then
-          (let n1 = ary.(i) in
-          let n2 = ary.(i+1) in
-          ary.(i) <- n1 - 1;
-          ary.(i+1) <- n2 - 1;
-          kouho+1
-          )
-        else if ary.(i) = 2 then
-          (let n = ary.(i) in
-          ary.(i) <- n - 2;
-          kouho + 1)
-        else
-          kouho
-      else
+      if ary.(i) > 0 then 
         if ary.(i) = 2 then
-          (let n = ary.(i) in
+          let n = ary.(i) in
           ary.(i) <- n - 2;
-          kouho + 1)
+          kouho + 1
         else
-          kouho
+          if i < 7  then
+            if ary.(i+1) > 0 then
+              let n1 = ary.(i) in
+              let n2 = ary.(i+1) in
+              ary.(i) <- n1 - 1;
+              ary.(i+1) <- n2 - 1;
+              kouho+1
+            else if ary.(i+2) > 0 then
+              let n1 = ary.(i) in
+              let n2 = ary.(i+2) in
+              ary.(i) <- n1 - 1;
+              ary.(i+2) <- n2 - 1;
+              kouho+1
+            else
+              kouho
+          else if i < 8 then
+            if ary.(i+1) > 0 then
+              let n1 = ary.(i) in
+              let n2 = ary.(i+1) in
+              ary.(i) <- n1 - 1;
+              ary.(i+1) <- n2 - 1;
+              kouho+1
+            else
+              kouho
+          else
+              kouho
+      else
+        kouho
     in
     if kouho = kouho' then
       if i = 8 then
@@ -393,30 +391,22 @@ let mentsu_kouho_syuntsu ary f_lst_len =
 
 
 
-let serch_koritsu lst m = 
-  let n = List.length lst in
-  let rec loop i tmp = 
-    let (ary,(a,b)) = List.nth lst i in
-    let tmp =     
-      if (a,b) = m then
-        ary::tmp
-      else
-        tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+let serch_koritsu (lst:(int array*(int*int))list) m = 
+  let fil_lst = List.filter (fun (_,(a,b)) -> if (a,b) = m then true else false) lst in 
+  let rec loop i tmp t_lst = match t_lst with 
+    | [] -> tmp
+    | (ary,_)::t -> loop i (tmp + ary.(i)) t
   in
-  let ary = 
-    if n = 0 then
-      []
-    else
-      loop (n-1) [] 
+  let rec loop2 i tmp = match i with 
+  | 0 -> tmp
+  | _ -> let x = loop i 0 fil_lst in 
+          loop2 (i-1) (x::tmp)
   in
-  let ary = Array.concat ary in
-  let lst = Array.to_list ary in
-  lst
+  if fil_lst = [] then 
+    []
+  else
+    loop2 8 []
+
 
 
 
@@ -440,7 +430,7 @@ let mentsu_kouho_kotsu ary f_lst_len =
       loop' ary (i+1) mentsu
     in
   let n = loop' ary 0 [] in 
-  let lst = List.map (fun (a,(b,c)) -> (b,c)) n in
+  let lst = List.map (fun (_,(b,c)) -> (b,c)) n in
   let m = opt_kouho lst f_lst_len in 
   let x = serch_koritsu n m in
   (x,m) 
@@ -518,7 +508,7 @@ let koritsu m p s zi =
 
 
 
-
+(*
 let compile_yukouhai lst = 
   let m = List.length lst in
   let rec loop i tmp = 
@@ -557,7 +547,9 @@ let loss_hai b_lst a_lst ary zi_ary =
     0
   else
     loop (m-1) 0
-  
+*)
+
+(*  
 let opt_yukouhai lst ary zi_ary= 
   let m = List.length lst in
   let base_lst = compile_yukouhai lst in
@@ -582,7 +574,7 @@ let opt_yukouhai lst ary zi_ary=
     (-1,(1,Not_hai))
   else
     loop (m-1) (30,(1,Not_hai))
-
+*)
 (*mentsu,mentsukouho*)
 let mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len = 
   let m_ary = lst_to_ary_type m_lst in
@@ -595,7 +587,7 @@ let mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len =
   let (zi,(xzi,yzi)) = mentsu_kouho_zi zi_ary in
   let n = (xm+xp+xs+xzi,ym+yp+ys+yzi) in
   let (x,y) = opt_kouho [n] f_lst_len in
-  let lst = koritsu m p s zi in
+  let lst = koritsu m p s zi in 
   (lst,8-((x+f_lst_len)*2+y))
 
 
@@ -663,7 +655,7 @@ let common_syanten lst =
     let n = opt_syanten sy_lst' in
     let lst = List.filter (fun (a,b) -> b = n) sy_lst in
     let lst = List.map (fun (a,b) -> a) lst in
-    let lst = List.fold_right (fun a b -> a@b) lst [] in
+    let lst = List.fold_left (fun a b -> a@b) [] lst in
     (lst,n)
 
     
@@ -678,61 +670,71 @@ let syanten lst =
 let create_table sutehai_lst tehai = 
   let ary = Array.make_matrix 3 9 4 in
   let zi_ary = Array.make 7 4 in
-  let rec loop2 lst j = 
-    let (x,y,_) = List.nth lst j in
-    let (x,y) = hai_to_ary (x,y) in
-    let _ = 
-      if  x = 3 then
-        let n = zi_ary.(y) in
-        zi_ary.(y) <- n - 1;
-      else
-        let n = ary.(x).(y) in
-        ary.(x).(y) <- n - 1;
-    in
-    if j = 0 then
-      ()
-    else
-      loop2 lst (j-1)
+  let rec loop2 t_lst = match t_lst with 
+    | [] -> ()
+    | (x,y,_)::t -> let (x,y) = hai_to_ary (x,y) in 
+                 let _ = if x = 3 then 
+                            let n = zi_ary.(y) in 
+                            zi_ary.(y) <- n-1
+                         else
+                            let n = ary.(x).(y) in
+                            ary.(x).(y) <- n - 1
+                  in
+                  loop2 t
   in
-  let rec loop2' lst j = 
-    let (x,y) = List.nth lst j in
-    let (x,y) = hai_to_ary (x,y) in
-    let _ = 
-      if  x = 3 then
-        let n = zi_ary.(y) in
-        zi_ary.(y) <- n - 1;
-      else
-        let n = ary.(x).(y) in
-        ary.(x).(y) <- n - 1;
-    in
-    if j = 0 then
-      ()
-    else
-      loop2' lst (j-1)
+  let rec loop3 t_lst = match t_lst with 
+    | [] -> ()
+    | (x,y)::t -> let (x,y) = hai_to_ary (x,y) in 
+                 let _ = if x = 3 then 
+                            let n = zi_ary.(y) in 
+                            zi_ary.(y) <- n-1
+                         else
+                            let n = ary.(x).(y) in
+                            ary.(x).(y) <- n - 1
+                  in
+                  loop3 t
   in
-  let rec loop i = 
-    let n = List.length (List.nth sutehai_lst i) in
-    let _ = 
-      if n = 0 then
-        ()
-      else
-        loop2 (List.nth sutehai_lst i) (n-1)
-    in
-    if i = 0 then
-      ()
-    else
-      loop (i-1)
+  let rec loop i = match i with 
+    | -1 -> ()
+    | _ -> let _ = loop2 (tapl_player sutehai_lst i) in
+           loop (i-1)
   in
   let _ = loop 3 in
-  let m = List.length tehai in
-  if m = 0 then
-    (ary,zi_ary)
+  let _ = loop3 tehai in
+  (ary,zi_ary)
+
+let count_yukouhai ary zi_ary (x,y) = 
+  if x = 3 then 
+    zi_ary.(y)
   else
-    let _ = loop2' tehai (m-1) in
-    (ary,zi_ary)
+    let n1 = ary.(x).(y) in 
+    if y = 0 then 
+      let n2 = ary.(x).(y+1) in 
+      let n3 = ary.(x).(y+2) in 
+      n1+n2+n3
+    else if y = 1 then 
+      let n2 = ary.(x).(y+1) in 
+      let n3 = ary.(x).(y+2) in 
+      let n4 = ary.(x).(y-1) in 
+      n1+n2+n3+n4
+    else if y = 7 then 
+      let n2 = ary.(x).(y-1) in 
+      let n3 = ary.(x).(y-2) in 
+      let n4 = ary.(x).(y+1) in 
+      n1+n2+n3+n4
+    else if y = 8 then 
+      let n2 = ary.(x).(y-1) in 
+      let n3 = ary.(x).(y-2) in 
+      n1+n2+n3
+    else
+      let n2 = ary.(x).(y-1) in 
+      let n3 = ary.(x).(y-2) in 
+      let n4 = ary.(x).(y+1) in 
+      let n5 = ary.(x).(y+2) in 
+      n1+n2+n3+n4+n5
 
 
-
+(*
 let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst = 
   let yaku = List.nth yaku_lst player in
   let reach_q = List.exists (fun a -> List.exists (fun b -> b = Reach || b = Doublereach) a) yaku_lst in
@@ -770,10 +772,11 @@ let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst =
     loop ((List.length tehai) - 1) trush
   else
     loop ((List.length tehai) - 1) (1,Not_hai)
+*)
 
-
-
-(*let _ = 
-  let (_,n)  = common_syanten [(8,Manzu);(9,Manzu);(9,Souzu);(9,Souzu);(0,Nan);(0,Nan);(0,Sya);(0,Sya);(0,Pei);(0,Pei);(0,Pei)] in
-
-  Printf.printf "%d\n" n;*)
+(*
+let _ = 
+  (*let (_,n)  = common_syanten [(1,Manzu);(9,Manzu);(1,Pinzu);(4,Pinzu);(7,Pinzu);(5,Souzu);(8,Souzu);(9,Souzu);(9,Souzu);(9,Souzu);(9,Souzu);(0,Sya);(0,Sya)] in
+*)
+  let (x,(y,z)) = mentsu_kouho_syuntsu [|2;2;2;0;0;0;2;2;0|] 0 in
+  Printf.printf "%d %d\n" y z;*)
