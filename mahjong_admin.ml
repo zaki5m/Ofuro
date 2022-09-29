@@ -1550,7 +1550,7 @@ let make_ary_lst (a,b,c,d) =
   let d = list_to_ary d in 
   (a,b,c,d)
 
-
+(*
 (*automatic*)
 let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_score furoritu_lst = 
   let furo_lst = ([],[],[],[]) in
@@ -1612,6 +1612,72 @@ let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_sc
           (0,(a,b,c,d),player_score))
     in
     loop' (kyoku-1) tehai_lst sutehai_lst yama_lst furo_lst ary_lst naki_lst dora_lst yaku_lst kyotaku player_score furiten_lst []
+*)
+
+
+(*automatic kyoku simulate version*)
+let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_score furoritu_lst = 
+  let furo_lst = ([],[],[],[]) in
+  let naki_lst = (false,false,false,false) in
+  let ary_lst = make_ary_lst tehai_lst in
+  let yaku_lst = ([],[],[],[]) in
+  let sutehai_lst = ([],[],[],[]) in
+  let furiten_lst = ([],[],[],[]) in
+  let rec loop' player tehai_lst sutehai_lst yama_lst furo_lst ary_lst naki_lst dora_lst yaku_lst kyotaku player_score furiten_lst furo_double_lst = 
+    let zi_kaze = kyoku_to_kaze kyoku player in
+    let tehai = tapl_player tehai_lst player in
+    let (x,y,_) = List.hd yama_lst in
+    let yama_lst = List.tl yama_lst in
+    let tehai = add_tehai tehai (x,y) in
+    let (t_b,t_ten) = possible_tumo_agari (tapl_player ary_lst player) zi_kaze ba (tapl_player naki_lst player) (tapl_player furo_lst player) (x,y) (tapl_player yaku_lst player) dora_lst (tapl_player sutehai_lst player) yama_lst in
+    let (tehai, f, yama_lst, dora_lst,(x',y')) = 
+      if possible_ankan (tapl_player ary_lst player) (x,y) = true then
+        ankan (x,y) tehai (tapl_player furo_lst player) yama_lst dora_lst
+      else
+        (tehai,(tapl_player furo_lst player),yama_lst,dora_lst,(x,y)) 
+    in
+    let furo_lst = add_lst furo_lst f player in
+    let (t_b,t_ten) = 
+      if (x,y) = (x',y') then
+        (t_b,t_ten)
+      else
+        possible_tumo_agari (tapl_player ary_lst player) zi_kaze ba (tapl_player naki_lst player) (tapl_player furo_lst player) (x',y') (Rinsyankaihou::(tapl_player yaku_lst player)) dora_lst (tapl_player sutehai_lst player) yama_lst
+    in
+    let (ten_0,ten_1,ten_2,ten_3) = 
+      if t_b = true then
+        (tumo_agari t_ten player kyoku honba kyotaku)
+      else
+        (0,0,0,0)
+    in
+    if (ten_0,ten_1,ten_2,ten_3) <> (0,0,0,0) then
+      ((*let tehai_lst = add_tehai_lst tehai_lst tehai player in
+      t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
+      (0,(ten_0,ten_1,ten_2,ten_3),naki_lst,player_score))
+    else
+        let tehai_lst = add_lst tehai_lst tehai player in
+        let (tehai_lst,sutehai_lst,ary_lst,furo_lst,naki_lst,player,yama_lst,yaku_lst,dora_lst,(a,b,c,d),kyotaku,player_score,furiten_lst,furo_double_lst) = furo_loop yama_lst tehai_lst sutehai_lst ary_lst (x,y) player furo_lst naki_lst yaku_lst dora_lst kyoku ba honba kyotaku player_score furiten_lst furo_double_lst furoritu_lst in
+        if (a,b,c,d) = (0,0,0,0) then
+          let player = 
+            if player = 3 then
+              0
+            else
+              player + 1 
+          in
+          if List.length yama_lst = 14 then
+            ((*t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
+            let tenpai_lst = ryukyoku_ten ary_lst furo_lst [] dora_lst in
+            let (ten_0,ten_1,ten_2,ten_3) = tenpai_ryo tenpai_lst in
+            let player_score = ten_to_player player_score (ten_0,ten_1,ten_2,ten_3) in
+            (kyotaku,(ten_0/100,ten_1/100,ten_2/100,ten_3/100),naki_lst,player_score))
+          else
+            loop' player tehai_lst sutehai_lst yama_lst furo_lst ary_lst naki_lst dora_lst yaku_lst kyotaku player_score furiten_lst furo_double_lst
+        else
+          ((*t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
+          (0,(a,b,c,d),naki_lst,player_score))
+    in
+    loop' (kyoku-1) tehai_lst sutehai_lst yama_lst furo_lst ary_lst naki_lst dora_lst yaku_lst kyotaku player_score furiten_lst []
+
+
 
 (*not automatic*)
 (*
@@ -1637,7 +1703,7 @@ let kyoku_s ba kyoku honba kyotaku player_score  =
 let kyoku_s ba kyoku honba kyotaku player_score furoritu_lst count = 
   let lst2 = big_hai_lst in
   let lst3 = r_hai lst2 in
-  (*let lst3 = r_hai2 lst2 count in *)
+  (*let lst3 = r_hai2 lst2 count in*) 
   let lst4 = List.sort (fun (_ ,_ ,z1) (_ ,_ ,z2) -> if z1 < z2 then -1 else 1) lst3 in
   let (yama_lst,tehai_lst_0,tehai_lst_1,tehai_lst_2,tehai_lst_3,dora_lst) = haipai lst4 in
   let tehai_lst = 
@@ -1711,6 +1777,7 @@ let hantyan () =
 
 
 (*automatic*)
+(*
 let hantyan furoritu_lst = 
   let furoritu_lst = 
     if (List.length furoritu_lst) = 4 then 
@@ -1771,7 +1838,7 @@ let hantyan furoritu_lst =
         loop' (kyoku+1) ba honba kyotaku player_score total_kyoku 
     in
     loop' 1 0 0 0 player_score 0 
-
+*)
 
 (*let _ = hantyan [25.0;25.0;25.0;25.0]*)
 

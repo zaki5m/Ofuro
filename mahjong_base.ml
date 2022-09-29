@@ -36,6 +36,24 @@ let tapl_player tapl player = match player with
   | 2 -> let (_,_,x,_) = tapl in x
   | _ -> let (_,_,_,x) = tapl in x
 
+let tapl_player_in tapl tmp player = match player with 
+  | 0 -> let x2 = tapl_player_2 tapl in 
+         let x3 = tapl_player_3 tapl in
+         let x4 = tapl_player_4 tapl in  
+         (tmp,x2,x3,x4)
+  | 1 -> let x1 = tapl_player_1 tapl in 
+         let x3 = tapl_player_3 tapl in
+         let x4 = tapl_player_4 tapl in  
+         (x1,tmp,x3,x4)
+  | 2 -> let x1 = tapl_player_1 tapl in 
+         let x2 = tapl_player_2 tapl in
+         let x4 = tapl_player_4 tapl in  
+         (x1,x2,tmp,x4)
+  | _ -> let x1 = tapl_player_1 tapl in 
+         let x2 = tapl_player_2 tapl in
+         let x3 = tapl_player_3 tapl in  
+         (x1,x2,x3,tmp)
+
 let print_list lst = 
     List.iter (fun (m,n) -> Printf.printf "%s " (rename (m,n)); ) lst;
     Printf.printf "\n"
