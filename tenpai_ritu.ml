@@ -2471,6 +2471,7 @@ let self_t_ritu yama_len tumo_len yukou_lst tumo_lst =
 
 
 (*aryはunderが((float_of_int len*.4.+.17.) -. h) topが (top - 1)　ただし　30以下に限る *)
+(*
 let print_t_ritu () = 
   let rec loop2 len max_len under top tmp =
     let tmp = tmp *. top /. under in
@@ -2483,6 +2484,60 @@ let print_t_ritu () =
     let t_ritu = if under <= top || under <= 15. then 0. else loop2 len end_len under (under -. top) 1. in 
       if end_len < 1 then 
         if under = (float_of_int len*.4.+.17.) -. 30. then
+          if top = 70. then 
+            Printf.printf "%F|]|]|]" t_ritu
+          else 
+            (Printf.printf "%F;" t_ritu;
+            loop len over end_len under (top+.1.))
+        else
+          if top = 70. then 
+            (Printf.printf "%F|];\n[|" t_ritu;
+            loop len over end_len (under-.1.) 1.)
+          else 
+            (Printf.printf "%F;" t_ritu;
+            loop len over end_len under (top+.1.))
+      else
+        if under = (float_of_int len*.4.+.17.) -. 30. then
+          if top = 70. then 
+            (Printf.printf "%F|]|];\n[|[|" t_ritu;
+            loop len over (end_len-1) (float_of_int len*.4.+.17.) 1.)
+          else 
+            (Printf.printf "%F;" t_ritu;
+            loop len over end_len under (top+.1.))
+        else
+          if top = 70. then 
+            (Printf.printf "%F|];\n[|" t_ritu;
+            loop len over end_len (under-.1.) 1.)
+          else 
+            (Printf.printf "%F;" t_ritu;
+            loop len over end_len under (top+.1.))
+  in
+  let rec len_loop len over = 
+    if len > 0 then 
+        (Printf.printf "let t_ritu_%d_ary = [|[|[|" len;
+        loop len over len (float_of_int len*.4.+.17.) 1.;
+        Printf.printf "\n";
+        len_loop (len - 1) true
+        )
+    else
+      ()
+  in
+  len_loop 17 true
+*)
+
+
+let print_t_ritu () = 
+  let rec loop2 len max_len under top tmp =
+    let tmp = tmp *. top /. under in
+    if len > max_len && (top -. 4.) > 0. then 
+      loop2 (len-1) max_len (under-.4.) (top-.4.) tmp
+    else
+      tmp /. (under-.4.)
+  in
+  let rec loop len (over:bool) end_len under top = (*overは35より上を測っているかどうか*)
+    let t_ritu = if under <= top || under <= 15. then 0. else loop2 len end_len under (under -. top) 1. in 
+      if end_len < 1 then 
+        if under = (float_of_int len*.4.+.17.) -. 3. then
           if top = 70. then 
             Printf.printf "%F|]|]|]" t_ritu
           else 
