@@ -1,5 +1,5 @@
 (executable
-  (name mahjong_admin)
+  (name simulate)
   (libraries domainslib)
 )
 
