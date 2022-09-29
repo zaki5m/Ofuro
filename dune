@@ -1,6 +1,6 @@
 (executable
-  (name simulate)
-  (libraries domainslib)
+  (name client)
+  (libraries domainslib yojson unix)
 )
 
 (env
