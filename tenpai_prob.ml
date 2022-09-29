@@ -4,7 +4,7 @@ open Domainslib
 open Mahjong_haieff
 open Mahjong_safty
 open M_gragh
-open Tenpai_ary
+open Tenpai_ary2
 
 module C = Domainslib.Chan
 
@@ -207,7 +207,7 @@ let yukou_to_ritu yama_len tumo_len yukou_lst tumo_lst =
     0.0
   else 
     loop tumo_len (float_of_int (tumo_len - tumo_len_len + 1)) 1. 0. (float_of_int (List.nth yukou_lst 0)) (float_of_int (tumo_len - tumo_len_len + 1)) 0 
-
+(*
 let self_t_ritu yama_len tumo_len yukou_lst tumo_lst = 
   let yama_len = yama_len +. 14. in 
   let n = List.length yukou_lst in 
@@ -238,6 +238,39 @@ let self_t_ritu yama_len tumo_len yukou_lst tumo_lst =
     0. 
   else
     loop tumo_len tumo_len 0 yama_len 1. 0. yukou_lst
+*)
+
+let self_t_ritu yama_len tumo_len yukou_lst tumo_lst = 
+  let yama_len = yama_len +. 14. in 
+  let n = List.length yukou_lst in 
+  let rec loop2 len max_len under top tmp =
+    let tmp = tmp *. top /. under in
+    if len > max_len && (top-.4.) > 0. then 
+      loop2 (len-1) max_len (under-.4.) (top-.4.) tmp
+    else
+      tmp /. (under-.4.)
+  in
+  let rec loop len end_len i yama tmp sum t_lst = match t_lst with
+    | [] -> sum
+    | h::t -> let tumo = List.nth tumo_lst i in 
+              let result = Tenpai_ary2.serch len end_len yama h in
+              let tmp2 = if result = None then 
+                          loop2 len end_len yama (yama -. float_of_int h) 1. 
+                        else
+                          Option.get result
+              in 
+              let tmp2 = tmp *. tmp2 *. (float_of_int tumo) in
+              let tmp3 = if i = n-1 then tmp2 else loop (end_len-1) (end_len-1) (i+1) (yama-.(float_of_int (len - end_len+1))*.4.) tmp2 0. t in
+              if end_len > (n-i) then 
+                loop len (end_len-1) i yama tmp (sum +. tmp3) (h::t)
+              else
+                sum +. tmp3
+  in
+  if tumo_len < n then
+    0. 
+  else
+    loop tumo_len tumo_len 0 yama_len 1. 0. yukou_lst
+
 
 (*ary,zi_aryは残り枚数のテーブル。　返り値(kitaiti,agariritu) 0th: reach無し 1th:reachあり*)
 let tenpai_kitaiti lst f_lst zi_kaze ba_kaze naki yaku_lst dora_lst ary zi_ary tumo_l rm_wan =
