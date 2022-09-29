@@ -136,7 +136,7 @@ let response_none () =
 
 let tsumo tehai_s sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst furo_double_lst = 
   let k_hai = pre_prob_select tehai_s sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst furo_double_lst in 
-  let tsumogiri = if (List.nth tehai_s (List.length tehai_s - 1)) = k_hai then true else false in 
+  let tsumogiri = if List.hd tehai_s = k_hai then true else false in 
   `Assoc
   [
     ("type", `String "dahai");

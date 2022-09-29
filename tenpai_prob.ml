@@ -2808,7 +2808,7 @@ let f_kitaiti p_f_lst tehai f_lst (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora
                             let (t_ritu,agariritu,total_kitaiti,k_hai) = 
                               if n <= 0 then
                                 let (k_hai,x) = tenpai_to_opt_f n_tehai tumo_l rm_wan n_f_lst zi_kaze ba_kaze true [] dora_lst ary zi_ary kuikae_lst in
-                                let (kitaiti,agariritu) = x in
+                                let (agariritu,kitaiti) = x in
                                 (1.0,agariritu,kitaiti,k_hai)
                               else 
                                 let (k_lst,t_ritu,agariritu,_,_,_,total_kitaiti) = col_tenpai_f_kuikae ary zi_ary n_tehai yama_len n_f_lst zi_kaze ba_kaze true dora_lst kuikae_lst in 
@@ -3418,7 +3418,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
       else
         let ((f_t_ritu,f_agariritu,f_kitaiti,k_hai),f_hai) = max_f_agariritu_a f_kitaiti_lst in  
         let (k_lst,t_ritu,agariritu,kitaiti,anzendo,_,_) = not_naki in
-        (*let _ = 
+        let _ = 
           if f_agariritu > 0.0 && f_kitaiti > 0.0 then
             (let tehai = List.map ( fun a -> change_gragh a) tehai in 
             let _ = if f_agariritu> 1.0 then (print_hai tehai 0; Printf.printf "\n"; print_hai tehai 1; Printf.printf "\n"; print_hai tehai 2; Printf.printf "\n"; print_hai tehai 3; Printf.printf "\n"; print_hai tehai 4; Printf.printf "\n";) else () in 
@@ -3426,7 +3426,8 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           else
             ()
           in
-        *)
+          []
+        (*
         if naki = false then 
           if (f_agariritu -. agariritu) > 0.0 && furoritu_to_furo (List.nth furoritu_lst player) (f_agariritu -. agariritu) (kitaiti -.f_kitaiti) tumo_len && k_hai <> (1,Not_hai) then
             [(k_hai,f_hai)]
@@ -3452,6 +3453,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
             [(k_hai,f_hai)]*)
             
             []
+            *)
     else 
       []
       (*
@@ -3467,6 +3469,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         *)
 
 (*mjai*)
+(*
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst furoritu =
   let (_,n) = syanten tehai in
   let reach_q_1 =  List.exists (fun b -> b = Reach || b = Doublereach) (tapl_player_1 yaku_lst) in
@@ -3543,7 +3546,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           [(k_hai,f_hai)]
         *)
 
-
+*)
 
 
 
