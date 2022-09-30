@@ -1,6 +1,6 @@
 (executable
-  (name mahjong_admin)
-  (libraries domainslib)
+  (name simulate)
+  (libraries domainslib yojson unix)
 )
 
 (env

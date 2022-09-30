@@ -340,7 +340,8 @@ let simulate count (uma1,uma2) furoritu_lst =
 let simulate_kyoku count furoritu_lst =
   let player_score = (25000,25000,25000,25000) in
   let rec loop i (tmp1,tmp2,tmp3,tmp4) (naki_tmp1,naki_tmp2,naki_tmp3,naki_tmp4) zyuni_lst = 
-    let (_,(a,b,c,d),(naki_a,naki_b,naki_c,naki_d),player_score) = kyoku_s 0 1 0 0 player_score furoritu_lst 0 in
+    let (_,_,(naki_a,naki_b,naki_c,naki_d),(a,b,c,d)) = kyoku_s 0 1 0 0 player_score furoritu_lst 0 in
+    Hashtbl.reset myhash;
     flush stdout;
     let a = a - 25000 in
     let b = b - 25000 in
@@ -370,6 +371,7 @@ let simulate_kyoku count furoritu_lst =
       Printf.printf "C: %d %d %d %d \n" s1 s2 s3 s4;
       let (s1,s2,s3,s4) = List.nth zyuni_lst 3 in  
       Printf.printf "D: %d %d %d %d \n" s1 s2 s3 s4;*)
+      Printf.printf "finish\n";
       (*Printf.printf "result: %dtimes A%f real(%f):%d B%f real(%f):%d c%f real(%f):%d d%f real(%f):%d\n" count (List.nth furoritu_lst 0) ((float_of_int naki_tmp1)/.(float_of_int count)) tmp1 (List.nth furoritu_lst 1) ((float_of_int naki_tmp2)/.(float_of_int count)) tmp2 (List.nth furoritu_lst 2) ((float_of_int naki_tmp3)/.(float_of_int count)) tmp3 (List.nth furoritu_lst 3) ((float_of_int naki_tmp4)/.(float_of_int count)) tmp4*))
     else
       loop (i-1) (tmp1,tmp2,tmp3,tmp4) (naki_tmp1,naki_tmp2,naki_tmp3,naki_tmp4) zyuni_lst
@@ -377,5 +379,5 @@ let simulate_kyoku count furoritu_lst =
   loop (count-1) (0,0,0,0) (0,0,0,0) [(0,0,0,0);(0,0,0,0);(0,0,0,0);(0,0,0,0)]
 
 (*let _ = simulate 250 (10000,30000) [10.0;35.0;35.0;10.0] *)
-let _ = simulate_kyoku 5 [25.;25.;25.;25.]
+let _ = simulate_kyoku 5 [35.;35.;35.;35.]
 
