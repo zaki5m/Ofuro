@@ -3196,18 +3196,28 @@ let threthhold_furo_20 agariritu kitaiti tumo_len =
       false
 
 let threthhold_furo_25 agariritu kitaiti tumo_len = 
-  if tumo_len > 12 then 
-    if (16000.0 *. agariritu *. agariritu) > kitaiti then 
+  if tumo_len > 15 then 
+    if ((20000.0 *. agariritu *. agariritu *. agariritu) > kitaiti && agariritu < 0.) || (agariritu > 0. && (1000. *. agariritu *. agariritu) > kitaiti) then 
+      true
+    else
+      false
+  else if tumo_len > 12 then 
+    if ((20000.0 *. agariritu *. agariritu *. agariritu) > kitaiti && agariritu < 0.) || (agariritu > 0. && (1000. *. agariritu *. agariritu) > kitaiti) then 
+      true
+    else
+      false
+  else if tumo_len > 9 then 
+    if ((20000.0 *. agariritu *. agariritu *. agariritu) > kitaiti && agariritu < 0.) || (agariritu > 0. && (1000. *. agariritu *. agariritu) > kitaiti) then 
       true
     else
       false
   else if tumo_len > 6 then 
-    if (16000.0 *. agariritu *. agariritu) > kitaiti then 
+    if ((30000.0 *. agariritu *. agariritu *. agariritu) > kitaiti && agariritu < 0.) || (agariritu > 0. && (1000. *. agariritu *. agariritu) > kitaiti) then 
       true
     else
       false
   else
-    if (44000.0 *. agariritu *. agariritu) > kitaiti then 
+    if ((10000000.0 *. agariritu *. agariritu *. agariritu) > kitaiti && agariritu < 0.) || agariritu > 0. then 
       true
     else
       false
