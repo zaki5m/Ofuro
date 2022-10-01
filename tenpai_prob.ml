@@ -2078,7 +2078,7 @@ let minus_kitaiti_p lst =
     | (k_lst,t_ritu,agariritu,kitaiti,anzendo)::t -> let minus_kitaiti = sum -. kitaiti in 
                                                      (*Printf.printf "sum :%f anzendo: %d\n" sum anzendo; *)
                                                      let anzendo_f = float_of_int anzendo in 
-                                                     let total_kitaiti = kitaiti -.  anzendo_f*.100.0 in
+                                                     let total_kitaiti = kitaiti -.  anzendo_f*.0.0 in
                                                      loop2 ((k_lst,t_ritu,agariritu,kitaiti,anzendo,minus_kitaiti,total_kitaiti)::tmp) t 
   in
   loop2 [] lst
