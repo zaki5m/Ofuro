@@ -3367,12 +3367,12 @@ let threthhold_furo_30 agariritu kitaiti tumo_len =
 
 let threthhold_furo_35 agariritu kitaiti tumo_len = 
   if tumo_len > 15 then 
-    if (agariritu > 0. && (2600. *. agariritu *. agariritu -. 900) > kitaiti) then 
+    if (agariritu > 0. && (2600. *. agariritu *. agariritu -. 900.) > kitaiti) then 
       true
     else
       false
   else if tumo_len > 12 then 
-    if (agariritu > 0. && (400. *. agariritu *. agariritu -. 500) > kitaiti) then 
+    if (agariritu > 0. && (400. *. agariritu *. agariritu -. 500.) > kitaiti) then 
       true
     else
       false
@@ -3570,6 +3570,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
       else
         let ((f_t_ritu,f_agariritu,f_kitaiti,k_hai),f_hai) = max_f_agariritu_a f_kitaiti_lst in  
         let (k_lst,t_ritu,agariritu,kitaiti,anzendo,_,_) = not_naki in
+        (*
         let _ = 
           if f_agariritu > 0.0 && f_kitaiti > 0.0 then
             (let tehai = List.map ( fun a -> change_gragh a) tehai in 
@@ -3579,7 +3580,8 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
             ()
           in
           []
-        (*
+          *)
+        
         if naki = false then 
           if (f_agariritu -. agariritu) > 0.0 && furoritu_to_furo (List.nth furoritu_lst player) (f_agariritu -. agariritu) (kitaiti -.f_kitaiti) tumo_len && k_hai <> (1,Not_hai) then
             [(k_hai,f_hai)]
@@ -3605,7 +3607,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
             [(k_hai,f_hai)]*)
             
             []
-            *)
+            
     else 
       []
       (*
