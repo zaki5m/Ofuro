@@ -1633,6 +1633,7 @@ let parallel ary zi_ary pool lst =
 
 let hash_serch_lst_to_ary lst = 
   let m = List.length lst in 
+  Printf.printf "%d\n"m; flush stdout;
   let ary = Array.make m [] in 
   let rec loop i t_lst = match t_lst with
     | [] -> ()
@@ -1659,6 +1660,7 @@ let parallel tmp =
 
 let judge_parallel tehai = 
   let lst = hash_serch tehai in 
+  Printf.printf "hit:%d\n"(List.length lst); flush stdout;
   if lst = [] then 
     let (_,n) = syanten tehai in
     if n  >=  1 then 
@@ -2373,6 +2375,7 @@ let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst =
     let tenpai_lst = col_tenpai_parallel tenpai_lst tumo_l rm_wan in
     let tenpai_lst = tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
     let last_form_tenpai_lst = opt_tenpai_form_p tenpai_lst in
+    List.iter (fun (a,b,c,d) -> let (a1,a2) = hai_to_ary (List.nth a (List.length a -1)) in Printf.printf "(%d,%d)) %f %f %f \n"a1 a2 b c d;) last_form_tenpai_lst;
     if last_form_tenpai_lst = [] then 
       ([],0.0,0.0,0.0,0,0.0,0.0)
     else
@@ -3389,6 +3392,32 @@ let threthhold_furo_30 agariritu kitaiti tumo_len =
     else
       false
 
+let threthhold_furo_35 agariritu kitaiti tumo_len = 
+  if tumo_len > 15 then 
+    if (agariritu > 0. && (2600. *. agariritu *. agariritu -. 900.) > kitaiti) then 
+      true
+    else
+      false
+  else if tumo_len > 12 then 
+    if (agariritu > 0. && (400. *. agariritu *. agariritu -. 500.) > kitaiti) then 
+      true
+    else
+      false
+  else if tumo_len > 9 then 
+    if (agariritu > 0. && (600. *. agariritu *. agariritu) > kitaiti) then 
+      true
+    else
+      false
+  else if tumo_len > 6 then 
+    if ((340000.0 *. agariritu *. agariritu *. agariritu) > kitaiti && agariritu < 0.) || (agariritu > 0. && (700. *. agariritu *. agariritu) > kitaiti) then 
+      true
+    else
+      false
+  else
+    if ((10000000.0 *. agariritu *. agariritu *. agariritu) > kitaiti && agariritu < 0.) || (agariritu > 0. && (115400. *. agariritu *. agariritu) > kitaiti) then 
+      true
+    else
+      false
 
 let furoritu_to_furo furoritu agariritu kitaiti tumo_len = 
   if furoritu >= 32.5 then 
