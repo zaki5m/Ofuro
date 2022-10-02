@@ -1655,7 +1655,23 @@ let parallel tmp =
   Array.iter Domain.join domains;
   pre
 
-  
+let print_de lst = 
+  let rec loop2 x t_lst = match x with 
+    | 4 -> ()
+    | _ -> print_hai t_lst x;Printf.printf "\n"; loop2 (x+1) t_lst 
+in
+  let rec loop t_lst = match t_lst with
+    | [] -> ()
+    | (_,_,_,_,h)::t -> let h = List.map (fun a -> change_gragh a)h in loop2 0 h; loop t 
+in
+loop lst
+let print_de2 lst = 
+  let rec loop2 x t_lst = match x with 
+    | 4 -> ()
+    | _ -> print_hai t_lst x;Printf.printf "\n"; loop2 (x+1) t_lst 
+  in
+  let h = List.map (fun a -> change_gragh a) lst in 
+  loop2 0 h
 
 let judge_parallel tehai = 
   let lst = hash_serch tehai in 
@@ -2212,6 +2228,12 @@ let col_tenpai_parallel tenpai_lst_ary tumo_l rm_wan =
   let n = Array.length tenpai_lst_ary in 
   let tasks = Array.init n (fun i -> i) in
   create_work tasks;
+  let rec loop2 tmp rest_tumo_lst yukou_lst = match yukou_lst with 
+    | [] -> tmp
+    | h::t -> let h1::t1 = rest_tumo_lst in 
+              let tmp = tmp *. ((float_of_int h1)/. (float_of_int h)) in 
+              loop2 tmp t1 t
+  in
   let rec loop tmp lst = match lst with
     | [] -> tmp
     | (k_lst,tumo_lst,rest_tumo_lst,k_count,yukou_lst,current_tehai)::t -> 
@@ -2219,6 +2241,7 @@ let col_tenpai_parallel tenpai_lst_ary tumo_l rm_wan =
             let t_ritu = self_t_ritu rm_wan tumo_l yukou_lst rest_tumo_lst in 
             let k_ritu = calc_k_ritu_not_naki k_count in 
             (*let k_ritu = k_ritu *. (yukou_to_ritu (int_of_float rm_wan) tumo_l yukou_lst rest_tumo_lst) in*)
+            let k_ritu = k_ritu *. (loop2 1. rest_tumo_lst yukou_lst) in 
             let t_ritu = t_ritu *. k_ritu in 
             (*let _ =  if true then (Printf.printf "%d, " tumo_l; Printf.printf "%f, " t_ritu; List.iter (fun a -> Printf.printf "%d "a) rest_tumo_lst; Printf.printf "\n") else () in*)
             if t_ritu <= 0.0 then
@@ -2238,6 +2261,12 @@ let col_tenpai_parallel_f tenpai_lst_ary tumo_l rm_wan =
   let n = Array.length tenpai_lst_ary in 
   let tasks = Array.init n (fun i -> i) in
   create_work tasks;
+  let rec loop2 tmp rest_tumo_lst yukou_lst = match yukou_lst with 
+    | [] -> tmp
+    | h::t -> let h1::t1 = rest_tumo_lst in 
+              let tmp = tmp *. ((float_of_int h1)/. (float_of_int h)) in  
+              loop2 tmp t1 t
+  in
   let rec loop tmp lst = match lst with
     | [] -> tmp
     | (k_lst,tumo_lst,rest_tumo_lst,k_count,yukou_lst,current_tehai)::t -> 
@@ -2245,6 +2274,7 @@ let col_tenpai_parallel_f tenpai_lst_ary tumo_l rm_wan =
             let t_ritu = self_t_ritu rm_wan tumo_l yukou_lst rest_tumo_lst in 
             let k_ritu = calc_k_ritu_not_naki k_count in 
             (*let k_ritu = k_ritu *. (yukou_to_ritu (int_of_float rm_wan) tumo_l yukou_lst rest_tumo_lst) in*)
+            let k_ritu = k_ritu *. (loop2 1. rest_tumo_lst yukou_lst) in 
             let t_ritu = t_ritu *. k_ritu in 
             (*let _ =  if true then (Printf.printf "%d, " tumo_l; Printf.printf "%f, " t_ritu; List.iter (fun a -> Printf.printf "%d "a) rest_tumo_lst; Printf.printf "\n") else () in*)
             if t_ritu <= 0.0 then
@@ -3389,6 +3419,32 @@ let threthhold_furo_30 agariritu kitaiti tumo_len =
     else
       false
 
+let threthhold_furo_35 agariritu kitaiti tumo_len = 
+  if tumo_len > 15 then 
+    if (agariritu > 0. && (2600. *. agariritu *. agariritu -. 900.) > kitaiti) then 
+      true
+    else
+      false
+  else if tumo_len > 12 then 
+    if (agariritu > 0. && (400. *. agariritu *. agariritu -. 500.) > kitaiti) then 
+      true
+    else
+      false
+  else if tumo_len > 9 then 
+    if (agariritu > 0. && (600. *. agariritu *. agariritu) > kitaiti) then 
+      true
+    else
+      false
+  else if tumo_len > 6 then 
+    if ((340000.0 *. agariritu *. agariritu *. agariritu) > kitaiti && agariritu < 0.) || (agariritu > 0. && (700. *. agariritu *. agariritu) > kitaiti) then 
+      true
+    else
+      false
+  else
+    if ((10000000.0 *. agariritu *. agariritu *. agariritu) > kitaiti && agariritu < 0.) || (agariritu > 0. && (115400. *. agariritu *. agariritu) > kitaiti) then 
+      true
+    else
+      false
 
 let furoritu_to_furo furoritu agariritu kitaiti tumo_len = 
   if furoritu >= 32.5 then 
@@ -3699,5 +3755,8 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
 *)
 
 
-
+let _ = let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(7,Manzu);(4,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan);(0,Tyun)] in 
+  let (ary,zi_ary) = create_table ([],[],[],[]) tehai in
+(* let tenpai_lst = judge_parallel tehai in *)
+  col_tenpai ary zi_ary tehai 80 [] 0 0 false [(0,3)]
 
