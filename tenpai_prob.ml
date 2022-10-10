@@ -245,22 +245,22 @@ let self_t_ritu yama_len tumo_len yukou_lst tumo_lst =
   let n = List.length yukou_lst in 
   let rec loop2 len max_len under top tmp =
     let tmp = tmp *. top /. under in
-    if len > max_len && (top-.4.) > 0. then 
-      loop2 (len-1) max_len (under-.4.) (top-.4.) tmp
+    if len > max_len then 
+      loop2 (len-1) max_len (under-.1.) (top-.1.) tmp
     else
       tmp /. (under-.4.)
   in
   let rec loop len end_len i yama tmp sum t_lst = match t_lst with
     | [] -> sum
     | h::t -> let tumo = List.nth tumo_lst i in 
-              let result = Tenpai_ary2.serch len end_len yama h in
+              let result = None (*Tenpai_ary2.serch len end_len yama h*) in
               let tmp2 = if result = None then 
                           loop2 len end_len yama (yama -. float_of_int h) 1. 
                         else
                           Option.get result
               in 
               let tmp2 = tmp *. tmp2 *. (float_of_int tumo) in
-              let tmp3 = if i = n-1 then tmp2 else loop (end_len-1) (end_len-1) (i+1) (yama-.(float_of_int (len - end_len+1))*.4.) tmp2 0. t in
+              let tmp3 = if i = n-1 then tmp2 else loop (end_len-1) (end_len-1) (i+1) (yama-.(float_of_int (len - end_len+1))) tmp2 0. t in
               if end_len > (n-i) then 
                 loop len (end_len-1) i yama tmp (sum +. tmp3) (h::t)
               else
@@ -1676,7 +1676,6 @@ let print_de2 lst =
 
 let judge_parallel tehai = 
   let lst = hash_serch tehai in 
-  Printf.printf "hit:%d\n"(List.length lst); flush stdout;
   if lst = [] then 
     let (_,n) = syanten tehai in
     if n  >=  1 then 
@@ -2016,7 +2015,8 @@ let first_sutehai_to_one_index tenpai_array =
         else
           loop (i-1) (most_lst, b_tmp, c_tmp, d_tmp) tmp_lst (most_lst, most_a, most_b, most_c)
       else
-        let tmp_lst = (most_lst, b_tmp, c_tmp, d_tmp)::tmp_lst in 
+        let n_first_sutehai = List.nth a_lst (List.length a_lst - 1) in 
+        let tmp_lst = if let (x,_) = n_first_sutehai in x = 0 && d_tmp <> 0. then (most_lst, b_tmp, c_tmp, d_tmp+.5.)::tmp_lst else (most_lst, b_tmp, c_tmp, d_tmp)::tmp_lst in 
         let (a_lst, b_tmp, c_tmp, d_tmp) = (k_lst,t_ritu,agariritu,kitaiti) in 
         if i = 0 then 
           (a_lst, b_tmp, c_tmp, d_tmp)::tmp_lst
@@ -2405,7 +2405,7 @@ let col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst =
     let tenpai_lst = col_tenpai_parallel tenpai_lst tumo_l rm_wan in
     let tenpai_lst = tenpai_to_kitaiti_p ary zi_ary tenpai_lst f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan in
     let last_form_tenpai_lst = opt_tenpai_form_p tenpai_lst in
-    List.iter (fun (a,b,c,d) -> let (a1,a2) = hai_to_ary (List.nth a (List.length a -1)) in Printf.printf "(%d,%d)) %f %f %f \n"a1 a2 b c d;) last_form_tenpai_lst;
+    (*List.iter (fun (a,b,c,d) -> let (a1,a2) = hai_to_ary (List.nth a (List.length a -1)) in Printf.printf "(%d,%d)) %f %f %f \n"a1 a2 b c d;) last_form_tenpai_lst;*)
     if last_form_tenpai_lst = [] then 
       ([],0.0,0.0,0.0,0,0.0,0.0)
     else
@@ -2626,10 +2626,10 @@ let common_b ary zi_ary tehai sutehai_lst tumo_len (f_lst:(state*(int*(int*int*i
     let (s_hai,s_count) = somete tehai f_lst in
     let (t_lst,t_count) = titoi_allow tehai f_lst in
     let mode = 
-      if tumo_len > 15 then 
+      if tumo_len > 12 then 
           if kind_k >= 9 then
             Kokushi
-          else if s_count >= 9 then
+          else if s_count >= 11 then
             Some
           else if t_count >= 4 then
             Titoi
@@ -2685,7 +2685,7 @@ let mode_choice count tumo_len =
     else
       false 
   else if tumo_len > 9 then
-    if count <= 1 then
+    if count <= 2 then
       true
     else
       false  
@@ -3759,9 +3759,9 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
 
 *)
 
-
+(*
 let _ = let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(7,Manzu);(4,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan);(0,Tyun)] in 
   let (ary,zi_ary) = create_table ([],[],[],[]) tehai in
 (* let tenpai_lst = judge_parallel tehai in *)
   col_tenpai ary zi_ary tehai 80 [] 0 0 false [(0,3)]
-
+*)
