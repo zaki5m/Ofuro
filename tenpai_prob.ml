@@ -2908,17 +2908,45 @@ let dora_convert dora =
   else  
     ("dora", `List [`Int (List.nth dora 0);`Int (List.nth dora 1);`Int (List.nth dora 2);`Int (List.nth dora 2)])
     
+let furo_convert f_lst = 
+  let m = List.length f_lst in 
+  let rec loop tmp t_lst = match t_lst with
+    | [] -> tmp 
+    | (_,(a,(b,c,d)))::t -> let n1 = convert_hai_to_int (ary_to_hai (a,b)) in 
+                            let n2 = convert_hai_to_int (ary_to_hai (a,c)) in 
+                            let n3 = convert_hai_to_int (ary_to_hai (a,d)) in 
+                            loop (n1::n2::n3::tmp) t 
+  in
+  let n_f_lst = loop [] f_lst in 
+  if m = 0 then 
+    ("furo", `List [`Int 34])
+  else if m = 1 then 
+    ("furo", `List [`Int (List.nth n_f_lst 0);`Int (List.nth n_f_lst 1);`Int (List.nth n_f_lst 2)])
+  else if m = 2 then  
+    ("furo", `List [`Int (List.nth n_f_lst 0);`Int (List.nth n_f_lst 1);`Int (List.nth n_f_lst 2);`Int (List.nth n_f_lst 3);`Int (List.nth n_f_lst 4);`Int (List.nth n_f_lst 5)])
+  else if m = 3 then  
+    ("furo", `List [`Int (List.nth n_f_lst 0);`Int (List.nth n_f_lst 1);`Int (List.nth n_f_lst 2);`Int (List.nth n_f_lst 3);`Int (List.nth n_f_lst 4);`Int (List.nth n_f_lst 5);`Int (List.nth n_f_lst 6);`Int (List.nth n_f_lst 7);`Int (List.nth n_f_lst 8)])
+  else  
+    ("furo", `List [`Int (List.nth n_f_lst 0);`Int (List.nth n_f_lst 1);`Int (List.nth n_f_lst 2);`Int (List.nth n_f_lst 3);`Int (List.nth n_f_lst 4);`Int (List.nth n_f_lst 5);`Int (List.nth n_f_lst 6);`Int (List.nth n_f_lst 7);`Int (List.nth n_f_lst 8);`Int (List.nth n_f_lst 9);`Int (List.nth n_f_lst 10);`Int (List.nth n_f_lst 11)])
 
+let table_json ary zi_ary =
+  ("table", `List [`Int ary.(0).(0); `Int ary.(0).(1); `Int ary.(0).(2); `Int ary.(0).(3); `Int ary.(0).(4); `Int ary.(0).(5); `Int ary.(0).(6); `Int ary.(0).(7); `Int ary.(0).(8);
+                   `Int ary.(1).(0); `Int ary.(1).(1); `Int ary.(1).(2); `Int ary.(1).(3); `Int ary.(1).(4); `Int ary.(1).(5); `Int ary.(1).(6); `Int ary.(1).(7); `Int ary.(1).(8);
+                   `Int ary.(2).(0); `Int ary.(2).(1); `Int ary.(2).(2); `Int ary.(2).(3); `Int ary.(2).(4); `Int ary.(2).(5); `Int ary.(2).(6); `Int ary.(2).(7); `Int ary.(2).(8);
+                   `Int zi_ary.(0); `Int zi_ary.(1); `Int zi_ary.(2); `Int zi_ary.(3); `Int zi_ary.(4); `Int zi_ary.(5); `Int zi_ary.(6)]) 
 
-
-let dahaikouho hand dora zi_kaze ba_kaze turn = 
+let dahaikouho hand f_lst ary zi_ary dora zi_kaze ba_kaze turn = 
   let hand = List.map (fun a -> convert_hai_to_int a) hand in 
   let dora = List.map (fun a -> convert_hai_to_int (ary_to_hai a)) dora in 
   let dahai = hand_convert hand in
   let doraindicators = dora_convert dora in  
+  let furo_json = furo_convert f_lst in
+  let table = table_json ary zi_ary in 
   `Assoc
     [
       dahai;
+      furo_json;
+      table;
       doraindicators;
       ("zikaze", `Int zi_kaze);
       ("bakaze", `Int ba_kaze);
@@ -2926,13 +2954,13 @@ let dahaikouho hand dora zi_kaze ba_kaze turn =
     ]
 
 
-let client_fun ic oc hand dora zi_kaze ba_kaze turn = 
+let client_fun ic oc hand f_lst ary zi_ary dora zi_kaze ba_kaze turn = 
   let open Yojson.Basic.Util in
   let zi_kaze = if zi_kaze = 0 then 27 else if zi_kaze = 1 then 28 else if zi_kaze = 2 then 29 else 30 in 
   let ba_kaze = if ba_kaze = 0 then 27 else 28 in 
   let turn = 18 - turn in 
   (*Yojson.Basic.to_channel oc new_json;*)
-  let new_json = dahaikouho hand dora zi_kaze ba_kaze turn in 
+  let new_json = dahaikouho hand f_lst ary zi_ary dora zi_kaze ba_kaze turn in 
   let new_json = Yojson.Basic.to_string new_json in 
   output_string !oc (new_json ^ "\n");
   Out_channel.flush !oc;
@@ -2974,7 +3002,7 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
     else if n = n' then 
       common_b ary zi_ary tehai sutehai_lst tumo_l f_lst player
     else if tumo_l < 1 then 
-      let (dahai,_,_,_) = client_fun ic_kitaiti oc_kitaiti tehai dora_lst zi_kaze ba_kaze (tumo_l+1) in 
+      let (dahai,_,_,_) = client_fun ic_kitaiti oc_kitaiti tehai (tapl_player furo_lst) ary zi_ary dora_lst zi_kaze ba_kaze (tumo_l+1) in 
       hai_to_int tehai dahai
     else if n = 0 then
       let (x,_) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku dora_lst ary zi_ary in
@@ -2991,7 +3019,7 @@ let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_k
       else
       let x = List.nth a (a_len-1) in
       hai_to_int tehai x*)
-      let (dahai,_,_,_) = client_fun ic_kitaiti oc_kitaiti tehai dora_lst zi_kaze ba_kaze tumo_l in 
+      let (dahai,_,_,_) = client_fun ic_kitaiti oc_kitaiti tehai (tapl_player furo_lst) ary zi_ary dora_lst zi_kaze ba_kaze tumo_l in 
       hai_to_int tehai dahai
   else
     if reach_q_1 || reach_q_2 || reach_q_3 || reach_q_4 then
@@ -3789,10 +3817,29 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           []
         else
           [(k_hai,f_hai)]
- *)       
+ *)  
+ 
+ 
+
+let patern_to_kitaiti tehai (x,y) f_lst p_f_lst ary zi_ary dora zi_kaze ba_kaze turn = 
+  let rec loop (tmp,t_ritu,agariritu,kitaiti) t_lst = match t_lst with 
+    | [] -> (t_ritu,agariritu,kitaiti)
+    | h::t -> let (dahai,tmp_a,tmp_b,tmp_c) = client_fun ic_kitaiti oc_kitaiti tehai (h::f_lst) ary zi_ary dora zi_kaze ba_kaze turn in 
+              let kuikae_lst = kuikae (x,y) h in 
+              let dahai = convert_int_to_hai dahai in 
+              if List.exists (fun a -> a = dahai) kuikae_lst then 
+                loop (tmp,t_ritu,agariritu,kitaiti) t 
+              else if tmp_c > kitaiti then 
+                loop (h,tmp_a,tmp_b,tmp_c) t 
+              else
+                loop (tmp,t_ritu,agariritu,kitaiti) t 
+  in
+  let (furo_mentsu,t_ritu,agariritu,kitaiti) = loop (0.0,0.0,0.0) p_f_lst in 
+  let t_ritu = if t_ritu = 1.1 then 1.0 else t_ritu in
+  (furo_mentsu,t_ritu,a_ritu,kitaiti)
+
 
 (*data scan*)
-
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst furoritu_lst =
   let (_,n) = syanten tehai in
   let reach_q_1 =  List.exists (fun b -> b = Reach || b = Doublereach) (tapl_player_1 yaku_lst) in
@@ -3807,24 +3854,25 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
   else if n > 3 || n = tn && tn >= 3 then 
     []
   else 
-    [](*
     let (x,y) = ary_to_hai (x,y) in
     let (ary,zi_ary) = create_table sutehai_lst tehai in
     let (ary,zi_ary) = furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary in
     let p_f_lst = possible_furo_patern tehai (x,y) in
-    let f_kitaiti_lst = f_kitaiti p_f_lst tehai (tapl_player furo_lst player) (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst in
+    let (_,f_t_ritu,f_agariritu,f_kitaiti) = patern_to_kitaiti tehai (tapl_player furo_lst player) p_f_lst ary zi_ary dora zi_kaze ba_kaze tumo_len in 
+    (*let f_kitaiti_lst = f_kitaiti p_f_lst tehai (tapl_player furo_lst player) (x,y) ary zi_ary yama_len zi_kaze ba_kaze dora_lst in
     let tenpai_lst = judge_parallel_f tehai in
-    let tenpai_lst = parallel_rest_tumo_lst ary zi_ary tenpai_lst in 
+    let tenpai_lst = parallel_rest_tumo_lst ary zi_ary tenpai_lst in*) 
     if Array.length tenpai_lst = 0 || Array.length tenpai_lst = 1 && List.length tenpai_lst.(0) = 0 then 
       []
     else if (reach_q_1 || reach_q_2 || reach_q_3 || reach_q_4) = false then
-      let not_naki = col_tenpai_f ary zi_ary yama_len (tapl_player furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
+      (*let not_naki = col_tenpai_f ary zi_ary yama_len (tapl_player furo_lst player) zi_kaze ba_kaze naki dora_lst tenpai_lst in
       if f_kitaiti_lst = [] then 
         []
       else
         let ((f_t_ritu,f_agariritu,f_kitaiti,k_hai),f_hai) = max_f_agariritu_a f_kitaiti_lst in  
         let (k_lst,t_ritu,agariritu,kitaiti,anzendo,_,_) = not_naki in
-        (*
+        *)
+        let (dahai,t_ritu,agariritu,kitaiti) = client_fun ic_kitaiti oc_kitaiti tehai (tapl_player furo_lst) ary zi_ary dora_lst zi_kaze ba_kaze tumo_len in 
         let _ = 
           if f_agariritu > 0.0 && f_kitaiti > 0.0 then
             (let tehai = List.map ( fun a -> change_gragh a) tehai in 
@@ -3834,7 +3882,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
             ()
           in
           []
-          *)
+        
         
         if naki = false then 
           if (f_agariritu -. agariritu) > 0.0 && furoritu_to_furo (List.nth furoritu_lst player) (f_agariritu -. agariritu) (kitaiti -.f_kitaiti) tumo_len && k_hai <> (1,Not_hai) then
@@ -3875,7 +3923,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         else
           [(k_hai,f_hai)]
         *)
-*)
+
 (*mjai*)
 (*
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst furoritu =
