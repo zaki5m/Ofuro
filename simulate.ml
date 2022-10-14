@@ -4,6 +4,7 @@ open Mahjong_base
 open Mahjong_haieff
 open Tenpai_prob
 open Mahjong_admin
+open Unix
 
 let zyuniten a b c d (uma1,uma2) = 
   let lst = [a;b;c;d] in
@@ -338,15 +339,19 @@ let simulate count (uma1,uma2) furoritu_lst =
 *)
 
 let simulate_kyoku count furoritu_lst =
+  let addr = ADDR_INET(inet_addr_loopback, 1111) in
+  let ic , oc = open_connection addr in 
+  ic_kitaiti := ic; 
+  oc_kitaiti := oc; 
   let player_score = (25000,25000,25000,25000) in
   let rec loop i (tmp1,tmp2,tmp3,tmp4) (naki_tmp1,naki_tmp2,naki_tmp3,naki_tmp4) zyuni_lst = 
-    let (_,_,(naki_a,naki_b,naki_c,naki_d),(a,b,c,d)) = kyoku_s 0 1 0 0 player_score furoritu_lst 0 in
+    let (kyotaku,_,(naki_a,naki_b,naki_c,naki_d),(a,b,c,d)) = kyoku_s 0 1 0 0 player_score furoritu_lst 0 in
     Hashtbl.reset myhash;
-    flush stdout;
-    let a = a - 25000 in
-    let b = b - 25000 in
-    let c = c - 25000 in
-    let d = d - 25000 in
+    let kyotaku = kyotaku * 1000 /4 in 
+    let a = a + kyotaku - 25000 in
+    let b = b + kyotaku - 25000 in
+    let c = c + kyotaku - 25000 in
+    let d = d + kyotaku - 25000 in
     let tmp1 = a + tmp1 in
     let tmp2 = b + tmp2 in
     let tmp3 = c + tmp3 in
@@ -358,7 +363,6 @@ let simulate_kyoku count furoritu_lst =
     (*Printf.printf "%d\n" (total+total_kyoku);*)
     let (a',b',c',d') = zyuni a b c d in 
     let zyuni_lst = zyuni_count zyuni_lst (int_of_float a',int_of_float b',int_of_float c',int_of_float d') in 
-    flush stdout;
     (*Printf.printf "%d A:%d B:%d c:%d d:%d %f %f %f %f\n"i a b c d a' b' c' d'; flush stdout;*)
     if i = 0 then
       ((*Printf.printf "%d\n" (total+total_kyoku);*)
@@ -371,6 +375,7 @@ let simulate_kyoku count furoritu_lst =
       Printf.printf "C: %d %d %d %d \n" s1 s2 s3 s4;
       let (s1,s2,s3,s4) = List.nth zyuni_lst 3 in  
       Printf.printf "D: %d %d %d %d \n" s1 s2 s3 s4;*)
+      shutdown_connection !ic_kitaiti;
       Printf.printf "finish\n";
       (*Printf.printf "result: %dtimes A%f real(%f):%d B%f real(%f):%d c%f real(%f):%d d%f real(%f):%d\n" count (List.nth furoritu_lst 0) ((float_of_int naki_tmp1)/.(float_of_int count)) tmp1 (List.nth furoritu_lst 1) ((float_of_int naki_tmp2)/.(float_of_int count)) tmp2 (List.nth furoritu_lst 2) ((float_of_int naki_tmp3)/.(float_of_int count)) tmp3 (List.nth furoritu_lst 3) ((float_of_int naki_tmp4)/.(float_of_int count)) tmp4*))
     else
@@ -379,5 +384,5 @@ let simulate_kyoku count furoritu_lst =
   loop (count-1) (0,0,0,0) (0,0,0,0) [(0,0,0,0);(0,0,0,0);(0,0,0,0);(0,0,0,0)]
 
 (*let _ = simulate 250 (10000,30000) [10.0;35.0;35.0;10.0] *)
-let _ = simulate_kyoku 5 [35.;35.;35.;35.]
+let _ = simulate_kyoku 1 [30.;15.;30.;15.]
 
