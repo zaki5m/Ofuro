@@ -2974,8 +2974,8 @@ let client_fun ic oc hand f_lst ary zi_ary dora zi_kaze ba_kaze turn =
     ((1,Not_hai),0.,0.,0.)
   else
     let t_ritu = if t_ritu = 1.1 then 1.0 else if t_ritu = -0.1 then 0.0 else t_ritu in 
-    let a_ritu = if a_ritu = -0.1 then 0.0 else t_ritu in
-    let kitaiti = if kitaiti = -0.1 then 0.0 else t_ritu in
+    let a_ritu = if a_ritu = -0.1 then 0.0 else a_ritu in
+    let kitaiti = if kitaiti = -0.1 then 0.0 else kitaiti in
     let dahai = convert_int_to_hai dahai in 
     (dahai,t_ritu,a_ritu,kitaiti)
 
@@ -3713,7 +3713,7 @@ let threthhold_furo_10 agariritu kitaiti tumo_len =
     else
       false
   else
-    if (agariritu > 0. && ((-0.1) *. agariritu *. agariritu +. 350) < kitaiti) then 
+    if (agariritu > 0. && ((-0.1) *. agariritu *. agariritu +. 350.) < kitaiti) then 
       true
     else
       false
@@ -3768,7 +3768,7 @@ let threthhold_furo_20 agariritu kitaiti tumo_len =
     else
       false
   else
-    if (agariritu > 0. && ((-160.) *. agariritu *. agariritu +. 320) < kitaiti) then 
+    if (agariritu > 0. && ((-160.) *. agariritu *. agariritu +. 320.) < kitaiti) then 
       true
     else
       false
@@ -3850,7 +3850,7 @@ let threthhold_furo_35 agariritu kitaiti tumo_len =
     else
       false
   else
-    if (agariritu > 0. && ((-100.) *. agariritu *. agariritu +. 140) < kitaiti) then 
+    if (agariritu > 0. && ((-100.) *. agariritu *. agariritu +. 140.) < kitaiti) then 
       true
     else
       false
@@ -4042,7 +4042,7 @@ let patern_to_kitaiti tehai (x,y) f_lst p_f_lst ary zi_ary dora zi_kaze ba_kaze 
               else
                 loop (tmp,t_ritu,agariritu,kitaiti) t 
   in
-  let (furo_mentsu,t_ritu,agariritu,kitaiti) = loop ((Syuntu,(0,(0,1,2))),0.0,0.0,0.0) p_f_lst in 
+  let (furo_mentsu,t_ritu,agariritu,kitaiti) = loop ((Syuntu,(0,(0,1,2))),0.0,0.0,0.0) p_f_lst in
   let t_ritu = if t_ritu = 1.1 then 1.0 else t_ritu in
   (furo_mentsu,t_ritu,agariritu,kitaiti)
 
@@ -4083,7 +4083,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         let (k_lst,t_ritu,agariritu,kitaiti,anzendo,_,_) = not_naki in
         *)
         let (dahai,t_ritu,agariritu,kitaiti) = client_fun ic_kitaiti oc_kitaiti tehai (tapl_player furo_lst player) ary zi_ary dora_lst zi_kaze ba_kaze (tumo_len-1) in 
-        (*
+        
         let _ = 
           if f_agariritu > 0.0 && f_kitaiti > 0.0 then
             (let tehai = List.map ( fun a -> change_gragh a) tehai in 
@@ -4095,8 +4095,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           []
         else
           []
-        *)
-        
+        (*
         if naki = false then 
           if f_agariritu > 0.0 && f_kitaiti > 0.0 && furoritu_to_furo (List.nth furoritu_lst player) (f_agariritu -. agariritu) (f_kitaiti -. kitaiti) tumo_len  then
             [(dahai,f_hai)]
@@ -4136,7 +4135,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         else
           [(k_hai,f_hai)]
         *)
-
+*)
 (*mjai*)
 (*
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst furoritu =
