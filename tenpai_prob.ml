@@ -3693,54 +3693,54 @@ let threthhold_furo_35 agariritu kitaiti tumo_len =
 
 let threthhold_furo_10 agariritu kitaiti tumo_len = 
   if tumo_len > 15 then 
-    if (agariritu > 0. && ((-120.) *. agariritu *. agariritu +. 190.) < kitaiti) then 
+    if (agariritu > 0. && ((-150.) *. agariritu *. agariritu +. 80.) < kitaiti) then 
       true
     else
       false
   else if tumo_len > 12 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 120.) < kitaiti) then 
+    if (agariritu > 0. && ((-150.) *. agariritu *. agariritu +. 94.) < kitaiti) then 
       true
     else
       false
   else if tumo_len > 9 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 220.) < kitaiti) then 
+    if (agariritu > 0. && ((-100.) *. agariritu *. agariritu +. 57.) < kitaiti) then 
       true
     else
       false
   else if tumo_len > 6 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 320.) < kitaiti) then 
+    if (agariritu > 0. && ((-100.) *. agariritu *. agariritu +. 50.) < kitaiti) then 
       true
     else
       false
   else
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 1230.) < kitaiti) then 
+    if (agariritu > 0. && ((-100.) *. agariritu *. agariritu +. 17.) < kitaiti) then 
       true
     else
       false
 
 let threthhold_furo_15 agariritu kitaiti tumo_len = 
   if tumo_len > 15 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 100.) < kitaiti) then 
+    if (agariritu > 0. && ((-140.) *. agariritu *. agariritu +. 14.) < kitaiti) then 
       true
     else
       false
   else if tumo_len > 12 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 30.) < kitaiti) then 
+    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 9.) < kitaiti) then 
       true
     else
       false
   else if tumo_len > 9 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 140.) < kitaiti) then 
+    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 3.) < kitaiti) then 
       true
     else
       false
   else if tumo_len > 6 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 220.) < kitaiti) then 
+    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu ) < kitaiti) then 
       true
     else
       false
   else
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 940.) < kitaiti) then 
+    if (agariritu > 0. && ((-10000.) *. agariritu *. agariritu) < kitaiti) then 
       true
     else
       false
@@ -3748,54 +3748,54 @@ let threthhold_furo_15 agariritu kitaiti tumo_len =
 
 let threthhold_furo_20 agariritu kitaiti tumo_len = 
   if tumo_len > 15 then 
-    if (agariritu > 0. && ((-110.) *. agariritu *. agariritu +. 0.) < kitaiti) then 
+    if ((agariritu > 0. && ((-6180.) *. agariritu *. agariritu) < kitaiti) || kitaiti > 0.)  then 
       true
     else
       false
   else if tumo_len > 12 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 0.) < kitaiti) then 
+    if ((agariritu > 0. && ((-6180.) *. agariritu *. agariritu) < kitaiti) || kitaiti > 0.)  then 
       true
     else
       false
   else if tumo_len > 9 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 60.) < kitaiti) then 
+    if ((agariritu > 0. && ((-6880.) *. agariritu *. agariritu) < kitaiti) || kitaiti > 0.)  then 
       true
     else
       false
   else if tumo_len > 6 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 180.) < kitaiti) then 
+    if ((agariritu > 0. && ((-18880.) *. agariritu *. agariritu) < kitaiti) || kitaiti > 0.)  then 
       true
     else
       false
   else
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 740.) < kitaiti) then 
+    if (agariritu > 0.) then 
       true
     else
       false
 
 let threthhold_furo_25 agariritu kitaiti tumo_len = 
   if tumo_len > 15 then 
-    if (agariritu > 0. && ((-110.) *. agariritu *. agariritu +. 0.) < kitaiti) then 
+    if ((agariritu > 0. && ((-20500.) *. agariritu *. agariritu) < kitaiti) || kitaiti > 0.) then 
       true
     else
       false
   else if tumo_len > 12 then 
-    if (agariritu > 0. && ((-10680.) *. agariritu *. agariritu +. 0.) < kitaiti) then 
+    if ((agariritu > 0. && ((-13500.) *. agariritu *. agariritu +. 0.) < kitaiti) || kitaiti > 0.) then 
       true
     else
       false
   else if tumo_len > 9 then 
-    if (agariritu > 0. && ((-100.) *. agariritu *. agariritu +. 40.) < kitaiti) then 
+    if ((agariritu > 0. && ((-20000.) *. agariritu *. agariritu +. 40.) < kitaiti) || kitaiti > 0.) then 
       true
     else
       false
   else if tumo_len > 6 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 140.) < kitaiti) then 
+    if (agariritu > 0.) then 
       true
     else
       false
   else
-    if (agariritu > 0. && ((-90.) *. agariritu *. agariritu +. 560.) < kitaiti) then 
+    if (agariritu > 0.) then 
       true
     else
       false
@@ -3803,54 +3803,54 @@ let threthhold_furo_25 agariritu kitaiti tumo_len =
 
 let threthhold_furo_30 agariritu kitaiti tumo_len = 
   if tumo_len > 15 then 
-    if (agariritu > 0. && ((-2880.) *. agariritu *. agariritu +. 0.) < kitaiti) then 
+    if ((agariritu > 0. && ((-227000.) *. agariritu *. agariritu) < kitaiti) || kitaiti > 0.) then 
       true
     else
       false
   else if tumo_len > 12 then 
-    if (agariritu > 0. && ((-27080.) *. agariritu *. agariritu +. 110.) < kitaiti) then 
+    if ((agariritu > 0. && ((-52000.) *. agariritu *. agariritu) < kitaiti) || kitaiti > 0.) then 
       true
     else
       false
   else if tumo_len > 9 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 0.) < kitaiti) then 
+    if ((agariritu > 0. && ((-112700.) *. agariritu *. agariritu) < kitaiti) || kitaiti > 0.) then 
       true
     else
       false
   else if tumo_len > 6 then 
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 100.) < kitaiti) then 
+    if (agariritu > 0.) then 
       true
     else
       false
   else
-    if (agariritu > 0. && ((-80.) *. agariritu *. agariritu +. 490.) < kitaiti) then 
+    if (agariritu > 0.) then 
       true
     else
       false
 
 let threthhold_furo_35 agariritu kitaiti tumo_len = 
   if tumo_len > 15 then 
-    if (agariritu > 0. && ((-8580.) *. agariritu *. agariritu +. 20.) < kitaiti) then 
+    if ((agariritu > 0. && ((-789000.) *. agariritu *. agariritu ) < kitaiti) || kitaiti > 0.) then 
       true
     else
       false
   else if tumo_len > 12 then 
-    if (agariritu > 0. && ((-27080.) *. agariritu *. agariritu +. 100.) < kitaiti) then 
+    if ((agariritu > 0. && ((-341000.) *. agariritu *. agariritu) < kitaiti) || kitaiti > 0.) then 
       true
     else
       false
   else if tumo_len > 9 then 
-    if (agariritu > 0. && ((-3280.) *. agariritu *. agariritu +. 0.) < kitaiti) then 
+    if ((agariritu > 0. && ((-8090000.) *. agariritu *. agariritu) < kitaiti) || kitaiti > 0.) then 
       true
     else
       false
   else if tumo_len > 6 then 
-    if (agariritu > 0. && ((-1880.) *. agariritu *. agariritu +. 100.) < kitaiti) then 
+    if (agariritu > 0.) then 
       true
     else
       false
   else
-    if (agariritu > 0. && ((-880.) *. agariritu *. agariritu +. 460.) < kitaiti) then 
+    if (agariritu > 0.) then 
       true
     else
       false
