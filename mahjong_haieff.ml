@@ -1,36 +1,9 @@
 open Mahjong_base
 open Loop
 open Mahjong_safty
-open Domainslib
 
-module C = Domainslib.Chan
-
-let num_domains = int_of_string Sys.argv.(1) 
-
-type 'a message = Task of 'a | Quit
-
-let c = C.make_unbounded ()
-
-let lk = Mutex.create ()
-
-let create_work tasks =
-  Array.iter (fun t -> C.send c (Task t)) tasks;
-  for _ = 1 to num_domains do
-    C.send c Quit
-  done
-
-let create_work_lst tasks =
-  List.iter (fun t -> C.send c (Task t)) tasks
-
-let rec worker f () =
-  match C.recv c with
-  | Task a ->
-      f a;
-      worker f ()
-  | Quit -> ()
-
-let syanten_hash = Hashtbl.create 12345
-
+(*let syanten_hash = Hashtbl.create 12345
+*)
 
 
 let lst_to_ary_type lst = 
@@ -825,9 +798,10 @@ let convert_int_to_hai i = match i with
   | 31 -> (0,Haku)
   | 32 -> (0,Hatsu)
   | 33 -> (0,Tyun)
+  | _ -> (1,Not_hai)
 
 
-
+(*
 
 let calc_max_tumo_len max_tumo_len lst1 lst2 = 
   let m = List.length lst1 in 
@@ -1073,6 +1047,7 @@ let dis_add_main tehai ary zi_ary max_tumo_len =
                                                                                               else
                                                                                                 (a,b,c)
                                                                                           in
+                                                                                          
                                                                                           loop2 (tmp_a+.t_max,tmp_b+.a_max,tmp_c+.k_max) t2
                       in
                       let (t_max,a_max,k_max) = loop2 (0.,0.,0.) lst in 
@@ -1081,7 +1056,8 @@ let dis_add_main tehai ary zi_ary max_tumo_len =
                       else
                         loop (k_hai,t_ritu,agariritu,kitaiti) t
   in
-  let lst_len = List.length first_lst in 
+  
+  (*let lst_len = List.length first_lst in 
   let tasks = Array.init lst_len (fun i -> i) in
   create_work tasks ;
   let first_ary = Array.of_list first_lst in 
@@ -1091,18 +1067,19 @@ let dis_add_main tehai ary zi_ary max_tumo_len =
               (fun _ -> Domain.spawn(worker (update results))) in
   worker (update results) ();
   Array.iter Domain.join domains;
-  Array.fold_left (fun (a1,b1,c1,d1) (a2,b2,c2,d2) ->if d1 > d2 then (a1,b1,c1,d1) else (a2,b2,c2,d2)) ((1,Not_hai),-1.,-1.,-1.) results
-  (*loop ((1,Not_hai),-1.,-1.,-1.) first_lst*)
+  Array.fold_left (fun (a1,b1,c1,d1) (a2,b2,c2,d2) ->if d1 > d2 then (a1,b1,c1,d1) else (a2,b2,c2,d2)) ((1,Not_hai),-1.,-1.,-1.) results*)
+  loop ((1,Not_hai),-1.,-1.,-1.) first_lst
+*)
 
-
-
+(*
 let _ = let tehai = [(4,Manzu);(4,Manzu);(5,Manzu);(6,Manzu);(7,Manzu);(4,Pinzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton)] in 
         let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(7,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan)] in 
-        let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan);(0,Sya)] in 
+        (*let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan);(0,Sya)] in *)
 let (ary,zi_ary) = create_table ([],[],[],[]) tehai in
 let ((a,b),c,d,e) = dis_add_main tehai ary zi_ary 15 in 
 let (a,b) = hai_to_ary (a,b) in 
-Printf.printf "(%d,%d)%f %f %f\n"a b c d e; 
+Printf.printf "(%d,%d)%f %f %f\n"a b c d e;
+*) 
 (*
 let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst = 
   let yaku = List.nth yaku_lst player in
