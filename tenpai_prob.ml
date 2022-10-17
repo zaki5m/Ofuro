@@ -2810,34 +2810,7 @@ let judge_suzi k_hai ary zi_ary g_lst =
 
 
 
-    
   
-  
-
-
-let judge_reach ary zi_ary tehai sutehai_lst yaku_lst yama_len f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan yaku = 
-  let (_,n) = syanten tehai in 
-  if n = 0 then 
-    let (x,(_,kitaiti)) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku dora_lst ary zi_ary in
-    if kitaiti > 0.0 then
-      x
-    else
-      reach_defence ary zi_ary yaku_lst sutehai_lst tehai
-  else
-    let (a,_,_,_,_,_,_) = col_tenpai ary zi_ary tehai yama_len f_lst zi_kaze ba_kaze naki dora_lst in
-    let a_len = List.length a in 
-    if a_len = 0 then      
-      reach_defence ary zi_ary yaku_lst sutehai_lst tehai
-    else
-      let k_hai = List.nth a (a_len - 1) in
-      let g_lst = reach_genbutu yaku_lst sutehai_lst tehai in
-      if List.exists (fun x -> x = k_hai) g_lst then
-        hai_to_int tehai k_hai
-      else
-        if judge_suzi k_hai ary zi_ary g_lst then 
-          hai_to_int tehai k_hai
-        else
-          reach_defence ary zi_ary yaku_lst sutehai_lst tehai
 
 let convert_hai_to_int = function 
   | (1,Manzu) -> 0
@@ -2980,6 +2953,40 @@ let client_fun ic oc hand f_lst ary zi_ary dora zi_kaze ba_kaze turn =
     (dahai,t_ritu,a_ritu,kitaiti)
 
 
+
+
+let judge_reach ary zi_ary tehai sutehai_lst yaku_lst yama_len f_lst zi_kaze ba_kaze naki dora_lst tumo_l rm_wan yaku = 
+  let (_,n) = syanten tehai in 
+  let n' = titoi_syanten tehai in
+  let n'' = kokushi_syanten tehai in
+  if n = 0 then 
+    let (x,(_,kitaiti)) = tenpai_to_opt tehai tumo_l rm_wan f_lst zi_kaze ba_kaze naki yaku dora_lst ary zi_ary in
+    if kitaiti > 0.0 then
+      x
+    else
+      reach_defence ary zi_ary yaku_lst sutehai_lst tehai
+  else if n = n' || n = n'' then 
+    reach_defence ary zi_ary yaku_lst sutehai_lst tehai
+  else if tumo_l < 1 then 
+    let (k_hai,_,_,_,) = client_fun ic_kitaiti oc_kitaiti tehai f_lst ary zi_ary dora_lst zi_kaze ba_kaze (tumo_l+1) in
+    let g_lst = reach_genbutu yaku_lst sutehai_lst tehai in
+    if List.exists (fun x -> x =k_hai) g_lst then
+      hai_to_int tehai k_hai
+    else
+      if judge_suzi k_hai ary zi_ary g_lst then 
+        hai_to_int tehai k_hai
+      else
+        reach_defence ary zi_ary yaku_lst sutehai_lst tehai
+  else 
+    let (k_hai,_,_,_,) = client_fun ic_kitaiti oc_kitaiti tehai f_lst ary zi_ary dora_lst zi_kaze ba_kaze tumo_l in
+    let g_lst = reach_genbutu yaku_lst sutehai_lst tehai in
+    if List.exists (fun x -> x =k_hai) g_lst then
+      hai_to_int tehai k_hai
+    else
+      if judge_suzi k_hai ary zi_ary g_lst then 
+        hai_to_int tehai k_hai
+      else
+        reach_defence ary zi_ary yaku_lst sutehai_lst tehai
 
   
 let prob_select sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst furo_double_lst =
