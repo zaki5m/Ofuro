@@ -4090,7 +4090,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         let (k_lst,t_ritu,agariritu,kitaiti,anzendo,_,_) = not_naki in
         *)
         let (dahai,t_ritu,agariritu,kitaiti) = client_fun ic_kitaiti oc_kitaiti tehai (tapl_player furo_lst player) ary zi_ary dora_lst zi_kaze ba_kaze (tumo_len-1) in 
-        
+        (*
         let _ = 
           if f_agariritu > 0.0 && f_kitaiti > 0.0 then
             (let tehai = List.map ( fun a -> change_gragh a) tehai in 
@@ -4100,6 +4100,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           else
             ()
           in
+          *)
          
           
         

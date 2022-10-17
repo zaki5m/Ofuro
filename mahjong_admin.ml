@@ -1668,7 +1668,7 @@ let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_sc
             let tenpai_lst = ryukyoku_ten ary_lst furo_lst [] dora_lst in
             let (ten_0,ten_1,ten_2,ten_3) = tenpai_ryo tenpai_lst in
             let player_score = ten_to_player player_score (ten_0,ten_1,ten_2,ten_3) in
-            (kyotaku,(ten_0/100,ten_1/100,ten_2/100,ten_3/100),naki_lst,player_score))
+            (kyotaku,(0,0,0,0),naki_lst,player_score))
           else
             loop' player tehai_lst sutehai_lst yama_lst furo_lst ary_lst naki_lst dora_lst yaku_lst kyotaku player_score furiten_lst furo_double_lst
         else
