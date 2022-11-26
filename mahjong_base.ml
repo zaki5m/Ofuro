@@ -1,5 +1,5 @@
 type furo = Pon | Ti | Kan
-type hai = Manzu | Pinzu | Souzu | Ton | Nan | Sya | Pei | Haku | Hatsu | Tyun | Not_hai
+type hai = Manzu | Pinzu | Souzu | Ton | Nan | Sya | Pei | Haku | Hatsu | Tyun | Manzu_red | Pinzu_red | Souzu_red | Not_hai
 type state = Syuntu | Toitu | Anko | Minko | Ankan | Minkan | Ws
 type mati_state = Ryanmen | Kantyan | Pentyan | Tanki | Syanpon | Ns
 type yaku = Reach | Ippatu | Menzentumo | Yakuhai | Tanyao | Pinhu | Ipeiko | Haitei | Houtei | Rinsyankaihou | Tyankan
@@ -20,7 +20,9 @@ let rename (m, n) = match n with
   | Haku -> "haku" 
   | Hatsu -> "ryu"
   | Tyun -> "tyun"
-  | _ -> "not"             
+  | _ -> "not"        
+  
+let global_red = ref ((0,0,0),(0,0,0),(0,0,0),(0,0,0))
 
 let tapl_player_1 (x,_,_,_) = x 
 
@@ -53,7 +55,14 @@ let tapl_player_in tapl tmp player = match player with
          let x2 = tapl_player_2 tapl in
          let x3 = tapl_player_3 tapl in  
          (x1,x2,x3,tmp)
-
+(*f: 'a list -> bool tapl: ('a list, 'a list, 'a list, 'a list)*)
+let tapl_exists f tapl = 
+  let tmp1 = f (tapl_player_1 tapl) in 
+  let tmp2 = f (tapl_player_2 tapl) in
+  let tmp3 = f (tapl_player_3 tapl) in 
+  let tmp4 = f (tapl_player_4 tapl) in  
+  tmp1 || tmp2 || tmp3 || tmp4
+  
 let print_list lst = 
     List.iter (fun (m,n) -> Printf.printf "%s " (rename (m,n)); ) lst;
     Printf.printf "\n"
@@ -63,13 +72,13 @@ let list_to_ary lst =
   let rec loop i ary zi_ary = 
     let (x,hai) = List.nth lst i in
     let _ = 
-      if hai = Manzu then
+      if hai = Manzu || hai = Manzu_red then
         let n = ary.(0).(x-1) in
         ary.(0).(x-1) <- n+1;
-      else if hai = Pinzu then
+      else if hai = Pinzu || hai = Pinzu_red then
         let n = ary.(1).(x-1) in
         ary.(1).(x-1) <- n+1;
-      else if hai = Souzu then
+      else if hai = Souzu || hai = Souzu_red then
         let n = ary.(2).(x-1) in
         ary.(2).(x-1) <- n+1;
       else
@@ -148,9 +157,9 @@ let hai_to_ary (x,y) =
     else 
       (3,6)
   else
-    if y = Manzu then
+    if y = Manzu || y = Manzu_red then
       (0,x-1)
-    else if y = Pinzu then
+    else if y = Pinzu || y = Pinzu_red then
       (1,x-1)
     else
       (2,x-1)
@@ -167,6 +176,84 @@ let ary_to_hai_ex (x,y) n =
     []
   else
     loop (n-1) []
+
+let rhai_to_hai lst = 
+  let rec loop t_lst = match t_lst with
+   | [] -> []
+   | (x,y)::t -> if y = Manzu_red then 
+                    (x,Manzu)::(loop t)
+                  else if y = Pinzu_red then 
+                    (x,Pinzu)::(loop t)
+                  else if y = Souzu_red then 
+                    (x,Souzu)::(loop t)
+                  else
+                    (x,y)::(loop t)  
+  in
+  loop lst
+
+let rhai_to_hai_single (x,y) = 
+  if y = Manzu_red then 
+    (x,Manzu)
+  else if y = Pinzu_red then 
+    (x,Pinzu)
+  else if y = Souzu_red then 
+    (x,Souzu)
+  else
+    (x,y)
+
+let create_taable_in_red sutehai_lst tehai = 
+  let m_red = List.exists (fun a -> a = (5,Manzu_red)) tehai in 
+  let m_red = if m_red then true else tapl_exists (List.exists (fun (a,b,_) -> (a,b) = (5,Manzu_red))) sutehai_lst in 
+  let p_red = List.exists (fun a -> a = (5,Pinzu_red)) tehai in 
+  let p_red = if p_red then true else tapl_exists (List.exists (fun (a,b,_) -> (a,b) = (5,Pinzu_red))) sutehai_lst in 
+  let s_red = List.exists (fun a -> a = (5,Souzu_red)) tehai in 
+  let s_red = if s_red then true else tapl_exists (List.exists (fun (a,b,_) -> (a,b) = (5,Souzu_red))) sutehai_lst in 
+  Printf.printf "%B %B %B \n" m_red p_red s_red;
+  (m_red,p_red,s_red)
+
+let tehai_in_red tehai = 
+  let m = if List.exists (fun a -> a = (5,Manzu_red)) tehai then 1 else 0 in 
+  let p = if List.exists (fun a -> a = (5,Pinzu_red)) tehai then 1 else 0 in 
+  let s = if List.exists (fun a -> a = (5,Souzu_red)) tehai then 1 else 0 in 
+  m+p+s 
+
+let tehai_tapl_red tehai = 
+  let m = if List.exists (fun a -> a = (5,Manzu_red)) tehai then 1 else 0 in 
+  let p = if List.exists (fun a -> a = (5,Pinzu_red)) tehai then 1 else 0 in 
+  let s = if List.exists (fun a -> a = (5,Souzu_red)) tehai then 1 else 0 in 
+  (m,p,s)
+
+let select_red_to_black tehai (x,y,z) = 
+  let n = List.length tehai in 
+  if x = 5 then 
+    if y = Manzu_red then 
+      if List.exists (fun a -> a = (5,Manzu)) tehai then 
+        if (List.nth tehai (n-1)) = (5,Manzu) then
+          (5,Manzu,true)
+        else
+          (5,Manzu,false)
+      else
+        (x,y,z)
+    else if y = Pinzu_red then 
+      if List.exists (fun a -> a = (5,Pinzu)) tehai then 
+        if (List.nth tehai (n-1)) = (5,Pinzu) then
+          (5,Pinzu,true)
+        else
+          (5,Pinzu,false)
+      else
+        (x,y,z)
+      else if y = Souzu_red then 
+        if List.exists (fun a -> a = (5,Souzu)) tehai then 
+          if (List.nth tehai (n-1)) = (5,Souzu) then
+            (5,Souzu,true)
+          else
+            (5,Souzu,false)
+        else
+          (x,y,z)
+    else
+      (x,y,z)
+  else 
+    (x,y,z)
 
 let ary_to_list ary zi_ary = 
   let rec loop i j tmp = 
@@ -286,9 +373,10 @@ let ripai list =
 
 let hai_to_int (tehai:(int*hai)list) (x,y) =
   let m = List.length tehai in
+  let (x',y') = if x = 5 then if y = Manzu then (5,Manzu_red) else if y = Pinzu then (5,Pinzu_red) else (5,Souzu_red) else (x,y) in 
   let rec loop i = 
     let a = List.nth tehai i in
-    if a = (x,y) then
+    if a = (x,y) || a = (x',y') then
       i
     else if i = 0 then
       (m-1)
@@ -550,7 +638,7 @@ let which_some n_count m_count p_count s_count =
       else
         (Souzu,s_count)
   in
-  (hai,(n_count-count))
+  (hai,(n_count+count))
 
 
 
@@ -559,24 +647,24 @@ let somete tehai (f_lst:(state*(int*(int*int*int)))list) =
   let k = if k_furo = [] then 3 else (List.hd k_furo) in
   let k_furo = List.for_all (fun a -> a = k) k_furo in
   if k_furo = true then
-    let no_zi_lst = List.filter (fun (a,_) -> a = 0) tehai in
-    let n = List.length no_zi_lst in
-    let m_lst = List.filter (fun (_,b) -> b = Manzu) no_zi_lst in
-    let p_lst = List.filter (fun (_,b) -> b = Pinzu) no_zi_lst in
-    let s_lst = List.filter (fun (_,b) -> b = Souzu) no_zi_lst in
+    let zi_lst = List.filter (fun (a,_) -> a = 0) tehai in
+    let n = List.length zi_lst in
+    let m_lst = List.filter (fun (_,b) -> b = Manzu) tehai in
+    let p_lst = List.filter (fun (_,b) -> b = Pinzu) tehai in
+    let s_lst = List.filter (fun (_,b) -> b = Souzu) tehai in
     let m_count = List.length m_lst in
     let p_count = List.length p_lst in
     let s_count = List.length s_lst in
     let some_c = 
       if k = 0 then
-        (Manzu,(14 - (n-m_count))) 
+        (Manzu,(n-m_count)) 
       else if k = 1 then
-        (Pinzu,(14 - (n-p_count)))
+        (Pinzu,(n-p_count))
       else if k = 2 then
-        (Souzu,(14 - (n-s_count)))
+        (Souzu,(n-s_count))
       else
         let (hai,count) = which_some n m_count p_count s_count in
-        (hai,(14-count))
+        (hai,count)
     in
     some_c
   else

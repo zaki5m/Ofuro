@@ -6,6 +6,16 @@ open Tenpai_prob
 open Mahjong_admin
 open Unix
 
+let port = int_of_string Sys.argv.(1) 
+
+let p1 = float_of_string Sys.argv.(2) 
+
+let p2 = float_of_string Sys.argv.(3) 
+
+let p3 = float_of_string Sys.argv.(4) 
+
+let p4 = float_of_string Sys.argv.(5) 
+
 let zyuniten a b c d (uma1,uma2) = 
   let lst = [a;b;c;d] in
   let lst = List.sort (fun x y -> if x > y then -1 else 1) lst in
@@ -339,12 +349,12 @@ let simulate count (uma1,uma2) furoritu_lst =
 *)
 
 let simulate_kyoku count furoritu_lst =
-  let addr = ADDR_INET(inet_addr_loopback, 1111) in
+  let addr = ADDR_INET(inet_addr_loopback, port) in
   let ic , oc = open_connection addr in 
   ic_kitaiti := ic; 
   oc_kitaiti := oc; 
   let player_score = (25000,25000,25000,25000) in
-  let rec loop i (tmp1,tmp2,tmp3,tmp4) (naki_tmp1,naki_tmp2,naki_tmp3,naki_tmp4) zyuni_lst = 
+  let rec loop i (tmp1,tmp2,tmp3,tmp4) (naki_tmp1,naki_tmp2,naki_tmp3,naki_tmp4) (a_ritu_1,a_ritu_2,a_ritu_3,a_ritu_4) zyuni_lst = 
     let (kyotaku,(aplus,bplus,cplus,dplus),(naki_a,naki_b,naki_c,naki_d),(a,b,c,d)) = kyoku_s 0 1 0 0 player_score furoritu_lst 0 in
     Hashtbl.reset myhash;
     let kyotaku = kyotaku * 1000 /4 in 
@@ -356,10 +366,15 @@ let simulate_kyoku count furoritu_lst =
     let tmp2 = bplus + b + tmp2 in
     let tmp3 = cplus + c + tmp3 in
     let tmp4 = dplus + d + tmp4 in
+    let a_ritu_1 = if aplus > 0 then a_ritu_1 + 1 else a_ritu_1 in
+    let a_ritu_2 = if bplus > 0 then a_ritu_2 + 1 else a_ritu_2 in 
+    let a_ritu_3 = if cplus > 0 then a_ritu_3 + 1 else a_ritu_3 in 
+    let a_ritu_4 = if dplus > 0 then a_ritu_4 + 1 else a_ritu_4 in 
     let naki_tmp1 = if naki_a = true then naki_tmp1 + 1 else naki_tmp1 in 
     let naki_tmp2 = if naki_b = true then naki_tmp2 + 1 else naki_tmp2 in 
     let naki_tmp3 = if naki_c = true then naki_tmp3 + 1 else naki_tmp3 in 
     let naki_tmp4 = if naki_d = true then naki_tmp4 + 1 else naki_tmp4 in 
+    Printf.printf "finish\n";
     (*Printf.printf "%d\n" (total+total_kyoku);*)
     let (a',b',c',d') = zyuni a b c d in 
     let zyuni_lst = zyuni_count zyuni_lst (int_of_float a',int_of_float b',int_of_float c',int_of_float d') in 
@@ -377,12 +392,12 @@ let simulate_kyoku count furoritu_lst =
       Printf.printf "D: %d %d %d %d \n" s1 s2 s3 s4;*)
       shutdown_connection !ic_kitaiti;
       (*Printf.printf "finish\n";*)
-      Printf.printf "result: %dtimes A%f real(%f):%d B%f real(%f):%d c%f real(%f):%d d%f real(%f):%d\n" count (List.nth furoritu_lst 0) ((float_of_int naki_tmp1)/.(float_of_int count)) tmp1 (List.nth furoritu_lst 1) ((float_of_int naki_tmp2)/.(float_of_int count)) tmp2 (List.nth furoritu_lst 2) ((float_of_int naki_tmp3)/.(float_of_int count)) tmp3 (List.nth furoritu_lst 3) ((float_of_int naki_tmp4)/.(float_of_int count)) tmp4)
+      Printf.printf "result: %dtimes A%f real(%f)a_ritu(%f):%d B%f real(%f)a_ritu(%f):%d c%f real(%f)a_ritu(%f):%d d%f real(%f)a_ritu(%f):%d\n" count (List.nth furoritu_lst 0) ((float_of_int naki_tmp1)/.(float_of_int count)) ((float_of_int a_ritu_1) /.(float_of_int count)) tmp1 (List.nth furoritu_lst 1) ((float_of_int naki_tmp2)/.(float_of_int count)) ((float_of_int a_ritu_2) /.(float_of_int count)) tmp2 (List.nth furoritu_lst 2) ((float_of_int naki_tmp3)/.(float_of_int count)) ((float_of_int a_ritu_3) /.(float_of_int count)) tmp3 (List.nth furoritu_lst 3) ((float_of_int naki_tmp4)/.(float_of_int count)) ((float_of_int a_ritu_4) /.(float_of_int count)) tmp4)
     else
-      loop (i-1) (tmp1,tmp2,tmp3,tmp4) (naki_tmp1,naki_tmp2,naki_tmp3,naki_tmp4) zyuni_lst
+      loop (i-1) (tmp1,tmp2,tmp3,tmp4) (naki_tmp1,naki_tmp2,naki_tmp3,naki_tmp4) (a_ritu_1,a_ritu_2,a_ritu_3,a_ritu_4) zyuni_lst
   in
-  loop (count-1) (0,0,0,0) (0,0,0,0) [(0,0,0,0);(0,0,0,0);(0,0,0,0);(0,0,0,0)]
+  loop (count-1) (0,0,0,0) (0,0,0,0) (0,0,0,0) [(0,0,0,0);(0,0,0,0);(0,0,0,0);(0,0,0,0)]
 
 (*let _ = simulate 250 (10000,30000) [10.0;35.0;35.0;10.0] *)
-let _ = simulate_kyoku 2000 [15.;15.;30.;15.]
+let _ = simulate_kyoku 2000 [p1;p2;p3;p4]
 
