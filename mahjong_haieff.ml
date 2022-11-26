@@ -676,6 +676,7 @@ let common_syanten lst =
 
     
 let syanten lst = 
+  let lst = rhai_to_hai lst in
   let n1 = kokushi_syanten lst in
   let n2 = titoi_syanten lst in
   let (lst',n3) = common_syanten lst in
@@ -810,7 +811,11 @@ let convert_int_to_hai i = match i with
   | 31 -> (0,Haku)
   | 32 -> (0,Hatsu)
   | 33 -> (0,Tyun)
+  | 34 -> (5,Manzu_red)
+  | 35 -> (5,Pinzu_red)
+  | 36 -> (5,Souzu_red)
   | _ -> (1,Not_hai)
+
 
 
 
@@ -1017,7 +1022,7 @@ let draw n_extra_tumo syanten tehai ary zi_ary table_lst =
   else
     draw_without_tegawari n_extra_tumo syanten tehai ary zi_ary table_lst
 
-let discard n_extra_tumo tehai syanten_count ary zi_ary table_lst =
+let discard n_extra_tumo tehai syanten_count ary zi_ary table_lst dora_lst =
   let flags = make_discard_ary tehai syanten_count in 
   let rec loop tmp t_lst = match t_lst with
     | [] -> tmp 
@@ -1028,7 +1033,8 @@ let discard n_extra_tumo tehai syanten_count ary zi_ary table_lst =
                           else if syan = 0 then 
                             if syanten_count = 0 then 
                               let (n_ary,n_zi_ary) = list_to_ary n_tehai in 
-                              let tenpai_lst = tehai_to_ten n_ary n_zi_ary 0 0 false [] [Reach] [(2,3)] in (*要訂正*)
+                              let red = tehai_in_red n_tehai in 
+                              let tenpai_lst = tehai_to_ten n_ary n_zi_ary 0 0 false [] [Reach] dora_lst red in 
                               let (lst1,lst2) = create_agari tenpai_lst ary zi_ary in
                               (hai,[(n_extra_tumo,(syanten_count-1),n_tehai,(ary,zi_ary),(lst1::table_lst,lst2))])::tmp
                             else
@@ -1040,9 +1046,9 @@ let discard n_extra_tumo tehai syanten_count ary zi_ary table_lst =
   in
   loop [] flags
                             
-let dis_add_main tehai ary zi_ary max_tumo_len = 
+let dis_add_main tehai ary zi_ary max_tumo_len dora_lst = 
   let (_,n) = syanten tehai in 
-  let first_lst = discard 0 tehai n ary zi_ary [] in 
+  let first_lst = discard 0 tehai n ary zi_ary [] dora_lst in 
   let rec loop (k_hai,t_ritu,agariritu,kitaiti) t_lst = match t_lst with 
     | [] -> (k_hai,t_ritu,agariritu,kitaiti)
     | (hai,lst)::t -> let rec loop2 (tmp_a,tmp_b,tmp_c) t_lst2 = match t_lst2 with 
@@ -1051,7 +1057,7 @@ let dis_add_main tehai ary zi_ary max_tumo_len =
                                                                                             if syanten_count = -1 then 
                                                                                               calc_max_tumo_len max_tumo_len lst1 lst2
                                                                                             else
-                                                                                              let n_lst = discard n_extra_tumo n_tehai syanten_count ary2 zi_ary2 lst1 in 
+                                                                                              let n_lst = discard n_extra_tumo n_tehai syanten_count ary2 zi_ary2 lst1 dora_lst in 
                                                                                               let (k_hai,a,b,c) = loop ((1,Not_hai),-1.,-1.,-1.) n_lst in 
                                                                                               if k_hai = (1,Not_hai) then 
                                                                                                 (0.,0.,0.)
@@ -1186,18 +1192,18 @@ let dis_add_main_p tehai ary zi_ary max_tumo_len =
   worker (update results) ();
   Array.iter Domain.join domains;
   Array.fold_left (fun (a1,b1,c1,d1) (a2,b2,c2,d2) ->if d1 > d2 then (a1,b1,c1,d1) else (a2,b2,c2,d2)) ((1,Not_hai),-1.,-1.,-1.) results*)
-  *)
+  loop ((1,Not_hai),-1.,-1.,-1.) first_lst
 
 
 
-let _ = (*let tehai = [(3,Manzu);(9,Manzu);(9,Manzu);(1,Pinzu);(3,Pinzu);(3,Pinzu);(4,Pinzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(3,Souzu);(4,Souzu);(5,Souzu);(0,Tyun)] in*) 
-        let tehai = [(6,Manzu);(7,Manzu);(7,Manzu);(1,Pinzu);(1,Pinzu);(2,Pinzu);(2,Pinzu);(9,Pinzu);(4,Souzu);(6,Souzu);(6,Souzu);(0,Haku);(0,Haku);(0,Tyun)] in
+let _ = let tehai = [(4,Manzu);(4,Manzu);(5,Manzu);(6,Manzu);(7,Manzu);(4,Pinzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton)] in 
+        let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(7,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan)] in 
         (*let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan);(0,Sya)] in *)
 let (ary,zi_ary) = create_table ([],[],[],[]) tehai in
 let ((a,b),c,d,e) = dis_add_main tehai ary zi_ary 15 in 
 let (a,b) = hai_to_ary (a,b) in 
 Printf.printf "(%d,%d)%f %f %f\n"a b c d e;
-
+*)
 (*
 let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst = 
   let yaku = List.nth yaku_lst player in
@@ -1241,6 +1247,7 @@ let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst =
 (*
 let _ = 
   (*let (_,n)  = common_syanten [(1,Manzu);(9,Manzu);(1,Pinzu);(4,Pinzu);(7,Pinzu);(5,Souzu);(8,Souzu);(9,Souzu);(9,Souzu);(9,Souzu);(9,Souzu);(0,Sya);(0,Sya)] in
-*)
+
   let (x,(y,z)) = mentsu_kouho_syuntsu [|2;2;2;0;0;0;2;2;0|] 0 in
-  Printf.printf "%d %d\n" y z;)*)
+  Printf.printf "%d %d\n" y z;*)
+*)

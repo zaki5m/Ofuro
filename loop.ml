@@ -1949,13 +1949,13 @@ let dora_count lst ary zi_ary =
 
 
 
-let dora_in lst dora_lst ary zi_ary = 
+let dora_in lst dora_lst ary zi_ary red = 
   let m = List.length lst in
   let rec loop' i tmp = 
     let han = List.nth lst i in
     let n = 
       if han <> 0 then
-        dora_count dora_lst ary zi_ary 
+        (dora_count dora_lst ary zi_ary) + red  
       else
         0
     in
@@ -1972,7 +1972,7 @@ let dora_in lst dora_lst ary zi_ary =
 
 
 
-let opt_yaku ary zi_ary lst lst2 head mati zi_kaze ba_kaze naki zi_lst oya min_lst f_lst yaku_lst dora_lst = 
+let opt_yaku ary zi_ary lst lst2 head mati zi_kaze ba_kaze naki zi_lst oya min_lst f_lst yaku_lst dora_lst red = 
   let lst = furo_to_state lst f_lst in
   let zi_lst = furo_to_state_zi zi_lst f_lst in
   let m = List.length lst in
@@ -2023,9 +2023,9 @@ let opt_yaku ary zi_ary lst lst2 head mati zi_kaze ba_kaze naki zi_lst oya min_l
   let y_lst' = (loop' (m-1) []) lst' in
   let y_lst' = add_yaku y_lst' yaku_lst in
   let h_lst = yaku_to_han y_lst naki in
-  let h_lst = dora_in h_lst dora_lst ary zi_ary in
+  let h_lst = dora_in h_lst dora_lst ary zi_ary red in
   let h_lst' = yaku_to_han y_lst' naki in
-  let h_lst' = dora_in h_lst' dora_lst ary zi_ary in
+  let h_lst' = dora_in h_lst' dora_lst ary zi_ary red in
   let rec ex_pinhu x y z n n_lst=
     let x' = List.nth x n in
     let y' = List.nth y n in
@@ -2098,13 +2098,13 @@ let opt_ten2 lst =
     loop' (m-1) ((-1,-1),(0,0))
 
 
-let tehai_to_yaku ary zi_ary lst mati zi_kaze ba_kaze naki oya min_lst f_lst yaku_lst dora_lst =
+let tehai_to_yaku ary zi_ary lst mati zi_kaze ba_kaze naki oya min_lst f_lst yaku_lst dora_lst red =
   let m = List.length lst in
   let zi_lst = hantei_zi zi_ary in
   let rec loop' n new_lst =
     let (a,b) = List.nth lst n in
     let m_lst =  hantei_mentu ary zi_ary (a,b) in
-    let tmp = opt_yaku ary zi_ary b m_lst a mati zi_kaze ba_kaze naki zi_lst oya min_lst f_lst yaku_lst dora_lst in
+    let tmp = opt_yaku ary zi_ary b m_lst a mati zi_kaze ba_kaze naki zi_lst oya min_lst f_lst yaku_lst dora_lst red in
     let new_lst = tmp::new_lst in
     if n = 0 then
       new_lst
@@ -2154,7 +2154,7 @@ let furo_to_tehai ary zi_ary f_lst =
 
 
 
-let tehai_to_ten_2 ary zi_ary (x,y) lst zi_kaze ba_kaze naki oya f_lst yaku_lst dora_lst =
+let tehai_to_ten_2 ary zi_ary (x,y) lst zi_kaze ba_kaze naki oya f_lst yaku_lst dora_lst red =
   let ary2 = Array.map (fun x -> Array.copy x) ary in
   let zi_ary2 = Array.copy zi_ary in
   let _ =
@@ -2183,7 +2183,7 @@ let tehai_to_ten_2 ary zi_ary (x,y) lst zi_kaze ba_kaze naki oya f_lst yaku_lst 
       else
         []
       in
-    let tmp2 = tehai_to_yaku ary2 zi_ary2 head z zi_kaze ba_kaze naki oya min_lst f_lst yaku_lst dora_lst in
+    let tmp2 = tehai_to_yaku ary2 zi_ary2 head z zi_kaze ba_kaze naki oya min_lst f_lst yaku_lst dora_lst red in
     let tmp = 
       ((x,y),(opt_ten tmp2))::tmp in
     if i = 0 then
@@ -2197,7 +2197,7 @@ let tehai_to_ten_2 ary zi_ary (x,y) lst zi_kaze ba_kaze naki oya f_lst yaku_lst 
     loop' (m-1) []
 
 
-let titoitu_ten ary zi_ary (a,b) oya yaku_lst dora_lst = 
+let titoitu_ten ary zi_ary (a,b) oya yaku_lst dora_lst red = 
   let zi_ary2 = Array.copy zi_ary in
   let ary2 = Array.map (fun x -> Array.copy x) ary in
   let _ =
@@ -2218,7 +2218,7 @@ let titoitu_ten ary zi_ary (a,b) oya yaku_lst dora_lst =
     let tmp = (t_honitu ary2 zi_ary2)@tmp in
     let tmp = add_yaku [tmp] yaku_lst in
     let lst = yaku_to_han tmp false in
-    let lst = dora_in lst dora_lst ary zi_ary in
+    let lst = dora_in lst dora_lst ary zi_ary red in
     let x = List.hd lst in
     let tmp2 =
       if x > 4 then
@@ -2273,7 +2273,7 @@ let kokushi_ten ary zi_ary (a,b) oya =
 
 (*ary,zi_aryはf_lstの物は加えない*)
 (*return ((int*int)和了牌*(int*int)(ツモ，ロン))list *)
-let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int*(int*int*int)))list) (yaku_lst:Mahjong_base.yaku list) dora_lst =
+let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int*(int*int*int)))list) (yaku_lst:Mahjong_base.yaku list) dora_lst red =
   let oya = if zi_kaze = 0 then true else false in 
   let ary2 = Array.map (fun x -> Array.copy x) ary in
   let zi_ary2 = Array.copy zi_ary in
@@ -2288,9 +2288,9 @@ let tehai_to_ten ary zi_ary zi_kaze ba_kaze naki (f_lst:(Mahjong_base.state*(int
   let rec loop tmp = function
     | [] -> tmp
     | h::t -> let kokushi_lst = kokushi_ten ary2 zi_ary2 h oya in 
-              let titoi_lst = titoitu_ten ary2 zi_ary2 h oya yaku_lst dora_lst in
+              let titoi_lst = titoitu_ten ary2 zi_ary2 h oya yaku_lst dora_lst red in
               let lst2 = find_mati ary2 h zi_lst zi_ary2 in
-              let tmp2 = tehai_to_ten_2 ary2 zi_ary2 h lst2 zi_kaze ba_kaze naki oya f_lst yaku_lst dora_lst in
+              let tmp2 = tehai_to_ten_2 ary2 zi_ary2 h lst2 zi_kaze ba_kaze naki oya f_lst yaku_lst dora_lst red in
               let tmp2 = titoi_lst::tmp2 in
               let tmp2 = kokushi_lst::tmp2 in
               loop (opt_ten2 tmp2::tmp) t
