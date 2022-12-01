@@ -1046,7 +1046,8 @@ let discard n_extra_tumo tehai syanten_count ary zi_ary table_lst dora_lst =
   in
   loop [] flags
                             
-let dis_add_main tehai ary zi_ary max_tumo_len dora_lst = 
+let dis_add_main tehai ary zi_ary max_tumo_len dora_lst =
+  let tehai = rhai_to_hai tehai in  
   let (_,n) = syanten tehai in 
   let first_lst = discard 0 tehai n ary zi_ary [] dora_lst in 
   let rec loop (k_hai,t_ritu,agariritu,kitaiti) t_lst = match t_lst with 

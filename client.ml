@@ -272,6 +272,7 @@ let dahai tehai_s sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba
   let count = List.length (List.filter (fun a -> if a = (ary_to_hai (x,y)) then true else false) tehai) in 
   Printf.printf "count:%d\n" count; flush Stdlib.stdout;
   let x = purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst furoritu furiten_lst in
+  Printf.printf "count:%d\n" count; flush Stdlib.stdout;
   if x = [] then 
     response_none ()
   else

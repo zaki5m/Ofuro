@@ -464,7 +464,6 @@ let tehai_to_anzen_in_reach ary zi_ary tehai yaku_lst furiten_lst =
   in
   let new_furiten_lst = furiten_lst_loop [] 3 in 
   let new_furiten_lst = furiten_lst_to_comp new_furiten_lst in 
-  Printf.printf "new_f_lst:%d\n" (List.length new_furiten_lst);
   let rec loop tmp t_lst = match t_lst with 
     | [] -> tmp 
     | (x,y)::t -> let (x',y') = hai_to_ary (x,y) in

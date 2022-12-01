@@ -208,7 +208,6 @@ let create_taable_in_red sutehai_lst tehai =
   let p_red = if p_red then true else tapl_exists (List.exists (fun (a,b,_) -> (a,b) = (5,Pinzu_red))) sutehai_lst in 
   let s_red = List.exists (fun a -> a = (5,Souzu_red)) tehai in 
   let s_red = if s_red then true else tapl_exists (List.exists (fun (a,b,_) -> (a,b) = (5,Souzu_red))) sutehai_lst in 
-  Printf.printf "%B %B %B \n" m_red p_red s_red;
   (m_red,p_red,s_red)
 
 let tehai_in_red tehai = 
@@ -288,7 +287,6 @@ let ary_to_list ary zi_ary =
 
 let rec d_tehai (list:(int*hai) list) (x,y) = match list with
   | [] -> []
-  | [(x1,y1)] -> if (x1,y1) = (x,y) then [] else [(x1,y1)]
   | (x1,y1)::t -> if (x1,y1) = (x,y) then t else (x1,y1)::(d_tehai t (x,y))
 
 let hyouzi_to_dora (x,y) = 
@@ -307,9 +305,10 @@ let hyouzi_to_dora (x,y) =
       (x,y+1)
 
 (*数字から切る牌を選択*)
-let int_to_hai (tehai:(int*hai)list) a = 
+let int_to_hai (tehai:(int*hai)list) a =
+  let n = List.length tehai in  
   let (x,y) = List.nth tehai a in
-  if a = 13 then
+  if a = (n-1) then
     (x,y,true)
   else
     (x,y,false)
@@ -351,23 +350,23 @@ let rec ripai (xs:(int*hai)list) =
     | (a,b)::ys -> insert_element (a,b) (ripai ys)
 *)
 
-let ripai2 (list:(int*hai)list) hai  = 
-  let list = List.filter (fun ((_,y)) -> y = hai ) list in 
+let ripai2 (list:(int*hai)list) (hai:hai list)  = 
+  let list = List.filter (fun ((_,y)) -> List.exists (fun a -> a = y) hai) list in 
   let list = List.sort (fun (x1,_) (x2,_) -> if x1 < x2 then -1 else 1) list  in
   list
 
 
 let ripai list = 
-  let listm = ripai2 list Manzu in
-  let listp = ripai2 list Pinzu in
-  let lists = ripai2 list Souzu in
-  let listt = ripai2 list Ton in
-  let listn = ripai2 list Nan in
-  let listsy = ripai2 list Sya in
-  let listpe = ripai2 list Pei in
-  let listh = ripai2 list Haku in
-  let listr = ripai2 list Hatsu in
-  let listty = ripai2 list Tyun in
+  let listm = ripai2 list [Manzu;Manzu_red] in
+  let listp = ripai2 list [Pinzu;Pinzu_red] in
+  let lists = ripai2 list [Souzu;Souzu_red] in
+  let listt = ripai2 list [Ton] in
+  let listn = ripai2 list [Nan] in
+  let listsy = ripai2 list [Sya] in
+  let listpe = ripai2 list [Pei] in
+  let listh = ripai2 list [Haku] in
+  let listr = ripai2 list [Hatsu] in
+  let listty = ripai2 list [Tyun] in
   let list = listm @ listp @ lists @ listt @ listn @ listsy @ listpe @ listh @ listr @ listty in
   list
 
@@ -492,7 +491,8 @@ let kabe_to_deleat_suzi s = match s with
 
 let gukei_lst = [(2,[(1,3)]);(3,[(1,2);(2,4)]);(4,[(3,5)]);(5,[(4,6)]);(6,[(5,7)]);(7,[(6,8);(8,9)]);(8,[(7,9)])]
 
-let possible_furo_patern tehai (x,y) = 
+let possible_furo_patern tehai (x,y) =
+  let tehai = rhai_to_hai tehai in  
   let (xa,ya) = hai_to_ary (x,y) in
   let tmp = List.filter (fun (_,b) -> b = y) tehai in
   let p_f_lst =

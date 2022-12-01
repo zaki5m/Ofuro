@@ -498,14 +498,13 @@ let tumo_agari ten player kyoku honba kyotaku =
   loop' ten
 
 
-let ryukyoku_ten ary_lst furo_lst yaku_lst dora_lst = 
+let ryukyoku_ten tehai_lst = 
   let rec loop i tmp = match i with 
    | -1 -> tmp 
-   | _ -> let (ary,zi_ary) = tapl_player ary_lst i in
-          let f_lst = tapl_player furo_lst i in
-          let lst = tehai_to_ten ary zi_ary 0 0 true f_lst yaku_lst dora_lst 0 in
+   | _ -> let tehai = tapl_player tehai_lst i in
+          let (_,n) = syanten tehai in 
           let tmp = 
-            if lst <> [] then
+            if n = 0 then
               true::tmp
             else
               false::tmp
@@ -558,10 +557,9 @@ let reach_inq () =
     loop' ()
 
 
-let possible_reach lst sutehai naki (f_lst:(Mahjong_base.state*(int*(int*int*int))) list) (yaku_lst:Mahjong_base.yaku list) dora_lst zi_kaze ba_kaze kyotaku = 
-  let (ary,zi_ary) = list_to_ary lst in
-  let n = tehai_to_ten ary zi_ary zi_kaze ba_kaze naki f_lst yaku_lst dora_lst 0 in
-  if naki = false && n <> [] && (List.exists (fun a -> a = Reach || a = Doublereach) yaku_lst) = false then
+let possible_reach tehai sutehai naki (f_lst:(Mahjong_base.state*(int*(int*int*int))) list) (yaku_lst:Mahjong_base.yaku list) dora_lst zi_kaze ba_kaze kyotaku =
+  let (_,n) = syanten tehai in  
+  if naki = false && n = 0 && (List.exists (fun a -> a = Reach || a = Doublereach) yaku_lst) = false then
     let x = reach_inq () in
     if x = true then
       let kyotaku = kyotaku + 1 in
@@ -593,7 +591,7 @@ let kyoku_to_kaze kyoku player =
     else
       player + 1
 
-let kiriban tehai_lst sutehai_lst ary_lst player f_lst naki yaku_lst dora_lst kyoku ba kyotaku player_score yama_len furo_double_lst furiten_lst  = 
+let kiriban tehai_lst sutehai_lst ary_lst player f_lst naki yaku_lst dora_lst kyoku ba kyotaku player_score yama_len furo_double_lst furiten_lst  =
   let yaku_player = tapl_player yaku_lst player in
   let yaku_player = List.filter (fun a -> a <> Ippatu) yaku_player in 
   let zi_kaze = kyoku_to_kaze kyoku player in
@@ -602,7 +600,7 @@ let kiriban tehai_lst sutehai_lst ary_lst player f_lst naki yaku_lst dora_lst ky
     let n = 
       prob_select sutehai_lst tehai f_lst yaku_lst player yama_len zi_kaze ba naki dora_lst furo_double_lst furiten_lst
     in
-    (*Printf.printf "%d\n" n; flush stdout;*)
+    let n = if n >= List.length tehai then List.length tehai - 1 else n in  
     if n < 0 && (List.length tehai) <= n then
       loop' tehai sutehai
     else 
@@ -855,7 +853,7 @@ let remove_furo_hai tehai_lst furo_hai (x,y) =
   let (e,b') = ary_to_hai (b,e) in
   let tehai = 
     if a = Minkan then
-      let tmp_lst = List.filter (fun x -> x <> (c,b')) tehai_lst in 
+      let tmp_lst = List.filter (fun x -> x <> (c,b')) tehai_lst in
       if x = 5 then 
         if y = Manzu then 
           List.filter (fun x -> x <> (c,Manzu_red)) tmp_lst
@@ -868,52 +866,40 @@ let remove_furo_hai tehai_lst furo_hai (x,y) =
     else if a = Minko then
       if x = 5 then 
         if y = Manzu then 
-          let tehai = List.filter (fun x -> x <> (c,Manzu_red)) tehai_lst in 
-          if List.length tehai = List.length tehai_lst then 
-            let tehai_lst1 = d_tehai tehai_lst (c,b') in
-            let tehai_lst2 = d_tehai tehai_lst1 (c,b') in
-            tehai_lst2
-          else
-            d_tehai tehai (c,b') 
+          let tehai_lst = if List.exists (fun tmp -> tmp = (5,Manzu_red)) tehai_lst then  d_tehai tehai_lst (c,Manzu_red) else d_tehai tehai_lst (c,b') in
+          let tehai_lst = d_tehai tehai_lst (c,b') in
+          tehai_lst
         else if y = Pinzu then 
-          let tehai = List.filter (fun x -> x <> (c,Pinzu_red)) tehai_lst in 
-          if List.length tehai = List.length tehai_lst then 
-            let tehai_lst1 = d_tehai tehai_lst (c,b') in
-            let tehai_lst2 = d_tehai tehai_lst1 (c,b') in
-            tehai_lst2
-          else
-            d_tehai tehai (c,b')
+          let tehai_lst = if List.exists (fun tmp -> tmp = (5,Pinzu_red)) tehai_lst then  d_tehai tehai_lst (c,Pinzu_red) else d_tehai tehai_lst (c,b') in
+          let tehai_lst = d_tehai tehai_lst (c,b') in
+          tehai_lst
         else 
-          let tehai = List.filter (fun x -> x <> (c,Souzu_red)) tehai_lst in 
-          if List.length tehai = List.length tehai_lst then 
-            let tehai_lst1 = d_tehai tehai_lst (c,b') in
-            let tehai_lst2 = d_tehai tehai_lst1 (c,b') in
-            tehai_lst2
-          else
-            d_tehai tehai (c,b')
+          let tehai_lst = if List.exists (fun tmp -> tmp = (5,Souzu_red)) tehai_lst then  d_tehai tehai_lst (c,Souzu_red) else d_tehai tehai_lst (c,b') in
+          let tehai_lst = d_tehai tehai_lst (c,b') in
+          tehai_lst
       else
-        let tehai_lst1 = d_tehai tehai_lst (c,b') in
-        let tehai_lst2 = d_tehai tehai_lst1 (c,b') in
-        tehai_lst2
+        let tehai_lst = d_tehai tehai_lst (c,b') in
+        let tehai_lst = d_tehai tehai_lst (c,b') in
+        tehai_lst
     else
       if (x,y) = (c,b') then
-        let (d,b') = if List.exists (fun a -> a = (d,Manzu_red)) tehai_lst then (d,Manzu_red) else if List.exists (fun a -> a = (d,Pinzu_red)) tehai_lst then (d,Pinzu_red) else if List.exists (fun a -> a = (d,Souzu_red)) tehai_lst then (d,Souzu_red) else (d,b') in 
-        let (e,b') = if List.exists (fun a -> a = (e,Manzu_red)) tehai_lst then (e,Manzu_red) else if List.exists (fun a -> a = (e,Pinzu_red)) tehai_lst then (e,Pinzu_red) else if List.exists (fun a -> a = (e,Souzu_red)) tehai_lst then (e,Souzu_red) else (e,b') in 
-        let tehai_lst1 = d_tehai tehai_lst (d,b') in
-        let tehai_lst2 = d_tehai tehai_lst1 (e,b') in
-        tehai_lst2
+        let (d,b_1) = if (List.exists (fun a -> a = (d,Manzu_red)) tehai_lst) && b' = Manzu  then (d,Manzu_red) else if (List.exists (fun a -> a = (d,Pinzu_red)) tehai_lst) && b' = Pinzu then (d,Pinzu_red) else if (List.exists (fun a -> a = (d,Souzu_red)) tehai_lst) && b' = Souzu then (d,Souzu_red) else (d,b') in 
+        let (e,b_2) = if (List.exists (fun a -> a = (e,Manzu_red)) tehai_lst) && b' = Manzu then (e,Manzu_red) else if (List.exists (fun a -> a = (e,Pinzu_red)) tehai_lst) && b' = Pinzu then (e,Pinzu_red) else if (List.exists (fun a -> a = (e,Souzu_red)) tehai_lst) && b' = Souzu then (e,Souzu_red) else (e,b') in 
+        let tehai_lst = d_tehai tehai_lst (d,b_1) in
+        let tehai_lst = d_tehai tehai_lst (e,b_2) in
+        tehai_lst
       else if (x,y) = (d,b') then
-        let (c,b') = if List.exists (fun a -> a = (c,Manzu_red)) tehai_lst then (c,Manzu_red) else if List.exists (fun a -> a = (c,Pinzu_red)) tehai_lst then (c,Pinzu_red) else if List.exists (fun a -> a = (c,Souzu_red)) tehai_lst then (c,Souzu_red) else (c,b') in 
-        let (e,b') = if List.exists (fun a -> a = (e,Manzu_red)) tehai_lst then (e,Manzu_red) else if List.exists (fun a -> a = (e,Pinzu_red)) tehai_lst then (e,Pinzu_red) else if List.exists (fun a -> a = (e,Souzu_red)) tehai_lst then (e,Souzu_red) else (e,b') in 
-        let tehai_lst1 = d_tehai tehai_lst (c,b') in
-        let tehai_lst2 = d_tehai tehai_lst1 (e,b') in
-        tehai_lst2
+        let (c,b_1) = if (List.exists (fun a -> a = (c,Manzu_red)) tehai_lst) && b' = Manzu then (c,Manzu_red) else if (List.exists (fun a -> a = (c,Pinzu_red)) tehai_lst) && b' = Pinzu then (c,Pinzu_red) else if (List.exists (fun a -> a = (c,Souzu_red)) tehai_lst) && b' = Souzu then (c,Souzu_red) else (c,b') in 
+        let (e,b_2) = if (List.exists (fun a -> a = (e,Manzu_red)) tehai_lst) && b' = Manzu then (e,Manzu_red) else if (List.exists (fun a -> a = (e,Pinzu_red)) tehai_lst) && b' = Pinzu then (e,Pinzu_red) else if (List.exists (fun a -> a = (e,Souzu_red)) tehai_lst) && b' = Souzu then (e,Souzu_red) else (e,b') in 
+        let tehai_lst = d_tehai tehai_lst (c,b_1) in
+        let tehai_lst = d_tehai tehai_lst (e,b_2) in
+        tehai_lst
       else
-        let (d,b') = if List.exists (fun a -> a = (d,Manzu_red)) tehai_lst then (d,Manzu_red) else if List.exists (fun a -> a = (d,Pinzu_red)) tehai_lst then (d,Pinzu_red) else if List.exists (fun a -> a = (d,Souzu_red)) tehai_lst then (d,Souzu_red) else (d,b') in 
-        let (c,b') = if List.exists (fun a -> a = (c,Manzu_red)) tehai_lst then (c,Manzu_red) else if List.exists (fun a -> a = (c,Pinzu_red)) tehai_lst then (c,Pinzu_red) else if List.exists (fun a -> a = (c,Souzu_red)) tehai_lst then (c,Souzu_red) else (c,b') in 
-        let tehai_lst1 = d_tehai tehai_lst (c,b') in
-        let tehai_lst2 = d_tehai tehai_lst1 (d,b') in
-        tehai_lst2
+        let (d,b_1) = if (List.exists (fun a -> a = (d,Manzu_red)) tehai_lst) && b' = Manzu  then (d,Manzu_red) else if (List.exists (fun a -> a = (d,Pinzu_red)) tehai_lst) && b' = Pinzu then (d,Pinzu_red) else if (List.exists (fun a -> a = (d,Souzu_red)) tehai_lst) && b' = Souzu then (d,Souzu_red) else (d,b') in 
+        let (c,b_2) = if (List.exists (fun a -> a = (c,Manzu_red)) tehai_lst) && b' = Manzu then (c,Manzu_red) else if (List.exists (fun a -> a = (c,Pinzu_red)) tehai_lst) && b' = Pinzu then (c,Pinzu_red) else if (List.exists (fun a -> a = (c,Souzu_red)) tehai_lst) && b' = Souzu then (c,Souzu_red) else (c,b') in 
+        let tehai_lst = d_tehai tehai_lst (c,b_2) in
+        let tehai_lst = d_tehai tehai_lst (d,b_1) in
+        tehai_lst
     in
     tehai
 
@@ -1761,7 +1747,7 @@ let kyoku_start_end ba kyoku tehai_lst yama_lst dora_lst honba kyotaku player_sc
           in
           if List.length yama_lst = 14 then
             ((*t_format tehai_lst furo_lst sutehai_lst ba kyoku honba kyotaku player_score yaku_lst dora_lst; flush stdout;*)
-            let tenpai_lst = ryukyoku_ten ary_lst furo_lst [] dora_lst in
+            let tenpai_lst = ryukyoku_ten tehai_lst in
             let (ten_0,ten_1,ten_2,ten_3) = tenpai_ryo tenpai_lst in
             let player_score = ten_to_player player_score (ten_0,ten_1,ten_2,ten_3) in
             (kyotaku,(0,0,0,0),naki_lst,player_score))
