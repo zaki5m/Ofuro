@@ -1,5 +1,5 @@
 (executable
-  (name simulate)
+  (name client)
   (libraries domainslib yojson unix)
 )
 
