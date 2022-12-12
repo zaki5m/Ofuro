@@ -164,7 +164,7 @@ let hai_to_ary (x,y) =
     else
       (2,x-1)
 
-let ary_to_hai_ex (x,y) n = 
+let ary_to_hai_ex (x,y) n tmp = 
   let rec loop i tmp = 
     let tmp = (ary_to_hai (x,y))::tmp in
     if i = 0 then
@@ -173,9 +173,9 @@ let ary_to_hai_ex (x,y) n =
       loop (i-1) tmp
   in
   if n = 0 then
-    []
+    tmp
   else
-    loop (n-1) []
+    loop (n-1) tmp
 
 let rhai_to_hai lst = 
   let rec loop t_lst = match t_lst with
@@ -257,9 +257,7 @@ let select_red_to_black tehai (x,y,z) =
 let ary_to_list ary zi_ary = 
   let rec loop i j tmp = 
     let n =  ary.(i).(j) in
-    let tmp =
-      (ary_to_hai_ex (i,j) n)@tmp
-    in
+    let tmp = ary_to_hai_ex (i,j) n tmp in
     if i = 0 then
       if j = 0 then
         tmp
@@ -273,15 +271,13 @@ let ary_to_list ary zi_ary =
   in
   let rec loop2 i tmp = 
     let n =  zi_ary.(i) in
-    let tmp =
-      (ary_to_hai_ex (3,i) n)@tmp
-    in
+    let tmp = ary_to_hai_ex (3,i) n tmp in
     if i = 0 then
       tmp
     else
       loop2 (i-1) tmp
   in
-  (loop 2 8 [])@(loop2 6 [])
+  loop 2 8 (loop2 6 [])
     
 
 
@@ -332,23 +328,6 @@ let hai_match hai tmp = match hai with
   | Tyun -> false
   | _ -> true
 
-
-(*
-let rec ripai (xs:(int*hai)list) =
-  let rec insert_element ((c,d):(int*hai)) = function
-    [] -> [(c,d)]
-  | ((a',b')::ys) as a -> if b' = d then 
-                            if c < a' then (c,d)::a else (a',b')::insert_element (c,d) ys
-                          else
-                            if hai_match d b' then 
-                              (c,d)::a 
-                            else 
-                              (a',b')::insert_element (c,d) ys
-  in
-    match xs with
-      [] -> []
-    | (a,b)::ys -> insert_element (a,b) (ripai ys)
-*)
 
 let ripai2 (list:(int*hai)list) (hai:hai list)  = 
   let list = List.filter (fun ((_,y)) -> List.exists (fun a -> a = y) hai) list in 
@@ -563,22 +542,6 @@ let possible_furo_patern tehai (x,y) =
       in
       p_f_lst
 
-(*
-let exist_reach yaku_lst player =
-  let p_r = List.nth yaku_lst player in
-  let x = 
-    if List.exists (fun a -> a = Reach || a = Doublereach) p_r then
-      1
-    else
-      0
-  in
-  let lst = List.filter (fun ls -> (List.exists (fun a -> a = Reach || a = Doublereach) ls) = true) yaku_lst in
-  let m = List.length lst in
-  if m = x then
-    false
-  else
-    true
-*)
 
 let kind_kokushi tehai = 
   let m = List.length tehai in

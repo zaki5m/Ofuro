@@ -192,51 +192,6 @@ let hantei_syuntu array list =
     loops 0 0 list
 
 
-
-(*
-let hantei_syuntu array list=
-  (*let list = [] in*)
-  let rec loops i j array list = 
-    let lst =
-      let n = array.(i).(j) in
-      if n >= 1 then
-        if j <> 8 then
-          let n' = array.(i).(j+1) in       
-          if n' >= 1 then
-            if j <> 7 then
-              let n'' = array.(i).(j+2) in
-              if n'' >= 1 then
-                let list = Syuntu::list in
-                array.(i).(j) <- n - 1;
-                array.(i).(j+1) <- n' - 1;
-                array.(i).(j+2) <- n'' - 1;
-                loops i j array list
-              else
-                [Ws]
-            else
-              [Ws]
-          else
-            [Ws]
-        else
-          [Ws]
-      else
-        list
-      in
-
-    if i = 2 then
-      if j = 8 then
-          lst
-      else
-        loops i (j+1) array lst
-    else
-      if j = 8 then
-        loops (i+1) 0 array lst
-      else
-        loops i (j+1) array lst
-  in
-    loops 0 0 array list
-*)
-
 let hantei_koutu array = 
   let rec loopk i j array list count = 
     let n = array.(i).(j) in
@@ -249,9 +204,7 @@ let hantei_koutu array =
             [[Anko]]
           else
             add_state list [Anko]
-          in
-
-
+        in
         let lst2 = 
           if j = 8 then
             if i = 2 then
@@ -275,7 +228,6 @@ let hantei_koutu array =
       else
         list
       in
-
     if i = 2 then
       if j = 8  then
         let array2 = Array.map (fun x -> Array.copy x) array in
@@ -846,10 +798,7 @@ let find_mati ary (a,b) zi_lst zi_ary =
     if find_head_zi zi_ary2 = [] then
       find_head ary2 lst
     else
-      (*if find_head ary lst = [] then*)
         find_head_zi zi_ary2
-      (*else
-        (find_head_zi zi_ary)@(find_head ary lst) *)
     in
   let n2 = List.length head in
   let rec f h_lst n m_lst = 

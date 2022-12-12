@@ -1,5 +1,5 @@
 (executable
-  (name simulate)
+  (name mahjong_haieff)
   (libraries domainslib yojson unix)
 )
 
