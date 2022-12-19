@@ -10,13 +10,15 @@ let syanten_hash = Hashtbl.create 12345
 
 module C = Domainslib.Chan
 
+module T = Domainslib.Task
+
 type 'a message = Task of 'a | Quit
 
 let lk1 = Mutex.create ()
 
 let lk = Mutex.create ()
 
-let core_count = ref (int_of_string Sys.argv.(1))
+let core_count = int_of_string Sys.argv.(1)
 
 let lst_to_ary_type lst = 
   let ary = Array.make 9 0 in
@@ -211,34 +213,27 @@ let sprit_lst lst =
   loop [] [] [] [] lst
 
 let opt_kouho lst f_lst_len = 
-  let m = List.length lst in 
-  let rec loop' i tmp = 
-    let (x,y) = List.nth lst i in
-    let (x,y) = 
-      if x + y > (4-f_lst_len) then
-        let y = if x + (y-1) > (4-f_lst_len) then y-2 else y-1 in
-        (x,y) 
-      else
-        (x,y)
-    in
-    let n = x*2 + y in
-    let (x',y') = tmp in
-    let n' = x'*2 + y' in
-    let tmp =
-      if n > n' then
-        (x,y)
-      else
-        tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop' (i-1) tmp
-  in
-  if m = 0 then
-    (0,0)
-  else
-    loop' (m-1) (0,0)
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (x,y)::t -> let (x,y) = 
+                    if x + y > (4-f_lst_len) then
+                      let y = if x + (y-1) > (4-f_lst_len) then y-2 else y-1 in
+                      (x,y) 
+                    else
+                      (x,y)
+                  in
+                  let n = x*2 + y in
+                  let (x',y') = tmp in
+                  let n' = x'*2 + y' in
+                  let tmp =
+                    if n > n' then
+                      (x,y)
+                    else
+                      tmp
+                  in
+                    loop tmp t
+                in
+  loop (0,0) lst 
 
 
 
@@ -340,15 +335,8 @@ let midium_mentsu ary =
   let n = loop' 0 0 in
   loop 8 n
 
-
-let mentsu_kouho_syuntsu ary f_lst_len = 
-  let aryf = Array.copy ary in
-  let aryr = Array.copy ary in
-  let arym = Array.copy ary in
-  let (aryf,f) = forward_mentsu aryf in
-  let (aryr,r) = reverse_mentsu aryr in
-  let (arym,m) = midium_mentsu arym in
-  let rec loop2' ary i kouho = 
+let mentsu_kouho_syuntsu_2 ary = 
+  let rec loop2' i kouho = 
     let kouho' = 
       if ary.(i) > 0 then 
         if ary.(i) = 2 then
@@ -387,15 +375,26 @@ let mentsu_kouho_syuntsu ary f_lst_len =
     in
     if kouho = kouho' then
       if i = 8 then
-        (ary,kouho')
+        kouho'
       else
-        loop2' ary (i+1) kouho'
+        loop2' (i+1) kouho'
     else
-      loop2' ary i kouho'
+      loop2' i kouho'
     in
-  let (aryf,fk) = loop2' aryf 0 0 in
-  let (aryk,rk) = loop2' aryr 0 0 in
-  let (arym,mk) = loop2' arym 0 0 in
+    let kouho = loop2' 0 0 in 
+    (ary,kouho)
+
+
+let mentsu_kouho_syuntsu ary f_lst_len = 
+  let aryf = Array.copy ary in
+  let aryr = Array.copy ary in
+  let arym = Array.copy ary in
+  let (aryf,f) = forward_mentsu aryf in
+  let (aryr,r) = reverse_mentsu aryr in
+  let (arym,m) = midium_mentsu arym in
+  let (aryf,fk) = mentsu_kouho_syuntsu_2 aryf in
+  let (aryk,rk) = mentsu_kouho_syuntsu_2 aryr in
+  let (arym,mk) = mentsu_kouho_syuntsu_2 arym in
   let n = opt_kouho [(f,fk);(r,rk);(m,mk)] f_lst_len in
   if n = (f,fk) then
     (aryf,n)
@@ -428,13 +427,13 @@ let serch_koritsu (lst:(int array*(int*int))list) m =
 
 
 let mentsu_kouho_kotsu ary f_lst_len = 
-  let rec loop' ary i mentsu = 
+  let rec loop_mk ary i mentsu = 
     let mentsu = 
       if ary.(i) >= 3 then
         let ary2 = Array.copy ary in
         let n = ary2.(i) in
         ary2.(i) <- n - 3;
-        let tmp = loop' ary2 (i) [] in
+        let tmp = loop_mk ary2 (i) [] in
         let tmp = List.map (fun (z,(x,y)) -> (z,(x+1,y))) tmp in  
         tmp@mentsu
       else
@@ -443,9 +442,9 @@ let mentsu_kouho_kotsu ary f_lst_len =
     if i = 8 then
       (mentsu_kouho_syuntsu ary f_lst_len)::mentsu
     else
-      loop' ary (i+1) mentsu
+      loop_mk ary (i+1) mentsu
     in
-  let n = loop' ary 0 [] in 
+  let n = loop_mk ary 0 [] in 
   let lst = List.map (fun (_,(b,c)) -> (b,c)) n in
   let m = opt_kouho lst f_lst_len in 
   let x = serch_koritsu n m in
@@ -609,62 +608,76 @@ let mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len =
 
 
 let opt_syanten lst = 
-  let m = List.length lst in
-  let rec loop' i tmp = 
-    let n = List.nth lst i in 
-    let tmp = 
-      if tmp > n then
-        n
-      else
-        tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop' (i-1) tmp
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | h::t -> let tmp = 
+                if tmp > h then
+                  h
+                else
+                  tmp
+              in
+                loop tmp t
   in
-  if m = 0 then
-    8
-  else
-    loop' (m-1) 8
+  loop 8 lst
+
+let make_h_lst ary zi_ary =
+  let rec loop i j lst =
+    let lst =
+      if ary.(i).(j) >= 2 then
+        (i,j)::lst
+      else
+        lst
+    in
+
+    if i = 2 then
+      if j = 8 then
+        lst
+      else
+        loop i (j+1) lst
+    else
+      if j = 8 then
+        loop (i+1) 0 lst
+      else
+        loop i (j+1) lst
+      
+    in
+    let lst = find_head_zi zi_ary in 
+    loop 0 0 lst 
 
 
 let common_syanten lst = 
   let f_lst_len = (14 - (List.length lst))/3 in
   let (ary,zi_ary) = list_to_ary lst in
-  let h_lst = (possible_head ary)@(find_head_zi zi_ary) in
+  let h_lst = make_h_lst ary zi_ary in
   let m = List.length h_lst in
   let (m_lst,p_lst,s_lst,zi_lst) = sprit_lst lst in
-  let rec loop' i tmp = 
-    let (x,y) = List.nth h_lst i in
-    let (x,y) = ary_to_hai (x,y) in
-    let tmp = 
-      if y = Manzu then
-        let lst = d_tehai (d_tehai m_lst (x,y)) (x,y) in
-        let (a,b) = mentsu_kouho lst p_lst s_lst zi_lst f_lst_len in
-        (a,b-1)::tmp
-      else if y = Pinzu then
-        let lst = d_tehai (d_tehai p_lst (x,y)) (x,y) in
-        let (a,b) = mentsu_kouho m_lst lst s_lst zi_lst f_lst_len in
-        (a,b-1)::tmp
-      else if y = Souzu then
-        let lst = d_tehai (d_tehai s_lst (x,y)) (x,y) in
-        let (a,b) = mentsu_kouho m_lst p_lst lst zi_lst f_lst_len in
-        (a,b-1)::tmp
-      else 
-        let lst = d_tehai (d_tehai zi_lst (x,y)) (x,y) in
-        let (a,b) = mentsu_kouho m_lst p_lst s_lst lst f_lst_len in
-        (a,b-1)::tmp
-      in
-    if i = 0 then
-      tmp
-    else
-      loop' (i-1) tmp
-    in
+  let rec loop' tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (x,y)::t -> let (x,y) = ary_to_hai (x,y) in
+                  let tmp = 
+                    if y = Manzu then
+                      let lst = d_tehai (d_tehai m_lst (x,y)) (x,y) in
+                      let (a,b) = mentsu_kouho lst p_lst s_lst zi_lst f_lst_len in
+                      (a,b-1)::tmp
+                    else if y = Pinzu then
+                      let lst = d_tehai (d_tehai p_lst (x,y)) (x,y) in
+                      let (a,b) = mentsu_kouho m_lst lst s_lst zi_lst f_lst_len in
+                      (a,b-1)::tmp
+                    else if y = Souzu then
+                      let lst = d_tehai (d_tehai s_lst (x,y)) (x,y) in
+                      let (a,b) = mentsu_kouho m_lst p_lst lst zi_lst f_lst_len in
+                      (a,b-1)::tmp
+                    else 
+                      let lst = d_tehai (d_tehai zi_lst (x,y)) (x,y) in
+                      let (a,b) = mentsu_kouho m_lst p_lst s_lst lst f_lst_len in
+                      (a,b-1)::tmp
+                    in
+                  loop' tmp t
+                  in
   if m = 0 then
     mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len
   else
-    let sy_lst = loop' (m-1) [] in
+    let sy_lst = loop' [] h_lst in
     let n = mentsu_kouho m_lst p_lst s_lst zi_lst f_lst_len in
     let sy_lst = n::sy_lst in
     let sy_lst' = List.map (fun (_,b) -> b) sy_lst in
@@ -831,24 +844,24 @@ let calc_max_tumo_len max_tumo_len lst1 lst2 =
     else
       (sum_kitaiti+.sum)
   in
-  let rec loop len end_len i tmp sum sum_t_ritu sum_kitaiti = 
+  let rec loop_cal len end_len i tmp sum sum_t_ritu sum_kitaiti = 
     let next = tmp *. ary.(i-1).(len-end_len) in
-    let (t_ritu_tmp,tmp2,sum_k_tmp) = if i = 1 then (0.,next,0.) else loop (end_len-1) (end_len-1) (i-1) next 0. 0. 0. in 
+    let (t_ritu_tmp,tmp2,sum_k_tmp) = if i = 1 then (0.,next,0.) else loop_cal (end_len-1) (end_len-1) (i-1) next 0. 0. 0. in 
     let tmp3 = if i = 2 then loop2 (end_len-1) (end_len-1) next 0. else 0. in  
     let tmp4 = if i = 2 then next else 0. in  
     if end_len > i then 
-      loop len (end_len-1) i tmp (tmp2+.sum) (sum_t_ritu+.t_ritu_tmp+.tmp4) (sum_kitaiti+.sum_k_tmp+.tmp3)
+      loop_cal len (end_len-1) i tmp (tmp2+.sum) (sum_t_ritu+.t_ritu_tmp+.tmp4) (sum_kitaiti+.sum_k_tmp+.tmp3)
     else
       ((sum_t_ritu+.t_ritu_tmp+.tmp4),(tmp2+.sum),(sum_kitaiti+.sum_k_tmp+.tmp3))   
   in
   if max_tumo_len < m then 
     (0.,0.,0.) 
   else if m = 1 then 
-    let (_,b,_) = loop max_tumo_len max_tumo_len m 1. 0. 0. 0. in 
+    let (_,b,_) = loop_cal max_tumo_len max_tumo_len m 1. 0. 0. 0. in 
     let c = loop2 max_tumo_len max_tumo_len 1. 0. in 
     (1.0,b,c)
   else
-    let (a,b,c) = loop max_tumo_len max_tumo_len m 1. 0. 0. 0. in 
+    let (a,b,c) = loop_cal max_tumo_len max_tumo_len m 1. 0. 0. 0. in 
     (a,b,c)
 (*return (牌，残り枚数，向聴数の変化)*)
 let make_draw_ary tehai syanten_count ary zi_ary =
@@ -862,9 +875,12 @@ let make_draw_ary tehai syanten_count ary zi_ary =
             else
               ary.(x1).(y1)
           in
-          let n_tehai = add_tehai tehai (x,y) in
-          let (_,n) = syanten n_tehai in 
-          loop (((x,y),m,(syanten_count - n))::tmp) (i-1)
+          if m = 0 then 
+            loop tmp (i-1)
+          else
+            let n_tehai = add_tehai tehai (x,y) in
+            let (_,n) = common_syanten n_tehai in 
+            loop (((x,y),m,(syanten_count - n))::tmp) (i-1)
   in
   loop [] 33
 
@@ -872,7 +888,7 @@ let make_discard_ary tehai syanten_count =
   let rec loop tmp t_lst = match t_lst with 
     | [] -> tmp 
     | h::t -> let n_tehai = d_tehai tehai h in 
-              let (_,n) = syanten n_tehai in 
+              let (_,n) = common_syanten n_tehai in 
               loop ((h,(n-syanten_count))::tmp) t 
   in
   loop [] tehai 
@@ -1045,7 +1061,7 @@ let discard n_extra_tumo tehai syanten_count ary zi_ary table_lst dora_lst =
                         loop tmp t 
   in
   loop [] flags
-                            
+(*                           
 let dis_add_main tehai ary zi_ary max_tumo_len dora_lst =
   let tehai = rhai_to_hai tehai in  
   let (_,n) = syanten tehai in 
@@ -1075,6 +1091,37 @@ let dis_add_main tehai ary zi_ary max_tumo_len dora_lst =
                         loop (k_hai,t_ritu,agariritu,kitaiti) t
   in
   loop ((1,Not_hai),-1.,-1.,-1.) first_lst
+*)
+let dis_add_main tehai ary zi_ary max_tumo_len dora_lst = 
+  let tehai = rhai_to_hai tehai in  
+  let (_,n) = common_syanten tehai in 
+  let first_lst = discard 0 tehai n ary zi_ary [] dora_lst in 
+  let rec f_loop (k_hai,(t_ritu,agariritu,kitaiti)) t_lst pool = 
+    let new_lst = List.map (fun (hai,lst) -> (hai,(T.async pool (fun _ -> loop2 (0.,0.,0.) lst pool)))) t_lst in 
+    let new_lst = List.map (fun (a,b) -> (a,(T.await pool b))) new_lst in
+    List.fold_left (fun (a,(b,c,d)) (a1,(b1,c1,d1)) -> if d > d1 then (a,(b,c,d)) else (a1,(b1,c1,d1))) ((1,Not_hai),(-1.,-1.,-1.)) new_lst 
+  and loop2 (tmp_a,tmp_b,tmp_c) t_lst2 pool = match t_lst2 with 
+        | [] -> (tmp_a,tmp_b,tmp_c) 
+        | (n_extra_tumo,syanten_count,n_tehai,(ary2,zi_ary2),(lst1,lst2))::t2 -> let (t_max,a_max,k_max) = 
+                                                                            if syanten_count = -1 then 
+                                                                              calc_max_tumo_len max_tumo_len lst1 lst2
+                                                                            else
+                                                                              let n_lst = discard n_extra_tumo n_tehai syanten_count ary2 zi_ary2 lst1 dora_lst in 
+                                                                              let (k_hai,(a,b,c)) = f_loop ((1,Not_hai),(-1.,-1.,-1.)) n_lst pool in 
+                                                                              if k_hai = (1,Not_hai) then 
+                                                                                (0.,0.,0.)
+                                                                              else
+                                                                                (a,b,c)
+                                                                          in
+                                                                          
+                                                                          loop2 (tmp_a+.t_max,tmp_b+.a_max,tmp_c+.k_max) t2 pool
+      in
+    let pool = T.setup_pool ~num_additional_domains:(core_count - 1) () in
+    let res = T.run pool (fun _ -> f_loop ((1,Not_hai),(-1.,-1.,-1.)) first_lst pool) in
+    T.teardown_pool pool;
+    res
+    
+  
 (*
 
 let create_work tasks c num =
@@ -1108,40 +1155,7 @@ let dis_add_main_p tehai ary zi_ary max_tumo_len =
                                                                           calc_max_tumo_len max_tumo_len lst1 lst2
                                                                         else
                                                                           let n_lst = discard n_extra_tumo n_tehai syanten_count ary2 zi_ary2 lst1 in 
-                                                                          let (k_hai,a,b,c) = try_with loop n_lst
-                                                                          { effc = fun (type a) (eff: a t) ->
-                                                                              match eff with
-                                                                              | Xchg t_lst -> Some (fun (k: (a, _) continuation) ->
-                                                                                let lst_len = List.length t_lst in 
-                                                                                let c = C.make_unbounded () in 
-                                                                                let t_ary = Array.of_list t_lst in 
-                                                                                let tasks = Array.init lst_len (fun i -> i) in
-                                                                                let results = Array.make lst_len ((1,Not_hai),-1.,-1.,-1.) in
-                                                                                let update r i = r.(i) <- loop2 ((1,Not_hai),-1.,-1.,-1.) t_ary.(i) in 
-                                                                                Mutex.lock lk1;
-                                                                                let use_count = if !core_count < (lst_len-1) then 0 else (lst_len-1) in
-                                                                                let count = !core_count in 
-                                                                                core_count := count - use_count;
-                                                                                Mutex.unlock lk1;
-                                                                                create_work tasks c (use_count+1);
-                                                                                let _ =
-                                                                                  if use_count = 0 then 
-                                                                                    worker (update results) ()
-                                                                                  else 
-                                                                                    let domains = Array.init use_count
-                                                                                            (fun _ -> Domain.spawn(worker (update results))) in
-                                                                                    worker (update results) ();
-                                                                                    Array.iter Domain.join domains(*ここは終わり次第戻す処理に変更*)
-                                                                                in
-                                                                                Mutex.lock lk1;
-                                                                                let count = !core_count in 
-                                                                                core_count := count + use_count;
-                                                                                Mutex.unlock lk1;
-                                                                                let fun_result = Array.fold_right (fun (a1,a2,a3,a4) (b1,b2,b3,b4) -> if a4 > b4 then (a1,a2,a3,a4) else (b1,b2,b3,b4)) results ((1,Not_hai),-1.,-1.,-1.) in 
-                                                                                continue k fun_result)
-                                                                              | _ -> None }
-                                                                   
-                                                                          in 
+                                                                          let (k_hai,a,b,c) = loop n_lst in 
                                                                           if k_hai = (1,Not_hai) then 
                                                                             (0.,0.,0.)
                                                                           else
@@ -1149,39 +1163,78 @@ let dis_add_main_p tehai ary zi_ary max_tumo_len =
                                                                       in
                                                                       loop2 (tmp_a+.t_max,tmp_b+.a_max,tmp_c+.k_max) ((1,Not_hai),t2)
   in
-  try_with loop first_lst 
-    { effc = fun (type a) (eff: a t) ->
-        match eff with
-        | Xchg t_lst -> Some (fun (k: (a, _) continuation) ->
+  loop first_lst 
+
+  let dis_add_main_p1 tehai ary zi_ary max_tumo_len = 
+    try_with dis_add_main_p tehai ary zi_ary max_tumo_len 
+      { effc = fun (type a) (eff: a t) ->
+          match eff with
+          | Xchg t_lst -> Some (fun (k: (a, _) continuation) ->
+            let lst_len = List.length t_lst in 
           let lst_len = List.length t_lst in 
+            let lst_len = List.length t_lst in 
+          let lst_len = List.length t_lst in 
+            let lst_len = List.length t_lst in 
+            let c = C.make_unbounded () in 
           let c = C.make_unbounded () in 
+            let c = C.make_unbounded () in 
+          let c = C.make_unbounded () in 
+            let c = C.make_unbounded () in 
+            let t_ary = Array.of_list t_lst in 
           let t_ary = Array.of_list t_lst in 
-          let tasks = Array.init lst_len (fun i -> i) in
-          let results = Array.make lst_len ((1,Not_hai),-1.,-1.,-1.) in
+            let t_ary = Array.of_list t_lst in 
+          let t_ary = Array.of_list t_lst in 
+            let t_ary = Array.of_list t_lst in 
+            let tasks = Array.init lst_len (fun i -> i) in
+            let results = Array.make lst_len ((1,Not_hai),-1.,-1.,-1.) in
+            let update r i = r.(i) <- loop2 ((1,Not_hai),-1.,-1.,-1.) t_ary.(i) in 
           let update r i = r.(i) <- loop2 ((1,Not_hai),-1.,-1.,-1.) t_ary.(i) in 
-          Mutex.lock lk1;
-          let use_count = if !core_count < (lst_len-1) then 0 else (lst_len-1) in
+            let update r i = r.(i) <- loop2 ((1,Not_hai),-1.,-1.,-1.) t_ary.(i) in 
+          let update r i = r.(i) <- loop2 ((1,Not_hai),-1.,-1.,-1.) t_ary.(i) in 
+            let update r i = r.(i) <- loop2 ((1,Not_hai),-1.,-1.,-1.) t_ary.(i) in 
+            Mutex.lock lk1;
+            let use_count = if !core_count < (lst_len-1) then 0 else (lst_len-1) in
+            let count = !core_count in 
           let count = !core_count in 
-          core_count := count - use_count;
-          Mutex.unlock lk1;
-          create_work tasks c (use_count+1);
-          let _ =
+            let count = !core_count in 
+          let count = !core_count in 
+            let count = !core_count in 
+            core_count := count - use_count;
+            Mutex.unlock lk1;
+            create_work tasks c (use_count+1);
+            let _ =
+              if use_count = 0 then 
             if use_count = 0 then 
-              worker (update results) ()
+              if use_count = 0 then 
+            if use_count = 0 then 
+              if use_count = 0 then 
+                worker (update results) ()
+              else 
             else 
-              let domains = Array.init use_count
-                      (fun _ -> Domain.spawn(worker (update results))) in
-              worker (update results) ();
-              Array.iter Domain.join domains(*ここは終わり次第戻す処理に変更*)
-          in
-          Mutex.lock lk1;
+              else 
+            else 
+              else 
+                let domains = Array.init use_count
+                        (fun _ -> Domain.spawn(worker (update results))) in
+                worker (update results) ();
+                Array.iter Domain.join domains(*ここは終わり次第戻す処理に変更*)
+            in
+            Mutex.lock lk1;
+            let count = !core_count in 
           let count = !core_count in 
-          core_count := count + use_count;
-          Mutex.unlock lk1;
+            let count = !core_count in 
+          let count = !core_count in 
+            let count = !core_count in 
+            core_count := count + use_count;
+            Mutex.unlock lk1;
+            let fun_result = Array.fold_right (fun (a1,a2,a3,a4) (b1,b2,b3,b4) -> if a4 > b4 then (a1,a2,a3,a4) else (b1,b2,b3,b4)) results ((1,Not_hai),-1.,-1.,-1.) in 
           let fun_result = Array.fold_right (fun (a1,a2,a3,a4) (b1,b2,b3,b4) -> if a4 > b4 then (a1,a2,a3,a4) else (b1,b2,b3,b4)) results ((1,Not_hai),-1.,-1.,-1.) in 
-          continue k fun_result)
-        | _ -> None }
-  
+            let fun_result = Array.fold_right (fun (a1,a2,a3,a4) (b1,b2,b3,b4) -> if a4 > b4 then (a1,a2,a3,a4) else (b1,b2,b3,b4)) results ((1,Not_hai),-1.,-1.,-1.) in 
+          let fun_result = Array.fold_right (fun (a1,a2,a3,a4) (b1,b2,b3,b4) -> if a4 > b4 then (a1,a2,a3,a4) else (b1,b2,b3,b4)) results ((1,Not_hai),-1.,-1.,-1.) in 
+            let fun_result = Array.fold_right (fun (a1,a2,a3,a4) (b1,b2,b3,b4) -> if a4 > b4 then (a1,a2,a3,a4) else (b1,b2,b3,b4)) results ((1,Not_hai),-1.,-1.,-1.) in 
+            continue k fun_result)
+          | _ -> None }
+
   (*let lst_len = List.length first_lst in 
   let tasks = Array.init lst_len (fun i -> i) in
   create_work tasks ;
@@ -1194,17 +1247,17 @@ let dis_add_main_p tehai ary zi_ary max_tumo_len =
   Array.iter Domain.join domains;
   Array.fold_left (fun (a1,b1,c1,d1) (a2,b2,c2,d2) ->if d1 > d2 then (a1,b1,c1,d1) else (a2,b2,c2,d2)) ((1,Not_hai),-1.,-1.,-1.) results*)
   loop ((1,Not_hai),-1.,-1.,-1.) first_lst
-
+*)
 
 
 let _ = let tehai = [(4,Manzu);(4,Manzu);(5,Manzu);(6,Manzu);(7,Manzu);(4,Pinzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton)] in 
-        let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(7,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan)] in 
-        (*let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan);(0,Sya)] in *)
+        let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(7,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan)] in
+        let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan);(0,Sya)] in 
 let (ary,zi_ary) = create_table ([],[],[],[]) tehai in
-let ((a,b),c,d,e) = dis_add_main tehai ary zi_ary 15 in 
+let ((a,b),(c,d,e)) = dis_add_main tehai ary zi_ary 15 [(0,2)] in 
 let (a,b) = hai_to_ary (a,b) in 
 Printf.printf "(%d,%d)%f %f %f\n"a b c d e;
-*)
+
 (*
 let hai_eff_select sutehai_lst tehai furo_lst yaku_lst player furo_double_lst = 
   let yaku = List.nth yaku_lst player in

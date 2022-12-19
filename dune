@@ -1,5 +1,5 @@
 (executable
-  (name client)
+  (name mahjong_haieff)
   (libraries domainslib yojson unix)
 )
 
