@@ -7,6 +7,8 @@ open Domainslib
 
 type _ Effect.t += Xchg: 'a list -> ((int*hai)*float*float*float) t
 let syanten_hash = Hashtbl.create 12345
+let tenpai_hash = Hashtbl.create 12345
+let open_hash = Hashtbl.create 123456
 
 module C = Domainslib.Chan
 
@@ -15,6 +17,8 @@ module T = Domainslib.Task
 type 'a message = Task of 'a | Quit
 
 let lk1 = Mutex.create ()
+
+let lk2 = Mutex.create ()
 
 let lk = Mutex.create ()
 
@@ -1050,7 +1054,7 @@ let discard n_extra_tumo tehai syanten_count ary zi_ary table_lst dora_lst =
                             if syanten_count = 0 then 
                               let (n_ary,n_zi_ary) = list_to_ary n_tehai in 
                               let red = tehai_in_red n_tehai in 
-                              let tenpai_lst = tehai_to_ten n_ary n_zi_ary 0 0 false [] [Reach] dora_lst red in 
+                              let tenpai_lst = tehai_to_ten n_ary n_zi_ary 0 0 false [] [Reach] dora_lst red in
                               let (lst1,lst2) = create_agari tenpai_lst ary zi_ary in
                               (hai,[(n_extra_tumo,(syanten_count-1),n_tehai,(ary,zi_ary),(lst1::table_lst,lst2))])::tmp
                             else
@@ -1102,19 +1106,52 @@ let dis_add_main tehai ary zi_ary max_tumo_len dora_lst =
     List.fold_left (fun (a,(b,c,d)) (a1,(b1,c1,d1)) -> if d > d1 then (a,(b,c,d)) else (a1,(b1,c1,d1))) ((1,Not_hai),(-1.,-1.,-1.)) new_lst 
   and loop2 (tmp_a,tmp_b,tmp_c) t_lst2 pool = match t_lst2 with 
         | [] -> (tmp_a,tmp_b,tmp_c) 
-        | (n_extra_tumo,syanten_count,n_tehai,(ary2,zi_ary2),(lst1,lst2))::t2 -> let (t_max,a_max,k_max) = 
-                                                                            if syanten_count = -1 then 
-                                                                              calc_max_tumo_len max_tumo_len lst1 lst2
-                                                                            else
-                                                                              let n_lst = discard n_extra_tumo n_tehai syanten_count ary2 zi_ary2 lst1 dora_lst in 
-                                                                              let (k_hai,(a,b,c)) = f_loop ((1,Not_hai),(-1.,-1.,-1.)) n_lst pool in 
-                                                                              if k_hai = (1,Not_hai) then 
-                                                                                (0.,0.,0.)
-                                                                              else
-                                                                                (a,b,c)
-                                                                          in
-                                                                          
-                                                                          loop2 (tmp_a+.t_max,tmp_b+.a_max,tmp_c+.k_max) t2 pool
+        | (n_extra_tumo,syanten_count,n_tehai,(ary2,zi_ary2),(lst1,lst2))::t2 -> let n_tehai = ripai n_tehai in 
+                                                                                let hash_val = Hashtbl.hash (n_extra_tumo,(ary2,zi_ary2),n_tehai) in
+                                                                                let hash_return = Hashtbl.find_all open_hash hash_val in
+                                                                                (*let hash_return = if hash_return = None then None else let (tmp_lst,_) = Option.get hash_return in if tmp_lst = n_tehai then hash_return else None in  *)
+                                                                                let (t_max,a_max,k_max) = 
+                                                                                if hash_return = [] then 
+                                                                                  let (t_max,a_max,k_max) =
+                                                                                  if syanten_count = -1 then 
+                                                                                    calc_max_tumo_len max_tumo_len lst1 lst2
+                                                                                  else
+                                                                                    let n_lst = discard n_extra_tumo n_tehai syanten_count ary2 zi_ary2 lst1 dora_lst in 
+                                                                                    let (k_hai,(a,b,c)) = f_loop ((1,Not_hai),(-1.,-1.,-1.)) n_lst pool in 
+                                                                                    if k_hai = (1,Not_hai) then 
+                                                                                      (0.,0.,0.)
+                                                                                    else
+                                                                                      (a,b,c)
+                                                                                  in
+                                                                                  let _ = 
+                                                                                    Mutex.lock lk2; 
+                                                                                    Hashtbl.add open_hash hash_val ((n_extra_tumo,(ary2,zi_ary2),n_tehai),(t_max,a_max,k_max)); 
+                                                                                    Mutex.unlock lk2 in 
+                                                                                    (t_max,a_max,k_max)
+                                                                                else
+                                                                                  (*let (tmp_lst,(t_max,a_max,k_max)) = Option.get hash_return in*)
+                                                                                  if List.exists (fun (tmp_lst,_) -> tmp_lst = (n_extra_tumo,(ary2,zi_ary2),n_tehai)) hash_return then 
+                                                                                    let (_,(t_max,a_max,k_max)) = List.find (fun ((_,_,tmp_lst),_) -> tmp_lst = n_tehai) hash_return in
+                                                                                    (t_max,a_max,k_max)
+                                                                                  else
+                                                                                    let (t_max,a_max,k_max) = 
+                                                                                      if syanten_count = -1 then 
+                                                                                        calc_max_tumo_len max_tumo_len lst1 lst2
+                                                                                      else
+                                                                                        let n_lst = discard n_extra_tumo n_tehai syanten_count ary2 zi_ary2 lst1 dora_lst in 
+                                                                                        let (k_hai,(a,b,c)) = f_loop ((1,Not_hai),(-1.,-1.,-1.)) n_lst pool in 
+                                                                                        if k_hai = (1,Not_hai) then 
+                                                                                          (0.,0.,0.)
+                                                                                        else
+                                                                                          (a,b,c)
+                                                                                    in
+                                                                                    let _ = 
+                                                                                      Mutex.lock lk2; 
+                                                                                      Hashtbl.add open_hash hash_val ((n_extra_tumo,(ary2,zi_ary2),n_tehai),(t_max,a_max,k_max)); 
+                                                                                      Mutex.unlock lk2 in 
+                                                                                      (t_max,a_max,k_max)
+                                                                              in
+                                                                              loop2 (tmp_a+.t_max,tmp_b+.a_max,tmp_c+.k_max) t2 pool
       in
     let pool = T.setup_pool ~num_additional_domains:(core_count - 1) () in
     let res = T.run pool (fun _ -> f_loop ((1,Not_hai),(-1.,-1.,-1.)) first_lst pool) in
@@ -1140,7 +1177,7 @@ let rec worker f c () =
 
 
 let dis_add_main_p tehai ary zi_ary max_tumo_len =
-  let (_,n) = syanten tehai in 
+  let (_,n) = syanten tehai in syanten_count
   let first_lst = discard 0 tehai n ary zi_ary [] in 
   let loop t_lst = 
     if t_lst = [] then 
@@ -1151,12 +1188,7 @@ let dis_add_main_p tehai ary zi_ary max_tumo_len =
   let rec loop2 (tmp_a,tmp_b,tmp_c) (hai,t_lst2) = match t_lst2 with 
     | [] -> (tmp_a,tmp_b,tmp_c) 
     | (n_extra_tumo,syanten_count,n_tehai,(ary2,zi_ary2),(lst1,lst2))::t2 -> let (t_max,a_max,k_max) = 
-                                                                        if syanten_count = -1 then 
-                                                                          calc_max_tumo_len max_tumo_len lst1 lst2
-                                                                        else
-                                                                          let n_lst = discard n_extra_tumo n_tehai syanten_count ary2 zi_ary2 lst1 in 
-                                                                          let (k_hai,a,b,c) = loop n_lst in 
-                                                                          if k_hai = (1,Not_hai) then 
+                                                              syanten_count            if k_hai = (1,Not_hai) then 
                                                                             (0.,0.,0.)
                                                                           else
                                                                             (a,b,c)
@@ -1252,7 +1284,7 @@ let dis_add_main_p tehai ary zi_ary max_tumo_len =
 
 let _ = let tehai = [(4,Manzu);(4,Manzu);(5,Manzu);(6,Manzu);(7,Manzu);(4,Pinzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton)] in 
         let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(7,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan)] in
-        let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan);(0,Sya)] in 
+        (*let tehai = [(4,Manzu);(4,Manzu);(6,Manzu);(5,Pinzu);(7,Pinzu);(8,Pinzu);(8,Pinzu);(9,Pinzu);(6,Souzu);(7,Souzu);(8,Souzu);(0,Ton);(0,Nan);(0,Sya)] in *)
 let (ary,zi_ary) = create_table ([],[],[],[]) tehai in
 let ((a,b),(c,d,e)) = dis_add_main tehai ary zi_ary 15 [(0,2)] in 
 let (a,b) = hai_to_ary (a,b) in 
