@@ -1,0 +1,9 @@
+(executable
+  (name simulate)
+  (libraries domainslib yojson unix)
+)
+
+(env
+  (dev
+    (flags (:standard -warn-error -a)))
+)

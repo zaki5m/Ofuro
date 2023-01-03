@@ -1,12 +1,12 @@
 type furo = Pon | Ti | Kan
-type hai = Manzu | Pinzu | Souzu | Ton | Nan | Sya | Pei | Haku | Hatsu | Tyun | Not_hai
+type hai = Manzu | Pinzu | Souzu | Ton | Nan | Sya | Pei | Haku | Hatsu | Tyun | Manzu_red | Pinzu_red | Souzu_red | Not_hai
 type state = Syuntu | Toitu | Anko | Minko | Ankan | Minkan | Ws
 type mati_state = Ryanmen | Kantyan | Pentyan | Tanki | Syanpon | Ns
 type yaku = Reach | Ippatu | Menzentumo | Yakuhai | Tanyao | Pinhu | Ipeiko | Haitei | Houtei | Rinsyankaihou | Tyankan
             | Doublereach | Sansyokudouzyun | Sansyokudoukou | Sanankou | Ikkitukan | Titoitu | Toitoi | Tyanta | Sankantu | Syousangen
             | Honroutou | Ryanpeikou | Zyuntyan | Honitu | Tinitu | Suankou | Daisangen | Kokusimusou | Ryuiso | Tuiso | Tinroutou
             | Sukantu | Syoususi | Daisusi | Tyurenpoutou | Tihou | Tenhou
-type mode_b = Kokushi | Some | Titoi | CommonB
+type mode_b = Kokushi | Some | Titoi | CommonB | Attack_common_b
 
 
 let rename (m, n) = match n with
@@ -20,8 +20,49 @@ let rename (m, n) = match n with
   | Haku -> "haku" 
   | Hatsu -> "ryu"
   | Tyun -> "tyun"
-  | _ -> "not"             
+  | _ -> "not"        
+  
+let global_red = ref ((0,0,0),(0,0,0),(0,0,0),(0,0,0))
 
+let tapl_player_1 (x,_,_,_) = x 
+
+let tapl_player_2 (_,x,_,_) = x
+
+let tapl_player_3 (_,_,x,_) = x
+
+let tapl_player_4 (_,_,_,x) = x 
+
+let tapl_player tapl player = match player with 
+  | 0 -> let (x,_,_,_) = tapl in x
+  | 1 -> let (_,x,_,_) = tapl in x
+  | 2 -> let (_,_,x,_) = tapl in x
+  | _ -> let (_,_,_,x) = tapl in x
+
+let tapl_player_in tapl tmp player = match player with 
+  | 0 -> let x2 = tapl_player_2 tapl in 
+         let x3 = tapl_player_3 tapl in
+         let x4 = tapl_player_4 tapl in  
+         (tmp,x2,x3,x4)
+  | 1 -> let x1 = tapl_player_1 tapl in 
+         let x3 = tapl_player_3 tapl in
+         let x4 = tapl_player_4 tapl in  
+         (x1,tmp,x3,x4)
+  | 2 -> let x1 = tapl_player_1 tapl in 
+         let x2 = tapl_player_2 tapl in
+         let x4 = tapl_player_4 tapl in  
+         (x1,x2,tmp,x4)
+  | _ -> let x1 = tapl_player_1 tapl in 
+         let x2 = tapl_player_2 tapl in
+         let x3 = tapl_player_3 tapl in  
+         (x1,x2,x3,tmp)
+(*f: 'a list -> bool tapl: ('a list, 'a list, 'a list, 'a list)*)
+let tapl_exists f tapl = 
+  let tmp1 = f (tapl_player_1 tapl) in 
+  let tmp2 = f (tapl_player_2 tapl) in
+  let tmp3 = f (tapl_player_3 tapl) in 
+  let tmp4 = f (tapl_player_4 tapl) in  
+  tmp1 || tmp2 || tmp3 || tmp4
+  
 let print_list lst = 
     List.iter (fun (m,n) -> Printf.printf "%s " (rename (m,n)); ) lst;
     Printf.printf "\n"
@@ -31,13 +72,13 @@ let list_to_ary lst =
   let rec loop i ary zi_ary = 
     let (x,hai) = List.nth lst i in
     let _ = 
-      if hai = Manzu then
+      if hai = Manzu || hai = Manzu_red then
         let n = ary.(0).(x-1) in
         ary.(0).(x-1) <- n+1;
-      else if hai = Pinzu then
+      else if hai = Pinzu || hai = Pinzu_red then
         let n = ary.(1).(x-1) in
         ary.(1).(x-1) <- n+1;
-      else if hai = Souzu then
+      else if hai = Souzu || hai = Souzu_red then
         let n = ary.(2).(x-1) in
         ary.(2).(x-1) <- n+1;
       else
@@ -70,7 +111,7 @@ let list_to_ary lst =
   in
   loop (m-1) (Array.make_matrix 3 9 0) (Array.make 7 0)
 
-let rec add_tehai list (x,y) = match list with
+let rec add_tehai (list:(int*hai)list) (x,y) = match list with
   | [] -> [(x,y)]
   | [(x1,y1)] -> [(x1,y1);(x,y)]
   | h::t -> h::(add_tehai t (x,y))
@@ -116,14 +157,14 @@ let hai_to_ary (x,y) =
     else 
       (3,6)
   else
-    if y = Manzu then
+    if y = Manzu || y = Manzu_red then
       (0,x-1)
-    else if y = Pinzu then
+    else if y = Pinzu || y = Pinzu_red then
       (1,x-1)
     else
       (2,x-1)
 
-let ary_to_hai_ex (x,y) n = 
+let ary_to_hai_ex (x,y) n tmp = 
   let rec loop i tmp = 
     let tmp = (ary_to_hai (x,y))::tmp in
     if i = 0 then
@@ -132,16 +173,91 @@ let ary_to_hai_ex (x,y) n =
       loop (i-1) tmp
   in
   if n = 0 then
-    []
+    tmp
   else
-    loop (n-1) []
+    loop (n-1) tmp
+
+let rhai_to_hai lst = 
+  let rec loop t_lst = match t_lst with
+   | [] -> []
+   | (x,y)::t -> if y = Manzu_red then 
+                    (x,Manzu)::(loop t)
+                  else if y = Pinzu_red then 
+                    (x,Pinzu)::(loop t)
+                  else if y = Souzu_red then 
+                    (x,Souzu)::(loop t)
+                  else
+                    (x,y)::(loop t)  
+  in
+  loop lst
+
+let rhai_to_hai_single (x,y) = 
+  if y = Manzu_red then 
+    (x,Manzu)
+  else if y = Pinzu_red then 
+    (x,Pinzu)
+  else if y = Souzu_red then 
+    (x,Souzu)
+  else
+    (x,y)
+
+let create_taable_in_red sutehai_lst tehai = 
+  let m_red = List.exists (fun a -> a = (5,Manzu_red)) tehai in 
+  let m_red = if m_red then true else tapl_exists (List.exists (fun (a,b,_) -> (a,b) = (5,Manzu_red))) sutehai_lst in 
+  let p_red = List.exists (fun a -> a = (5,Pinzu_red)) tehai in 
+  let p_red = if p_red then true else tapl_exists (List.exists (fun (a,b,_) -> (a,b) = (5,Pinzu_red))) sutehai_lst in 
+  let s_red = List.exists (fun a -> a = (5,Souzu_red)) tehai in 
+  let s_red = if s_red then true else tapl_exists (List.exists (fun (a,b,_) -> (a,b) = (5,Souzu_red))) sutehai_lst in 
+  (m_red,p_red,s_red)
+
+let tehai_in_red tehai = 
+  let m = if List.exists (fun a -> a = (5,Manzu_red)) tehai then 1 else 0 in 
+  let p = if List.exists (fun a -> a = (5,Pinzu_red)) tehai then 1 else 0 in 
+  let s = if List.exists (fun a -> a = (5,Souzu_red)) tehai then 1 else 0 in 
+  m+p+s 
+
+let tehai_tapl_red tehai = 
+  let m = if List.exists (fun a -> a = (5,Manzu_red)) tehai then 1 else 0 in 
+  let p = if List.exists (fun a -> a = (5,Pinzu_red)) tehai then 1 else 0 in 
+  let s = if List.exists (fun a -> a = (5,Souzu_red)) tehai then 1 else 0 in 
+  (m,p,s)
+
+let select_red_to_black tehai (x,y,z) = 
+  let n = List.length tehai in 
+  if x = 5 then 
+    if y = Manzu_red then 
+      if List.exists (fun a -> a = (5,Manzu)) tehai then 
+        if (List.nth tehai (n-1)) = (5,Manzu) then
+          (5,Manzu,true)
+        else
+          (5,Manzu,false)
+      else
+        (x,y,z)
+    else if y = Pinzu_red then 
+      if List.exists (fun a -> a = (5,Pinzu)) tehai then 
+        if (List.nth tehai (n-1)) = (5,Pinzu) then
+          (5,Pinzu,true)
+        else
+          (5,Pinzu,false)
+      else
+        (x,y,z)
+      else if y = Souzu_red then 
+        if List.exists (fun a -> a = (5,Souzu)) tehai then 
+          if (List.nth tehai (n-1)) = (5,Souzu) then
+            (5,Souzu,true)
+          else
+            (5,Souzu,false)
+        else
+          (x,y,z)
+    else
+      (x,y,z)
+  else 
+    (x,y,z)
 
 let ary_to_list ary zi_ary = 
   let rec loop i j tmp = 
     let n =  ary.(i).(j) in
-    let tmp =
-      (ary_to_hai_ex (i,j) n)@tmp
-    in
+    let tmp = ary_to_hai_ex (i,j) n tmp in
     if i = 0 then
       if j = 0 then
         tmp
@@ -155,21 +271,18 @@ let ary_to_list ary zi_ary =
   in
   let rec loop2 i tmp = 
     let n =  zi_ary.(i) in
-    let tmp =
-      (ary_to_hai_ex (3,i) n)@tmp
-    in
+    let tmp = ary_to_hai_ex (3,i) n tmp in
     if i = 0 then
       tmp
     else
       loop2 (i-1) tmp
   in
-  (loop 2 8 [])@(loop2 6 [])
+  loop 2 8 (loop2 6 [])
     
 
 
-let rec d_tehai list (x,y) = match list with
+let rec d_tehai (list:(int*hai) list) (x,y) = match list with
   | [] -> []
-  | [(x1,y1)] -> if (x1,y1) = (x,y) then [] else [(x1,y1)]
   | (x1,y1)::t -> if (x1,y1) = (x,y) then t else (x1,y1)::(d_tehai t (x,y))
 
 let hyouzi_to_dora (x,y) = 
@@ -188,43 +301,60 @@ let hyouzi_to_dora (x,y) =
       (x,y+1)
 
 (*数字から切る牌を選択*)
-let int_to_hai tehai a = 
+let int_to_hai (tehai:(int*hai)list) a =
+  let n = List.length tehai in  
   let (x,y) = List.nth tehai a in
-  if a = 13 then
+  if a = (n-1) then
     (x,y,true)
   else
     (x,y,false)
 
-let furo_to_hai (a,(b,(c,d,e))) = 
+let furo_to_hai (_,(b,(c,d,e))) = 
   let x1 = ary_to_hai (b,c) in
   let x2 = ary_to_hai (b,d) in
   let x3 = ary_to_hai (b,e) in
   [x1;x2;x3]
 
-let ripai2 (list:(int*hai)list) hai = 
-  let list = List.filter (fun ((x,y)) -> y = hai ) list in 
-  let list = List.sort (fun (x1,y1) (x2,y2) -> if x1 < x2 then -1 else 1) list  in
+let hai_match hai tmp = match hai with 
+  | Manzu -> true
+  | Pinzu -> if tmp = Manzu then false else true 
+  | Souzu -> if tmp = Manzu || tmp = Pinzu then false else true
+  | Ton -> if tmp = Manzu || tmp = Pinzu || tmp = Souzu then false else true
+  | Nan -> if tmp = Manzu || tmp = Pinzu || tmp = Souzu || tmp = Ton then false else true
+  | Sya -> if tmp = Pei || tmp = Haku || tmp = Hatsu || tmp = Tyun then true else false
+  | Pei -> if tmp = Haku || tmp = Hatsu || tmp = Tyun then true else false
+  | Haku -> if tmp = Hatsu || tmp = Tyun then true else false
+  | Hatsu -> if tmp = Tyun then true else false
+  | Tyun -> false
+  | _ -> true
+
+
+let ripai2 (list:(int*hai)list) (hai:hai list)  = 
+  let list = List.filter (fun ((_,y)) -> List.exists (fun a -> a = y) hai) list in 
+  let list = List.sort (fun (x1,_) (x2,_) -> if x1 < x2 then -1 else 1) list  in
   list
 
+
 let ripai list = 
-  let listm = ripai2 list Manzu in
-  let listp = ripai2 list Pinzu in
-  let lists = ripai2 list Souzu in
-  let listt = ripai2 list Ton in
-  let listn = ripai2 list Nan in
-  let listsy = ripai2 list Sya in
-  let listpe = ripai2 list Pei in
-  let listh = ripai2 list Haku in
-  let listr = ripai2 list Hatsu in
-  let listty = ripai2 list Tyun in
+  let listm = ripai2 list [Manzu;Manzu_red] in
+  let listp = ripai2 list [Pinzu;Pinzu_red] in
+  let lists = ripai2 list [Souzu;Souzu_red] in
+  let listt = ripai2 list [Ton] in
+  let listn = ripai2 list [Nan] in
+  let listsy = ripai2 list [Sya] in
+  let listpe = ripai2 list [Pei] in
+  let listh = ripai2 list [Haku] in
+  let listr = ripai2 list [Hatsu] in
+  let listty = ripai2 list [Tyun] in
   let list = listm @ listp @ lists @ listt @ listn @ listsy @ listpe @ listh @ listr @ listty in
   list
 
-let hai_to_int tehai (x,y) =
+let hai_to_int (tehai:(int*hai)list) (x,y) =
   let m = List.length tehai in
+  let (x',y') = if x = 5 then if y = Manzu then (5,Manzu_red) else if y = Pinzu then (5,Pinzu_red) else (5,Souzu_red) else (x,y) in 
   let rec loop i = 
     let a = List.nth tehai i in
-    if a = (x,y) then
+    if a = (x,y) || a = (x',y') then
       i
     else if i = 0 then
       (m-1)
@@ -234,25 +364,18 @@ let hai_to_int tehai (x,y) =
   loop (m-1)
 
 (*furo_lstから副露されている牌の配列の座標のリストを返す*)  
-let furo_to_ary f_lst = 
-  let m = List.length f_lst in
-  let rec loop i tmp = 
-    let (a,(b,(c,d,e))) = List.nth f_lst i in
-    let tmp = 
-      if a = Minkan || a = Ankan then
-        [(b,c);(b,c);(b,c);(b,c)]@tmp
-      else
-        [(b,c);(b,d);(b,e)]@tmp
-    in
-    if i = 0 then
-      tmp
-    else
-      loop (i-1) tmp
+let furo_to_ary (f_lst:((state*(int*(int*int*int)))) list) other_furo_lst = 
+  let rec loop tmp t_lst = match t_lst with 
+    | [] -> tmp 
+    | (a,(b,(c,d,e)))::t -> let tmp = 
+                              if a = Minkan || a = Ankan then
+                                (b,c)::(b,c)::(b,c)::(b,c)::tmp
+                              else
+                                (b,c)::(b,d)::(b,e)::tmp
+                            in
+                            loop tmp t 
   in
-  if m = 0 then
-    []
-  else
-    loop (m-1) []
+  loop other_furo_lst f_lst
 
 let rm_furo_double ary zi_ary furo_double_lst =
   let m = List.length furo_double_lst in 
@@ -281,32 +404,26 @@ let rm_furo_double ary zi_ary furo_double_lst =
 
 (*furo_lstから副露されている牌を配列から引いた配列を返す。(ary,zi_ary)*)     
 let furo_lst_to_rm_ary furo_lst furo_double_lst ary zi_ary =
-  let a_lst = furo_to_ary (List.nth furo_lst 0) in
-  let b_lst = furo_to_ary (List.nth furo_lst 1) in
-  let c_lst = furo_to_ary (List.nth furo_lst 2) in
-  let d_lst = furo_to_ary (List.nth furo_lst 3) in
-  let lst = a_lst@b_lst@c_lst@d_lst in
-  let m = List.length lst in
-  let rec loop i = 
-    let (x,y) = List.nth lst i in
-    let _ = 
-      if x = 3 then
-        let n = zi_ary.(y) in
-        zi_ary.(y) <- n - 1;
-      else
-        let n = ary.(x).(y) in
-        ary.(x).(y) <- n - 1;
-    in
-    if i = 0 then
-      (ary,zi_ary)
-    else
-      loop (i-1)
+  let a_lst = furo_to_ary (tapl_player_1 furo_lst) [] in
+  let b_lst = furo_to_ary (tapl_player_2 furo_lst) a_lst in
+  let c_lst = furo_to_ary (tapl_player_3 furo_lst) b_lst in
+  let lst = furo_to_ary (tapl_player_4 furo_lst) c_lst in
+  let rec loop t_lst = match t_lst with 
+    | [] -> ()
+    | (x,y)::t -> let _ = if x = 3 then
+                            let n = zi_ary.(y) in
+                            zi_ary.(y) <- n - 1;
+                          else
+                            let n = ary.(x).(y) in
+                            ary.(x).(y) <- n - 1;
+                        in
+                  loop t 
   in
-  if m = 0 then
+  if lst = [] then
     (ary,zi_ary)
   else
-    let (ary2,zi_ary2) = loop (m-1) in 
-    rm_furo_double ary2 zi_ary2 furo_double_lst
+    (loop lst;
+    rm_furo_double ary zi_ary furo_double_lst)
 
 
 
@@ -353,9 +470,10 @@ let kabe_to_deleat_suzi s = match s with
 
 let gukei_lst = [(2,[(1,3)]);(3,[(1,2);(2,4)]);(4,[(3,5)]);(5,[(4,6)]);(6,[(5,7)]);(7,[(6,8);(8,9)]);(8,[(7,9)])]
 
-let possible_furo_patern tehai (x,y) = 
+let possible_furo_patern tehai (x,y) =
+  let tehai = rhai_to_hai tehai in  
   let (xa,ya) = hai_to_ary (x,y) in
-  let tmp = List.filter (fun (a,b) -> b = y) tehai in
+  let tmp = List.filter (fun (_,b) -> b = y) tehai in
   let p_f_lst =
     if List.length (List.filter (fun a -> a = (x,y)) tmp) >= 2 then
       [(Minko,(xa,(ya,ya,ya)))]
@@ -425,21 +543,6 @@ let possible_furo_patern tehai (x,y) =
       p_f_lst
 
 
-let exist_reach yaku_lst player =
-  let p_r = List.nth yaku_lst player in
-  let x = 
-    if List.exists (fun a -> a = Reach || a = Doublereach) p_r then
-      1
-    else
-      0
-  in
-  let lst = List.filter (fun ls -> (List.exists (fun a -> a = Reach || a = Doublereach) ls) = true) yaku_lst in
-  let m = List.length lst in
-  if m = x then
-    false
-  else
-    true
-
 let kind_kokushi tehai = 
   let m = List.length tehai in
   let rec loop i k_tmp h_tmp = 
@@ -468,7 +571,7 @@ let kind_kokushi tehai =
 let furo_kind f_lst =
   let m = List.length f_lst in
   let rec loop i tmp = 
-    let (a,(b,(c,d,e))) = List.nth f_lst i in
+    let (_,(b,(_,_,_))) = List.nth f_lst i in
     let tmp = 
       if b = 3 then
         tmp
@@ -498,40 +601,40 @@ let which_some n_count m_count p_count s_count =
       else
         (Souzu,s_count)
   in
-  (hai,(n_count-count))
+  (hai,(n_count+count))
 
 
 
-let somete tehai f_lst = 
+let somete tehai (f_lst:(state*(int*(int*int*int)))list) = 
   let k_furo = furo_kind f_lst in
   let k = if k_furo = [] then 3 else (List.hd k_furo) in
   let k_furo = List.for_all (fun a -> a = k) k_furo in
   if k_furo = true then
-    let no_zi_lst = List.filter (fun (a,b) -> a = 0) tehai in
-    let n = List.length no_zi_lst in
-    let m_lst = List.filter (fun (a,b) -> b = Manzu) no_zi_lst in
-    let p_lst = List.filter (fun (a,b) -> b = Pinzu) no_zi_lst in
-    let s_lst = List.filter (fun (a,b) -> b = Souzu) no_zi_lst in
+    let zi_lst = List.filter (fun (a,_) -> a = 0) tehai in
+    let n = List.length zi_lst in
+    let m_lst = List.filter (fun (_,b) -> b = Manzu) tehai in
+    let p_lst = List.filter (fun (_,b) -> b = Pinzu) tehai in
+    let s_lst = List.filter (fun (_,b) -> b = Souzu) tehai in
     let m_count = List.length m_lst in
     let p_count = List.length p_lst in
     let s_count = List.length s_lst in
     let some_c = 
       if k = 0 then
-        (Manzu,(14 - (n-m_count))) 
+        (Manzu,(n-m_count)) 
       else if k = 1 then
-        (Pinzu,(14 - (n-p_count)))
+        (Pinzu,(n-p_count))
       else if k = 2 then
-        (Souzu,(14 - (n-s_count)))
+        (Souzu,(n-s_count))
       else
         let (hai,count) = which_some n m_count p_count s_count in
-        (hai,(14-count))
+        (hai,count)
     in
     some_c
   else
     (Ton,0)
 
 
-let titoi_allow tehai f_lst = 
+let titoi_allow tehai (f_lst:(state*(int*(int*int*int)))list) = 
   let m = List.length tehai in
   let rec loop i tmp count = 
     let x = List.nth tehai i in
@@ -581,7 +684,7 @@ let haitei_slide rm_wan yaku_lst player =
       if player = i then 
         []
       else
-        List.nth yaku_lst i
+        tapl_player yaku_lst i
     in
     let tmp = 
       if List.exists (fun a -> a = Reach || a = Doublereach) yaku then
@@ -595,7 +698,7 @@ let haitei_slide rm_wan yaku_lst player =
       loop (i-1) tmp
   in
   let r_lst = 
-    if List.exists (fun a -> a = Reach || a = Doublereach) (List.nth yaku_lst player) then 
+    if List.exists (fun a -> a = Reach || a = Doublereach) (tapl_player yaku_lst player) then 
       []
     else
       loop 3 []
