@@ -1769,7 +1769,7 @@ let judge_reach ary zi_ary tehai sutehai_lst yaku_lst yama_len f_lst zi_kaze ba_
 
 let dis_add_main_pre tehai ary zi_ary tumo_l dora_lst =
   let dora = List.map (fun a -> hyouzi_to_dora a) dora_lst in 
-  let (dahai,_,_,_) = dis_add_main tehai ary zi_ary tumo_l dora in
+  let (dahai,(_,_,_)) = dis_add_main tehai ary zi_ary tumo_l dora in
   hai_to_int tehai dahai
     
 
@@ -2869,7 +2869,7 @@ let judge_reach_defence_furo tmp_l tehai furiten_lst yaku_lst ary zi_ary =
 
 
 (*data scan*)
-(*
+
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst furoritu_lst furiten_lst =
   let (_,n) = syanten tehai in
   let reach_q_1 =  List.exists (fun b -> b = Reach || b = Doublereach) (tapl_player_1 yaku_lst) in
@@ -2955,8 +2955,9 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
         []
 
 
-*)
+
 (*mjai*)
+(*
 let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_kaze naki dora_lst (x,y) furo_double_lst furoritu furiten_lst =
   let tehai = rhai_to_hai tehai in 
   let (_,n) = syanten tehai in
@@ -3030,7 +3031,7 @@ let purob_furo sutehai_lst tehai furo_lst yaku_lst player yama_len zi_kaze ba_ka
           []
       else
         []
-
+*)
 
 
 (*
