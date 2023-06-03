@@ -16,6 +16,8 @@ $ ./_build/default/mahjong_admin.exe port player1 player2 player3 player4
 ## mjaiでのシミュレーション
 
 麻雀AIサーバ"mjai"で動作する麻雀AI．
+
 mjai : https://github.com/gimite/mjai
 
 
+![image](https://user-images.githubusercontent.com/86464909/243076638-a025c829-a6cf-405c-9063-a618f167e452.png)
